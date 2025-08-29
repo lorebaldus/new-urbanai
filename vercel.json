@@ -14,12 +14,12 @@
         "dest": "/api/$1"
       },
       {
-        "src": "/",
-        "dest": "/frontend/index.html"
+        "src": "/styles.css",
+        "dest": "/frontend/styles.css"
       },
       {
-        "src": "/(.*)",
-        "dest": "/frontend/$1"
+        "src": "/",
+        "dest": "/frontend/index.html"
       }
     ]
   }
