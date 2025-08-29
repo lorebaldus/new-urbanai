@@ -230,83 +230,84 @@
           </div>
       </div>
 
-      <script>
-          document.addEventListener('DOMContentLoaded', () => {
-              const chatInput = document.getElementById('chatInput');
-              const sendBtn = document.getElementById('sendBtn');
-              const chatMessages =
-  document.getElementById('chatMessages');
-              const typing = document.getElementById('typing');
+       <script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const chatInput = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const chatMessages = document.getElementById('chatMessages');
+      const typing = document.getElementById('typing');
 
-              function addMessage(content, isUser = false) {
-                  const welcome = document.querySelector('.welcome');
-                  if (welcome) welcome.remove();
+      function addMessage(content, isUser = false) {
+          const welcome = document.querySelector('.welcome');
+          if (welcome) welcome.remove();
 
-                  const messageDiv = document.createElement('div');
-                  messageDiv.className = `message ${isUser ? 'user' : 
-  'bot'}`;
+          const messageDiv = document.createElement('div');
+          messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
 
-                  const avatar = document.createElement('div');
-                  avatar.className = `avatar ${isUser ? 'user' : 
-  'bot'}`;
-                  avatar.textContent = isUser ? 'U' : 'AI';
+          const avatar = document.createElement('div');
+          avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
+          avatar.textContent = isUser ? 'U' : 'AI';
 
-                  const contentDiv = document.createElement('div');
-                  contentDiv.className = 'message-content';
-                  contentDiv.innerHTML = content.replace(/\n/g,
-  '<br>');
+          const contentDiv = document.createElement('div');
+          contentDiv.className = 'message-content';
+          contentDiv.innerHTML = content.replace(/\n/g, '<br>');
 
-                  messageDiv.appendChild(avatar);
-                  messageDiv.appendChild(contentDiv);
-                  chatMessages.appendChild(messageDiv);
-                  chatMessages.scrollTop = chatMessages.scrollHeight;
-              }
+          messageDiv.appendChild(avatar);
+          messageDiv.appendChild(contentDiv);
+          chatMessages.appendChild(messageDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
 
-              function showTyping(show) {
-                  typing.style.display = show ? 'block' : 'none';
-              }
+      function showTyping(show) {
+          typing.style.display = show ? 'block' : 'none';
+      }
 
-              async function sendMessage() {
-                  const question = chatInput.value.trim();
-                  if (!question) return;
+      async function sendMessage() {
+          const question = chatInput.value.trim();
+          if (!question) return;
 
-                  chatInput.value = '';
-                  addMessage(question, true);
-                  showTyping(true);
+          chatInput.value = '';
+          addMessage(question, true);
+          showTyping(true);
 
-                  try {
-                      // Try initialize first
-                      try {
-                          await fetch('/api/initialize', { method:
-  'POST' });
-                      } catch (e) {}
+          try {
+              // Try initialize first
+              try {
+                  await fetch('/api/initialize', { method: 'POST' });
+              } catch (e) {}
 
-                      const response = await fetch('/api/query', {
-                          method: 'POST',
-                          headers: { 'Content-Type':
-  'application/json' },
-                          body: JSON.stringify({ question })
-                      });
-
-                      const result = await response.json();
-                      showTyping(false);
-                      addMessage(result.answer || 'Errore nella 
-  risposta');
-
-                  } catch (error) {
-                      showTyping(false);
-                      addMessage('Errore: ' + error.message);
-                  }
-              }
-
-              sendBtn.addEventListener('click', sendMessage);
-              chatInput.addEventListener('keydown', (e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      sendMessage();
-                  }
+              const response = await fetch('/api/query', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ question })
               });
-          });
-      </script>
+
+              const result = await response.json();
+              showTyping(false);
+              addMessage(result.answer || 'Errore nella risposta');
+
+          } catch (error) {
+              showTyping(false);
+              addMessage('Errore: ' + error.message);
+          }
+      }
+
+      // Event listeners
+      sendBtn.addEventListener('click', sendMessage);
+
+      chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+          }
+      });
+
+      // Auto-resize textarea
+      chatInput.addEventListener('input', () => {
+          chatInput.style.height = 'auto';
+          chatInput.style.height = chatInput.scrollHeight + 'px';
+      });
+  });
+  </script>
   </body>
   </html>
