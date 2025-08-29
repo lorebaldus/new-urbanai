@@ -1,6 +1,6 @@
-{
+  {
     "functions": {
-      "api/*.js": {
+      "api/health.js": {
         "runtime": "@vercel/node@3"
       }
     },
@@ -8,18 +8,7 @@
       {
         "src": "/health",
         "dest": "/api/health"
-      },
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/$1"
-      },
-      {
-        "src": "/styles.css",
-        "dest": "/frontend/styles.css"
-      },
-      {
-        "src": "/",
-        "dest": "/frontend/index.html"
       }
-    ]
+    ],
+    "cleanUrls": true
   }
