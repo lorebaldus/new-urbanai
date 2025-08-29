@@ -1,264 +1,461 @@
-  class UrbanAI {
-      constructor() {
-          this.apiBase = '/api';
-          this.isInitialized = false;
-          this.documentsProcessed = false;
+<!DOCTYPE html>
+  <html lang="it">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>UrbanAI - Assistente Pianificazione Urbana</title>
+      <style>
+          * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+          }
 
-          this.initializeElements();
-          this.attachEventListeners();
-          this.autoInitialize(); // AUTO-START!
-      }
+          body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  Roboto, sans-serif;
+              background: #f7f7f8;
+              color: #0d0d0d;
+              overflow-x: hidden;
+          }
 
-      initializeElements() {
-          this.elements = {
-              initBtn: document.getElementById('initBtn'),
-              processBtn: document.getElementById('processBtn'),
-              summaryBtn: document.getElementById('summaryBtn'),
-              keyPointsBtn: document.getElementById('keyPointsBtn'),
-              chatMessages: document.getElementById('chatMessages'),
-              chatInput: document.getElementById('chatInput'),
-              sendBtn: document.getElementById('sendBtn'),
-              status: document.getElementById('status'),
-              typing: document.getElementById('typing')
-          };
-      }
+          /* Header */
+          .header {
+              background: white;
+              border-bottom: 1px solid #e5e5e5;
+              padding: 12px 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              z-index: 100;
+              backdrop-filter: blur(20px);
+          }
 
-      attachEventListeners() {
-          this.elements.initBtn.addEventListener('click', () =>
-  this.manualInit());
-          this.elements.processBtn.addEventListener('click', () =>
-  this.processDocuments());
-          this.elements.summaryBtn.addEventListener('click', () =>
-  this.getDocumentSummary());
-          this.elements.keyPointsBtn.addEventListener('click', () =>
-  this.getKeyPoints());
-          this.elements.sendBtn.addEventListener('click', () =>
+          .logo {
+              font-size: 18px;
+              font-weight: 600;
+              color: #0d0d0d;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+          }
+
+          .status {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 6px 12px;
+              background: #f4f4f4;
+              border-radius: 20px;
+              font-size: 13px;
+          }
+
+          .status.ready { background: #dcfce7; color: #166534; }
+          .status.loading { background: #fef3c7; color: #92400e; }
+          .status.error { background: #fee2e2; color: #991b1b; }
+
+          /* Main Layout */
+          .main {
+              display: flex;
+              height: 100vh;
+              padding-top: 60px;
+          }
+
+          /* Chat Container */
+          .chat-container {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 0 20px;
+          }
+
+          .chat-messages {
+              flex: 1;
+              padding: 40px 0;
+              overflow-y: auto;
+          }
+
+          .message {
+              margin-bottom: 24px;
+              display: flex;
+              gap: 12px;
+          }
+
+          .message.user {
+              flex-direction: row-reverse;
+          }
+
+          .avatar {
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              font-weight: 600;
+              flex-shrink: 0;
+          }
+
+          .avatar.bot {
+              background: #2563eb;
+              color: white;
+          }
+
+          .avatar.user {
+              background: #059669;
+              color: white;
+          }
+
+          .message-content {
+              background: white;
+              padding: 16px 20px;
+              border-radius: 16px;
+              border: 1px solid #e5e5e5;
+              max-width: 80%;
+              line-height: 1.6;
+          }
+
+          .message.user .message-content {
+              background: #2563eb;
+              color: white;
+              border-color: #2563eb;
+          }
+
+          /* Input Area */
+          .input-container {
+              padding: 20px 0;
+              border-top: 1px solid #e5e5e5;
+              background: white;
+          }
+
+          .input-wrapper {
+              position: relative;
+              max-width: 100%;
+              background: white;
+              border: 1px solid #e5e5e5;
+              border-radius: 24px;
+              padding: 4px;
+              display: flex;
+              align-items: flex-end;
+          }
+
+          .chat-input {
+              flex: 1;
+              border: none;
+              outline: none;
+              padding: 12px 16px;
+              font-size: 16px;
+              resize: none;
+              background: transparent;
+              min-height: 24px;
+              max-height: 120px;
+              font-family: inherit;
+          }
+
+          .send-btn {
+              background: #2563eb;
+              color: white;
+              border: none;
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 8px;
+              transition: background 0.2s;
+          }
+
+          .send-btn:hover {
+              background: #1d4ed8;
+          }
+
+          .send-btn:disabled {
+              background: #9ca3af;
+              cursor: not-allowed;
+          }
+
+          /* Loading Animation */
+          .typing {
+              display: none;
+              padding: 20px;
+              text-align: center;
+              color: #6b7280;
+          }
+
+          .typing.show { display: block; }
+
+          .dot-typing {
+              position: relative;
+              display: inline-block;
+              width: 4px;
+              height: 4px;
+              border-radius: 50%;
+              background-color: #9ca3af;
+              animation: dot-typing 1.4s infinite linear;
+          }
+
+          .dot-typing::before,
+          .dot-typing::after {
+              content: '';
+              display: inline-block;
+              position: absolute;
+              top: 0;
+              width: 4px;
+              height: 4px;
+              border-radius: 50%;
+              background-color: #9ca3af;
+              animation: dot-typing 1.4s infinite linear;
+          }
+
+          .dot-typing::before {
+              left: -8px;
+              animation-delay: -0.32s;
+          }
+
+          .dot-typing::after {
+              left: 8px;
+              animation-delay: 0.32s;
+          }
+
+          @keyframes dot-typing {
+              0%, 60%, 100% {
+                  background-color: #9ca3af;
+              }
+              30% {
+                  background-color: #374151;
+              }
+          }
+
+          /* Welcome Message */
+          .welcome {
+              text-align: center;
+              padding: 60px 40px;
+              color: #6b7280;
+          }
+
+          .welcome h2 {
+              font-size: 28px;
+              font-weight: 600;
+              color: #0d0d0d;
+              margin-bottom: 12px;
+          }
+
+          .welcome p {
+              font-size: 16px;
+              line-height: 1.6;
+              margin-bottom: 32px;
+          }
+
+          /* Responsive */
+          @media (max-width: 768px) {
+              .chat-container {
+                  padding: 0 16px;
+              }
+
+              .header {
+                  padding: 12px 16px;
+              }
+          }
+      </style>
+  </head>
+  <body>
+      <div class="header">
+          <div class="logo">
+              🏙️ UrbanAI
+          </div>
+          <div class="status" id="status">
+              <span>⏳ Caricamento...</span>
+          </div>
+      </div>
+
+      <div class="main">
+          <div class="chat-container">
+              <div class="chat-messages" id="chatMessages">
+                  <div class="welcome">
+                      <h2>Benvenuto in UrbanAI</h2>
+                      <p>Il tuo assistente intelligente per la pianificazione
+   urbana e le normative.<br>
+                      Il sistema si sta inizializzando automaticamente...</p>
+                  </div>
+              </div>
+
+              <div class="typing" id="typing">
+                  UrbanAI sta scrivendo <span class="dot-typing"></span>
+              </div>
+
+              <div class="input-container">
+                  <div class="input-wrapper">
+                      <textarea 
+                          class="chat-input" 
+                          id="chatInput" 
+                          placeholder="Scrivi la tua domanda sui documenti 
+  urbanistici..."
+                          disabled
+                          rows="1"
+                      ></textarea>
+                      <button class="send-btn" id="sendBtn" disabled>
+                          ↑
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <script>
+          class UrbanAI {
+              constructor() {
+                  this.apiBase = '/api';
+                  this.isInitialized = false;
+
+                  this.initializeElements();
+                  this.attachEventListeners();
+                  this.autoInitialize();
+              }
+
+              initializeElements() {
+                  this.elements = {
+                      chatMessages: document.getElementById('chatMessages'),
+                      chatInput: document.getElementById('chatInput'),
+                      sendBtn: document.getElementById('sendBtn'),
+                      status: document.getElementById('status'),
+                      typing: document.getElementById('typing')
+                  };
+              }
+
+              attachEventListeners() {
+                  this.elements.sendBtn.addEventListener('click', () =>
   this.sendMessage());
 
-          this.elements.chatInput.addEventListener('keydown', (e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  this.sendMessage();
-              }
-          });
+                  this.elements.chatInput.addEventListener('keydown', (e) =>
+  {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          this.sendMessage();
+                      }
+                  });
 
-          // Auto-resize textarea
-          this.elements.chatInput.addEventListener('input', () => {
-              this.elements.chatInput.style.height = 'auto';
-              this.elements.chatInput.style.height =
+                  // Auto-resize textarea
+                  this.elements.chatInput.addEventListener('input', () => {
+                      this.elements.chatInput.style.height = 'auto';
+                      this.elements.chatInput.style.height =
   this.elements.chatInput.scrollHeight + 'px';
-          });
-      }
+                  });
+              }
 
-      updateStatus(text, type = 'loading') {
-          const statusEl = this.elements.status;
-          statusEl.className = `status ${type}`;
-          statusEl.innerHTML = `<span>${text}</span>`;
-      }
+              updateStatus(text, type = 'loading') {
+                  const statusEl = this.elements.status;
+                  statusEl.className = `status ${type}`;
+                  statusEl.innerHTML = `<span>${text}</span>`;
+              }
 
-      addMessage(content, isUser = false) {
-          const welcomeEl = document.querySelector('.welcome');
-          if (welcomeEl) welcomeEl.remove();
+              addMessage(content, isUser = false) {
+                  const welcomeEl = document.querySelector('.welcome');
+                  if (welcomeEl) welcomeEl.remove();
 
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+                  const messageDiv = document.createElement('div');
+                  messageDiv.className = `message ${isUser ? 'user' : 
+  'bot'}`;
 
-          const avatar = document.createElement('div');
-          avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
-          avatar.textContent = isUser ? 'U' : 'AI';
+                  const avatar = document.createElement('div');
+                  avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
+                  avatar.textContent = isUser ? 'U' : 'AI';
 
-          const contentDiv = document.createElement('div');
-          contentDiv.className = 'message-content';
-          contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+                  const contentDiv = document.createElement('div');
+                  contentDiv.className = 'message-content';
+                  contentDiv.innerHTML = content.replace(/\n/g, '<br>');
 
-          messageDiv.appendChild(avatar);
-          messageDiv.appendChild(contentDiv);
+                  messageDiv.appendChild(avatar);
+                  messageDiv.appendChild(contentDiv);
 
-          this.elements.chatMessages.appendChild(messageDiv);
-          this.elements.chatMessages.scrollTop =
+                  this.elements.chatMessages.appendChild(messageDiv);
+                  this.elements.chatMessages.scrollTop =
   this.elements.chatMessages.scrollHeight;
-      }
+              }
 
-      showTyping(show = true) {
-          this.elements.typing.classList.toggle('show', show);
-          if (show) {
-              this.elements.chatMessages.scrollTop =
+              showTyping(show = true) {
+                  this.elements.typing.classList.toggle('show', show);
+                  if (show) {
+                      this.elements.chatMessages.scrollTop =
   this.elements.chatMessages.scrollHeight;
-          }
-      }
+                  }
+              }
 
-      async makeRequest(endpoint, options = {}) {
-          const response = await fetch(`${this.apiBase}${endpoint}`, {
-              headers: { 'Content-Type': 'application/json' },
-              ...options
-          });
+              async makeRequest(endpoint, options = {}) {
+                  const response = await fetch(`${this.apiBase}${endpoint}`,
+  {
+                      headers: { 'Content-Type': 'application/json' },
+                      ...options
+                  });
 
-          if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-          }
+                  if (!response.ok) {
+                      throw new Error(`HTTP ${response.status}`);
+                  }
 
-          return await response.json();
-      }
+                  return await response.json();
+              }
 
-      async checkSystemStatus() {
-          try {
-              await this.makeRequest('/health');
-              this.updateStatus('✅ Connesso', 'ready');
-              return true;
-          } catch (error) {
-              this.updateStatus('❌ Errore connessione', 'error');
-              return false;
-          }
-      }
+              async autoInitialize() {
+                  this.updateStatus('🚀 Inizializzazione automatica...',
+  'loading');
 
-      // AUTO INITIALIZATION
-      async autoInitialize() {
-          this.updateStatus('🚀 Caricamento automatico...', 'loading');
-
-          try {
-              // Step 1: Check connection
-              const connected = await this.checkSystemStatus();
-              if (!connected) throw new Error('Connessione fallita');
-
-              // Step 2: Auto-initialize
-              await this.makeRequest('/initialize', { method: 'POST' });
-              this.isInitialized = true;
-              this.updateStatus('✅ Sistema pronto', 'ready');
-
-              // Enable buttons
-              this.elements.processBtn.disabled = false;
-              this.elements.summaryBtn.disabled = false;
-              this.elements.keyPointsBtn.disabled = false;
-              this.elements.chatInput.disabled = false;
-              this.elements.sendBtn.disabled = false;
-
-              // Hide manual init button
-              this.elements.initBtn.style.display = 'none';
-
-              this.addMessage('✅ Sistema pronto! Puoi fare domande 
-  direttamente o usare i pulsanti per riassunti e punti chiave.');
-
-          } catch (error) {
-              this.updateStatus('❌ Errore avvio', 'error');
-              this.addMessage('❌ Errore nell\'inizializzazione automatica. 
-  Usa il pulsante "Inizializza Sistema".');
-          }
-      }
-
-      // Manual fallback
-      async manualInit() {
-          try {
-              this.updateStatus('⚡ Inizializzando...', 'loading');
-              await this.makeRequest('/initialize', { method: 'POST' });
-
-              this.isInitialized = true;
-              this.updateStatus('✅ Sistema pronto', 'ready');
-
-              this.elements.processBtn.disabled = false;
-              this.elements.summaryBtn.disabled = false;
-              this.elements.keyPointsBtn.disabled = false;
-              this.elements.chatInput.disabled = false;
-              this.elements.sendBtn.disabled = false;
-              this.elements.initBtn.style.display = 'none';
-
-              this.addMessage('Sistema inizializzato manualmente!');
-          } catch (error) {
-              this.updateStatus('❌ Errore inizializzazione', 'error');
-              this.addMessage('Errore: ' + error.message);
-          }
-      }
-
-      async ensureReady() {
-          if (!this.isInitialized) {
-              await this.autoInitialize();
-          }
-      }
-
-      async sendMessage() {
-          await this.ensureReady();
-
-          const question = this.elements.chatInput.value.trim();
-          if (!question) return;
-
-          this.elements.chatInput.value = '';
-          this.elements.chatInput.style.height = 'auto';
-
-          this.addMessage(question, true);
-          this.showTyping(true);
-
-          try {
-              const result = await this.makeRequest('/query', {
-                  method: 'POST',
-                  body: JSON.stringify({ question })
-              });
-
-              this.showTyping(false);
-              this.addMessage(result.answer);
-          } catch (error) {
-              this.showTyping(false);
-              this.addMessage('Errore: ' + error.message);
-          }
-      }
-
-      async processDocuments() {
-          await this.ensureReady();
-
-          this.updateStatus('📁 Elaborando documenti...', 'loading');
-          this.addMessage('Elaborazione documenti in corso...');
-
-          try {
-              const result = await this.makeRequest('/process-documents', {
-  method: 'POST' });
-              this.documentsProcessed = true;
-              this.updateStatus('✅ Documenti elaborati', 'ready');
-              this.addMessage(`Documenti elaborati! Processati 
-  ${result.chunksProcessed} frammenti.`);
-          } catch (error) {
-              this.updateStatus('❌ Errore elaborazione', 'error');
-              this.addMessage('Errore: ' + error.message);
-          }
-      }
-
-      async getDocumentSummary() {
-          await this.ensureReady();
-
-          this.showTyping(true);
-          try {
-              const result = await this.makeRequest('/summarize');
-              this.showTyping(false);
-              this.addMessage(`📋 **Riassunto 
-  Documenti:**\n\n${result.summary}`);
-          } catch (error) {
-              this.showTyping(false);
-              this.addMessage('Errore nel riassunto: ' + error.message);
-          }
-      }
-
-      async getKeyPoints() {
-          await this.ensureReady();
-
-          const topic = prompt('Su quale argomento vuoi i punti chiave?',
-  'pianificazione urbanistica');
-          if (!topic) return;
-
-          this.showTyping(true);
-          try {
-              const result = await this.makeRequest('/extract-key-points', {
-                  method: 'POST',
-                  body: JSON.stringify({ topic })
-              });
-
-              this.showTyping(false);
-              this.addMessage(`🎯 **Punti Chiave - 
-  ${topic}:**\n\n${result.keyPoints}`);
-          } catch (error) {
-              this.showTyping(false);
-              this.addMessage('Errore: ' + error.message);
-          }
-      }
-  }
-
-  // Initialize app
-  document.addEventListener('DOMContentLoaded', () => {
-      new UrbanAI();
+                  try {
+                      await this.makeRequest('/initialize', { method: 'POST'
   });
+                      this.isInitialized = true;
+                      this.updateStatus('✅ Pronto per le domande', 'ready');
+
+                      this.elements.chatInput.disabled = false;
+                      this.elements.sendBtn.disabled = false;
+
+                      this.addMessage('✅ Sistema inizializzato 
+  automaticamente! Puoi fare domande sui documenti urbanistici.');
+
+                  } catch (error) {
+                      this.updateStatus('❌ Errore inizializzazione',
+  'error');
+                      this.addMessage('❌ Errore nell\'inizializzazione 
+  automatica: ' + error.message);
+                  }
+              }
+
+              async sendMessage() {
+                  const question = this.elements.chatInput.value.trim();
+                  if (!question) return;
+
+                  this.elements.chatInput.value = '';
+                  this.elements.chatInput.style.height = 'auto';
+
+                  this.addMessage(question, true);
+                  this.showTyping(true);
+
+                  try {
+                      const result = await this.makeRequest('/query', {
+                          method: 'POST',
+                          body: JSON.stringify({ question })
+                      });
+
+                      this.showTyping(false);
+                      this.addMessage(result.answer);
+                  } catch (error) {
+                      this.showTyping(false);
+                      this.addMessage('Errore: ' + error.message);
+                  }
+              }
+          }
+
+          // Initialize app
+          document.addEventListener('DOMContentLoaded', () => {
+              new UrbanAI();
+          });
+      </script>
+  </body>
+  </html>
