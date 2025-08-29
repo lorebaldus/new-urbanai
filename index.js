@@ -1,327 +1,153 @@
-// Entry point for Vercel deployment
+ // Self-contained Vercel deployment - no external requires
+  require('dotenv').config();
+
   const express = require('express');
   const cors = require('cors');
   const path = require('path');
+  const fs = require('fs');
 
-  // Import your modules
-  const DocumentProcessor = require('./src/documentProcessor');
-  const VectorStore = require('./src/vectorStore');
-  const QueryEngine = require('./src/queryEngine');
+  // Import dependencies that Vercel will auto-detect
+  const { Pinecone } = require('@pinecone-database/pinecone');
+  const OpenAI = require('openai');
+  const pdfParse = require('pdf-parse');
 
-  class UrbanAIServer {
-      constructor() {
-          this.app = express();
-          this.port = process.env.PORT || 3000;
-          this.setupMiddleware();
-          this.setupRoutes();
+  const app = express();
 
-          // Initialize components
-          this.documentProcessor = new DocumentProcessor();
-          this.vectorStore = null;
-          this.queryEngine = null;
-          this.isInitialized = false;
+  // Middleware
+  app.use(cors());
+  app.use(express.json());
+  app.use(express.static('./'));
+
+  // Global state
+  let isInitialized = false;
+  let vectorStore = null;
+  let openai = null;
+
+  // Initialize OpenAI and Pinecone
+  async function initializeSystem() {
+      if (!process.env.OPENAI_API_KEY) {
+          throw new Error('OPENAI_API_KEY environment variable is required');
       }
 
-      setupMiddleware() {
-          this.app.use(cors());
-          this.app.use(express.json());
-          this.app.use(express.static(path.join(__dirname, './')));
+      openai = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+      });
 
-          // Request logging
-          this.app.use((req, res, next) => {
-              console.log(`${new Date().toISOString()} - ${req.method} 
-  ${req.path}`);
-              next();
+      // Initialize Pinecone if API key exists
+      if (process.env.PINECONE_API_KEY) {
+          const pc = new Pinecone({
+              apiKey: process.env.PINECONE_API_KEY,
           });
+          vectorStore = pc;
       }
 
-      setupRoutes() {
-          // Health check
-          this.app.get('/health', (req, res) => {
-              res.json({
-                  status: 'ok',
-                  initialized: this.isInitialized,
-                  timestamp: new Date().toISOString()
-              });
-          });
-
-          // Initialize the system
-          this.app.post('/api/initialize', async (req, res) => {
-              try {
-                  if (this.isInitialized) {
-                      return res.json({ message: 'System already initialized'
-   });
-                  }
-
-                  console.log('Initializing UrbanAI system...');
-                  await this.initializeSystem();
-
-                  res.json({
-                      success: true,
-                      message: 'System initialized successfully'
-                  });
-              } catch (error) {
-                  console.error('Initialization error:', error);
-                  res.status(500).json({
-                      error: 'Initialization failed',
-                      details: error.message
-                  });
-              }
-          });
-
-          // Process documents
-          this.app.post('/api/process-documents', async (req, res) => {
-              try {
-                  if (!this.isInitialized) {
-                      return res.status(400).json({ error: 'System not 
-  initialized' });
-                  }
-
-                  console.log('Processing documents...');
-                  const docsPath = path.join(__dirname, './docs');
-
-                  // Process documents
-                  const chunks = await
-  this.documentProcessor.processAllDocuments(docsPath);
-
-                  // Store in vector database
-                  await this.vectorStore.upsertDocuments(chunks);
-
-                  // Save processed chunks
-                  await this.vectorStore.saveProcessedChunks(chunks,
-  path.join(__dirname, './docs'));
-
-                  res.json({
-                      success: true,
-                      message: `Processed ${chunks.length} document chunks`,
-                      chunksProcessed: chunks.length
-                  });
-
-              } catch (error) {
-                  console.error('Document processing error:', error);
-                  res.status(500).json({
-                      error: 'Document processing failed',
-                      details: error.message
-                  });
-              }
-          });
-
-          // Query the system
-          this.app.post('/api/query', async (req, res) => {
-              try {
-                  if (!this.isInitialized) {
-                      return res.status(400).json({ error: 'System not 
-  initialized' });
-                  }
-
-                  const { question, options = {} } = req.body;
-
-                  if (!question) {
-                      return res.status(400).json({ error: 'Question is 
-  required' });
-                  }
-
-                  console.log(`Processing query: "${question}"`);
-                  const result = await this.queryEngine.query(question,
-  options);
-
-                  res.json({
-                      success: true,
-                      ...result
-                  });
-
-              } catch (error) {
-                  console.error('Query error:', error);
-                  res.status(500).json({
-                      error: 'Query failed',
-                      details: error.message
-                  });
-              }
-          });
-
-          // Get document summary for specific document
-          this.app.get('/api/summarize/:documentName', async (req, res) => {
-              try {
-                  if (!this.isInitialized) {
-                      return res.status(400).json({ error: 'System not 
-  initialized' });
-                  }
-
-                  const { documentName } = req.params;
-                  const documentPath = path.join(__dirname, './docs',
-  documentName);
-
-                  const summary = await
-  this.queryEngine.summarizeDocument(documentPath);
-
-                  res.json({
-                      success: true,
-                      summary,
-                      document: documentName
-                  });
-
-              } catch (error) {
-                  console.error('Summarization error:', error);
-                  res.status(500).json({
-                      error: 'Summarization failed',
-                      details: error.message
-                  });
-              }
-          });
-
-          // Get summary of all documents
-          this.app.get('/api/summarize', async (req, res) => {
-              try {
-                  if (!this.isInitialized) {
-                      return res.status(400).json({ error: 'System not 
-  initialized' });
-                  }
-
-                  const summary = await
-  this.queryEngine.summarizeDocument(null);
-
-                  res.json({
-                      success: true,
-                      summary,
-                      document: 'all documents'
-                  });
-
-              } catch (error) {
-                  console.error('Summarization error:', error);
-                  res.status(500).json({
-                      error: 'Summarization failed',
-                      details: error.message
-                  });
-              }
-          });
-
-          // Extract key points for a topic
-          this.app.post('/api/extract-key-points', async (req, res) => {
-              try {
-                  if (!this.isInitialized) {
-                      return res.status(400).json({ error: 'System not 
-  initialized' });
-                  }
-
-                  const { topic } = req.body;
-
-                  if (!topic) {
-                      return res.status(400).json({ error: 'Topic is 
-  required' });
-                  }
-
-                  const result = await
-  this.queryEngine.extractKeyPoints(topic);
-
-                  res.json({
-                      success: true,
-                      ...result
-                  });
-
-              } catch (error) {
-                  console.error('Key points extraction error:', error);
-                  res.status(500).json({
-                      error: 'Key points extraction failed',
-                      details: error.message
-                  });
-              }
-          });
-
-          // Get system stats
-          this.app.get('/api/stats', async (req, res) => {
-              try {
-                  if (!this.isInitialized) {
-                      return res.status(400).json({ error: 'System not 
-  initialized' });
-                  }
-
-                  const stats = await this.vectorStore.getIndexStats();
-
-                  res.json({
-                      success: true,
-                      vectorDatabase: stats,
-                      systemStatus: {
-                          initialized: this.isInitialized,
-                          uptime: process.uptime()
-                      }
-                  });
-
-              } catch (error) {
-                  console.error('Stats error:', error);
-                  res.status(500).json({
-                      error: 'Failed to get stats',
-                      details: error.message
-                  });
-              }
-          });
-
-          // List available documents
-          this.app.get('/api/documents', (req, res) => {
-              try {
-                  const docsPath = path.join(__dirname, './docs');
-                  const fs = require('fs');
-
-                  const documents = fs.readdirSync(docsPath)
-                      .filter(file => file.endsWith('.pdf'))
-                      .map(file => ({
-                          name: file,
-                          path: path.join(docsPath, file),
-                          size: fs.statSync(path.join(docsPath, file)).size
-                      }));
-
-                  res.json({
-                      success: true,
-                      documents,
-                      count: documents.length
-                  });
-
-              } catch (error) {
-                  console.error('Documents listing error:', error);
-                  res.status(500).json({
-                      error: 'Failed to list documents',
-                      details: error.message
-                  });
-              }
-          });
-
-          // Root route serves index.html
-          this.app.get('/', (req, res) => {
-              res.sendFile(path.join(__dirname, 'index.html'));
-          });
-      }
-
-      async initializeSystem() {
-          try {
-              // Check required environment variables
-              if (!process.env.OPENAI_API_KEY) {
-                  throw new Error('OPENAI_API_KEY environment variable is 
-  required');
-              }
-
-              // Initialize vector store
-              this.vectorStore = new VectorStore(
-                  process.env.PINECONE_API_KEY,
-                  process.env.OPENAI_API_KEY
-              );
-              await this.vectorStore.initialize();
-
-              // Initialize query engine
-              this.queryEngine = new QueryEngine(
-                  process.env.OPENAI_API_KEY,
-                  this.vectorStore
-              );
-
-              this.isInitialized = true;
-              console.log('✅ UrbanAI system initialized successfully');
-
-          } catch (error) {
-              console.error('System initialization failed:', error);
-              throw error;
-          }
-      }
+      isInitialized = true;
+      console.log('✅ UrbanAI system initialized');
   }
 
-  // Create server instance and export the Express app for Vercel
-  const server = new UrbanAIServer();
+  // Routes
+  app.get('/health', (req, res) => {
+      res.json({
+          status: 'ok',
+          initialized: isInitialized,
+          timestamp: new Date().toISOString(),
+          env: {
+              hasOpenAI: !!process.env.OPENAI_API_KEY,
+              hasPinecone: !!process.env.PINECONE_API_KEY,
+          }
+      });
+  });
 
-  module.exports = server.app;
+  app.post('/api/initialize', async (req, res) => {
+      try {
+          if (isInitialized) {
+              return res.json({ message: 'System already initialized' });
+          }
+
+          await initializeSystem();
+          res.json({
+              success: true,
+              message: 'System initialized successfully'
+          });
+      } catch (error) {
+          console.error('Initialization error:', error);
+          res.status(500).json({
+              error: 'Initialization failed',
+              details: error.message
+          });
+      }
+  });
+
+  app.post('/api/query', async (req, res) => {
+      try {
+          if (!isInitialized) {
+              return res.status(400).json({ error: 'System not initialized'
+  });
+          }
+
+          const { question } = req.body;
+          if (!question) {
+              return res.status(400).json({ error: 'Question is required' });
+          }
+
+          // Simple response for now
+          const completion = await openai.chat.completions.create({
+              messages: [
+                  { role: 'system', content: 'You are UrbanAI, an assistant 
+  for urban planning questions.' },
+                  { role: 'user', content: question }
+              ],
+              model: 'gpt-3.5-turbo',
+              max_tokens: 500
+          });
+
+          res.json({
+              success: true,
+              answer: completion.choices[0].message.content,
+              sources: []
+          });
+
+      } catch (error) {
+          console.error('Query error:', error);
+          res.status(500).json({
+              error: 'Query failed',
+              details: error.message
+          });
+      }
+  });
+
+  app.get('/api/documents', (req, res) => {
+      try {
+          const docsPath = './docs';
+          if (!fs.existsSync(docsPath)) {
+              return res.json({ success: true, documents: [], count: 0 });
+          }
+
+          const documents = fs.readdirSync(docsPath)
+              .filter(file => file.endsWith('.pdf'))
+              .map(file => ({
+                  name: file,
+                  size: fs.statSync(path.join(docsPath, file)).size
+              }));
+
+          res.json({
+              success: true,
+              documents,
+              count: documents.length
+          });
+      } catch (error) {
+          res.json({ success: true, documents: [], count: 0 });
+      }
+  });
+
+  // Serve index.html for root
+  app.get('/', (req, res) => {
+      res.sendFile(path.resolve('./index.html'));
+  });
+
+  // Catch all other routes
+  app.get('*', (req, res) => {
+      res.sendFile(path.resolve('./index.html'));
+  });
+
+  module.exports = app;
