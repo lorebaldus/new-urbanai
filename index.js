@@ -1,5 +1,5 @@
  // Self-contained Vercel deployment - no external requires
-  require('dotenv').config();
+  // No dotenv needed - Vercel handles environment variables
 
   const express = require('express');
   const cors = require('cors');
