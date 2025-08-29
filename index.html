@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
   <html lang="it">
   <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="viewport" content="width=device-width, 
+  initial-scale=1.0">
       <title>UrbanAI - Assistente Pianificazione Urbana</title>
       <style>
           * {
@@ -12,14 +13,13 @@
           }
 
           body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-  Roboto, sans-serif;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe 
+  UI', Roboto, sans-serif;
               background: #f7f7f8;
               color: #0d0d0d;
               overflow-x: hidden;
           }
 
-          /* Header */
           .header {
               background: white;
               border-bottom: 1px solid #e5e5e5;
@@ -32,7 +32,6 @@
               left: 0;
               right: 0;
               z-index: 100;
-              backdrop-filter: blur(20px);
           }
 
           .logo {
@@ -49,23 +48,18 @@
               align-items: center;
               gap: 8px;
               padding: 6px 12px;
-              background: #f4f4f4;
+              background: #dcfce7;
+              color: #166534;
               border-radius: 20px;
               font-size: 13px;
           }
 
-          .status.ready { background: #dcfce7; color: #166534; }
-          .status.loading { background: #fef3c7; color: #92400e; }
-          .status.error { background: #fee2e2; color: #991b1b; }
-
-          /* Main Layout */
           .main {
               display: flex;
               height: 100vh;
               padding-top: 60px;
           }
 
-          /* Chat Container */
           .chat-container {
               flex: 1;
               display: flex;
@@ -128,7 +122,6 @@
               border-color: #2563eb;
           }
 
-          /* Input Area */
           .input-container {
               padding: 20px 0;
               border-top: 1px solid #e5e5e5;
@@ -155,7 +148,6 @@
               resize: none;
               background: transparent;
               min-height: 24px;
-              max-height: 120px;
               font-family: inherit;
           }
 
@@ -171,19 +163,8 @@
               align-items: center;
               justify-content: center;
               margin-right: 8px;
-              transition: background 0.2s;
           }
 
-          .send-btn:hover {
-              background: #1d4ed8;
-          }
-
-          .send-btn:disabled {
-              background: #9ca3af;
-              cursor: not-allowed;
-          }
-
-          /* Loading Animation */
           .typing {
               display: none;
               padding: 20px;
@@ -193,49 +174,6 @@
 
           .typing.show { display: block; }
 
-          .dot-typing {
-              position: relative;
-              display: inline-block;
-              width: 4px;
-              height: 4px;
-              border-radius: 50%;
-              background-color: #9ca3af;
-              animation: dot-typing 1.4s infinite linear;
-          }
-
-          .dot-typing::before,
-          .dot-typing::after {
-              content: '';
-              display: inline-block;
-              position: absolute;
-              top: 0;
-              width: 4px;
-              height: 4px;
-              border-radius: 50%;
-              background-color: #9ca3af;
-              animation: dot-typing 1.4s infinite linear;
-          }
-
-          .dot-typing::before {
-              left: -8px;
-              animation-delay: -0.32s;
-          }
-
-          .dot-typing::after {
-              left: 8px;
-              animation-delay: 0.32s;
-          }
-
-          @keyframes dot-typing {
-              0%, 60%, 100% {
-                  background-color: #9ca3af;
-              }
-              30% {
-                  background-color: #374151;
-              }
-          }
-
-          /* Welcome Message */
           .welcome {
               text-align: center;
               padding: 60px 40px;
@@ -252,29 +190,13 @@
           .welcome p {
               font-size: 16px;
               line-height: 1.6;
-              margin-bottom: 32px;
-          }
-
-          /* Responsive */
-          @media (max-width: 768px) {
-              .chat-container {
-                  padding: 0 16px;
-              }
-
-              .header {
-                  padding: 12px 16px;
-              }
           }
       </style>
   </head>
   <body>
       <div class="header">
-          <div class="logo">
-              🏙️ UrbanAI
-          </div>
-          <div class="status" id="status">
-              <span>⏳ Caricamento...</span>
-          </div>
+          <div class="logo">🏙️ UrbanAI</div>
+          <div class="status">✅ Pronto</div>
       </div>
 
       <div class="main">
@@ -282,14 +204,15 @@
               <div class="chat-messages" id="chatMessages">
                   <div class="welcome">
                       <h2>Benvenuto in UrbanAI</h2>
-                      <p>Il tuo assistente intelligente per la pianificazione
-   urbana e le normative.<br>
-                      Il sistema si sta inizializzando automaticamente...</p>
+                      <p>Il tuo assistente intelligente per la
+  pianificazione urbana e le normative.<br>
+                      Scrivi la tua domanda qui sotto per
+  iniziare!</p>
                   </div>
               </div>
 
               <div class="typing" id="typing">
-                  UrbanAI sta scrivendo <span class="dot-typing"></span>
+                  UrbanAI sta scrivendo...
               </div>
 
               <div class="input-container">
@@ -297,164 +220,92 @@
                       <textarea 
                           class="chat-input" 
                           id="chatInput" 
-                          placeholder="Scrivi la tua domanda sui documenti 
-  urbanistici..."
-                          disabled
+                          placeholder="Scrivi la tua domanda sui 
+  documenti urbanistici..."
                           rows="1"
                       ></textarea>
-                      <button class="send-btn" id="sendBtn" disabled>
-                          ↑
-                      </button>
+                      <button class="send-btn" id="sendBtn">↑</button>
                   </div>
               </div>
           </div>
       </div>
 
       <script>
-          class UrbanAI {
-              constructor() {
-                  this.apiBase = '/api';
-                  this.isInitialized = false;
+          document.addEventListener('DOMContentLoaded', () => {
+              const chatInput = document.getElementById('chatInput');
+              const sendBtn = document.getElementById('sendBtn');
+              const chatMessages =
+  document.getElementById('chatMessages');
+              const typing = document.getElementById('typing');
 
-                  this.initializeElements();
-                  this.attachEventListeners();
-                  this.autoInitialize();
-              }
-
-              initializeElements() {
-                  this.elements = {
-                      chatMessages: document.getElementById('chatMessages'),
-                      chatInput: document.getElementById('chatInput'),
-                      sendBtn: document.getElementById('sendBtn'),
-                      status: document.getElementById('status'),
-                      typing: document.getElementById('typing')
-                  };
-              }
-
-              attachEventListeners() {
-                  this.elements.sendBtn.addEventListener('click', () =>
-  this.sendMessage());
-
-                  this.elements.chatInput.addEventListener('keydown', (e) =>
-  {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          this.sendMessage();
-                      }
-                  });
-
-                  // Auto-resize textarea
-                  this.elements.chatInput.addEventListener('input', () => {
-                      this.elements.chatInput.style.height = 'auto';
-                      this.elements.chatInput.style.height =
-  this.elements.chatInput.scrollHeight + 'px';
-                  });
-              }
-
-              updateStatus(text, type = 'loading') {
-                  const statusEl = this.elements.status;
-                  statusEl.className = `status ${type}`;
-                  statusEl.innerHTML = `<span>${text}</span>`;
-              }
-
-              addMessage(content, isUser = false) {
-                  const welcomeEl = document.querySelector('.welcome');
-                  if (welcomeEl) welcomeEl.remove();
+              function addMessage(content, isUser = false) {
+                  const welcome = document.querySelector('.welcome');
+                  if (welcome) welcome.remove();
 
                   const messageDiv = document.createElement('div');
                   messageDiv.className = `message ${isUser ? 'user' : 
   'bot'}`;
 
                   const avatar = document.createElement('div');
-                  avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
+                  avatar.className = `avatar ${isUser ? 'user' : 
+  'bot'}`;
                   avatar.textContent = isUser ? 'U' : 'AI';
 
                   const contentDiv = document.createElement('div');
                   contentDiv.className = 'message-content';
-                  contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+                  contentDiv.innerHTML = content.replace(/\n/g,
+  '<br>');
 
                   messageDiv.appendChild(avatar);
                   messageDiv.appendChild(contentDiv);
-
-                  this.elements.chatMessages.appendChild(messageDiv);
-                  this.elements.chatMessages.scrollTop =
-  this.elements.chatMessages.scrollHeight;
+                  chatMessages.appendChild(messageDiv);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
               }
 
-              showTyping(show = true) {
-                  this.elements.typing.classList.toggle('show', show);
-                  if (show) {
-                      this.elements.chatMessages.scrollTop =
-  this.elements.chatMessages.scrollHeight;
-                  }
+              function showTyping(show) {
+                  typing.style.display = show ? 'block' : 'none';
               }
 
-              async makeRequest(endpoint, options = {}) {
-                  const response = await fetch(`${this.apiBase}${endpoint}`,
-  {
-                      headers: { 'Content-Type': 'application/json' },
-                      ...options
-                  });
-
-                  if (!response.ok) {
-                      throw new Error(`HTTP ${response.status}`);
-                  }
-
-                  return await response.json();
-              }
-
-              async autoInitialize() {
-                  this.updateStatus('🚀 Inizializzazione automatica...',
-  'loading');
-
-                  try {
-                      await this.makeRequest('/initialize', { method: 'POST'
-  });
-                      this.isInitialized = true;
-                      this.updateStatus('✅ Pronto per le domande', 'ready');
-
-                      this.elements.chatInput.disabled = false;
-                      this.elements.sendBtn.disabled = false;
-
-                      this.addMessage('✅ Sistema inizializzato 
-  automaticamente! Puoi fare domande sui documenti urbanistici.');
-
-                  } catch (error) {
-                      this.updateStatus('❌ Errore inizializzazione',
-  'error');
-                      this.addMessage('❌ Errore nell\'inizializzazione 
-  automatica: ' + error.message);
-                  }
-              }
-
-              async sendMessage() {
-                  const question = this.elements.chatInput.value.trim();
+              async function sendMessage() {
+                  const question = chatInput.value.trim();
                   if (!question) return;
 
-                  this.elements.chatInput.value = '';
-                  this.elements.chatInput.style.height = 'auto';
-
-                  this.addMessage(question, true);
-                  this.showTyping(true);
+                  chatInput.value = '';
+                  addMessage(question, true);
+                  showTyping(true);
 
                   try {
-                      const result = await this.makeRequest('/query', {
+                      // Try initialize first
+                      try {
+                          await fetch('/api/initialize', { method:
+  'POST' });
+                      } catch (e) {}
+
+                      const response = await fetch('/api/query', {
                           method: 'POST',
+                          headers: { 'Content-Type':
+  'application/json' },
                           body: JSON.stringify({ question })
                       });
 
-                      this.showTyping(false);
-                      this.addMessage(result.answer);
+                      const result = await response.json();
+                      showTyping(false);
+                      addMessage(result.answer || 'Errore nella 
+  risposta');
+
                   } catch (error) {
-                      this.showTyping(false);
-                      this.addMessage('Errore: ' + error.message);
+                      showTyping(false);
+                      addMessage('Errore: ' + error.message);
                   }
               }
-          }
 
-          // Initialize app
-          document.addEventListener('DOMContentLoaded', () => {
-              new UrbanAI();
+              sendBtn.addEventListener('click', sendMessage);
+              chatInput.addEventListener('keydown', (e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                  }
+              });
           });
       </script>
   </body>
