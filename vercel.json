@@ -1,5 +1,4 @@
 {
-    "version": 2,
     "functions": {
       "api/index.js": {
         "maxDuration": 30
@@ -15,11 +14,7 @@
         "dest": "/api/index.js"
       },
       {
-        "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico))",
-        "dest": "/$1"
-      },
-      {
-        "src": "/",
+        "src": "/(.*)",
         "dest": "/index.html"
       }
     ]
