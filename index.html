@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UrbanAI - Assistente per Pianificazione Urbana</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏙️ UrbanAI</h1>
+            <p>Assistente Intelligente per Pianificazione Urbana e Normative</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>🚀 Azioni Rapide</h3>
+                
+                <div id="systemStatus" class="status info">
+                    <strong>Stato:</strong> In attesa di inizializzazione...
+                </div>
+
+                <div class="quick-actions">
+                    <button id="initBtn" class="btn btn-primary">
+                        <span class="icon">⚡</span>
+                        Inizializza Sistema
+                    </button>
+                    
+                    <button id="processBtn" class="btn btn-secondary" disabled>
+                        <span class="icon">📁</span>
+                        Elabora Documenti
+                    </button>
+                    
+                    <button id="summaryBtn" class="btn btn-success" disabled>
+                        <span class="icon">📋</span>
+                        Riassunto Documenti
+                    </button>
+                    
+                    <button id="keyPointsBtn" class="btn btn-success" disabled>
+                        <span class="icon">🎯</span>
+                        Punti Chiave
+                    </button>
+                </div>
+
+                <h3>📊 Informazioni Sistema</h3>
+                <div id="systemInfo">
+                    <p><strong>Documenti:</strong> <span id="docCount">-</span></p>
+                    <p><strong>Stato API:</strong> <span id="apiStatus">Non connesso</span></p>
+                </div>
+
+                <h3>📋 Cronologia</h3>
+                <div class="history-container">
+                    <button id="clearHistoryBtn" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">🗑️ Pulisci Cronologia</button>
+                    <div id="historyList" class="history-list"></div>
+                </div>
+
+                <h3>📄 Export</h3>
+                <div class="export-container">
+                    <button id="exportPdfBtn" class="btn btn-success" style="width: 100%; margin-bottom: 10px;" disabled>📄 Esporta PDF</button>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>💬 Chat con UrbanAI</h2>
+                    <p>Fai domande sui documenti urbanistici caricati</p>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-content">
+                            Ciao! Sono UrbanAI, il tuo assistente per la pianificazione urbana. 
+                            Prima di iniziare, devi inizializzare il sistema e elaborare i documenti 
+                            usando i pulsanti nella barra laterale. Poi potrò rispondere alle tue domande!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="spinner"></div>
+                    <p id="loadingText">Elaborazione in corso...</p>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="message bot">
+                        <div class="message-content">
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            UrbanAI sta pensando...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="chat-input-group">
+                        <input 
+                            type="text" 
+                            class="chat-input" 
+                            id="chatInput" 
+                            placeholder="Scrivi la tua domanda sui documenti urbanistici..."
+                            disabled
+                        >
+                        <button class="send-btn" id="sendBtn" disabled>Invia</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class UrbanAI {
+            constructor() {
+                this.apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+                this.isInitialized = false;
+                this.documentsProcessed = false;
+                this.conversation = [];
+                this.messageId = 0;
+                
+                this.initializeElements();
+                this.attachEventListeners();
+                this.loadHistory();
+                this.checkSystemStatus();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    initBtn: document.getElementById('initBtn'),
+                    processBtn: document.getElementById('processBtn'),
+                    summaryBtn: document.getElementById('summaryBtn'),
+                    keyPointsBtn: document.getElementById('keyPointsBtn'),
+                    chatMessages: document.getElementById('chatMessages'),
+                    chatInput: document.getElementById('chatInput'),
+                    sendBtn: document.getElementById('sendBtn'),
+                    loading: document.getElementById('loading'),
+                    systemStatus: document.getElementById('systemStatus'),
+                    docCount: document.getElementById('docCount'),
+                    apiStatus: document.getElementById('apiStatus'),
+                    clearHistoryBtn: document.getElementById('clearHistoryBtn'),
+                    exportPdfBtn: document.getElementById('exportPdfBtn'),
+                    historyList: document.getElementById('historyList')
+                };
+            }
+
+            attachEventListeners() {
+                this.elements.initBtn.addEventListener('click', () => this.initializeSystem());
+                this.elements.processBtn.addEventListener('click', () => this.processDocuments());
+                this.elements.summaryBtn.addEventListener('click', () => this.getDocumentSummary());
+                this.elements.keyPointsBtn.addEventListener('click', () => this.getKeyPoints());
+                this.elements.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.elements.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
+                this.elements.exportPdfBtn.addEventListener('click', () => this.exportToPDF());
+                
+                this.elements.chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+            }
+
+            async makeRequest(endpoint, options = {}) {
+                try {
+                    const response = await fetch(`${this.apiBase}${endpoint}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        },
+                        ...options
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.error('Request failed:', error);
+                    throw error;
+                }
+            }
+
+            async checkSystemStatus() {
+                try {
+                    const health = await this.makeRequest('/health', { method: 'GET' });
+                    this.elements.apiStatus.textContent = 'Connesso ✓';
+                    
+                    if (health.initialized) {
+                        this.isInitialized = true;
+                        this.updateSystemStatus('Sistema inizializzato ✓', 'success');
+                        this.enableButtons();
+                    }
+
+                    const docs = await this.makeRequest('/documents', { method: 'GET' });
+                    this.elements.docCount.textContent = docs.count || 0;
+                    
+                } catch (error) {
+                    this.elements.apiStatus.textContent = 'Errore connessione ✗';
+                    this.updateSystemStatus('Errore connessione al server', 'error');
+                }
+            }
+
+            updateSystemStatus(message, type = 'info') {
+                this.elements.systemStatus.textContent = message;
+                this.elements.systemStatus.className = `status ${type}`;
+            }
+
+            enableButtons() {
+                if (this.isInitialized) {
+                    this.elements.processBtn.disabled = false;
+                    this.elements.summaryBtn.disabled = false;
+                    this.elements.keyPointsBtn.disabled = false;
+                }
+                
+                if (this.documentsProcessed) {
+                    this.elements.chatInput.disabled = false;
+                    this.elements.sendBtn.disabled = false;
+                    this.elements.exportPdfBtn.disabled = false;
+                }
+            }
+
+            showLoading(show = true, text = 'Elaborazione in corso...', showProgress = false) {
+                this.elements.loading.style.display = show ? 'block' : 'none';
+                const progressBar = document.getElementById('progressBar');
+                const loadingText = document.getElementById('loadingText');
+                
+                if (show) {
+                    loadingText.textContent = text;
+                    progressBar.style.display = showProgress ? 'block' : 'none';
+                } else {
+                    progressBar.style.display = 'none';
+                }
+                
+                // Disable buttons during loading
+                const buttons = [this.elements.initBtn, this.elements.processBtn, 
+                                this.elements.summaryBtn, this.elements.keyPointsBtn, this.elements.sendBtn];
+                buttons.forEach(btn => btn.disabled = show);
+            }
+
+            showTyping(show = true) {
+                const typingIndicator = document.getElementById('typingIndicator');
+                typingIndicator.style.display = show ? 'block' : 'none';
+                if (show) {
+                    this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
+                }
+            }
+
+            addMessage(content, isUser = false, sources = null, category = null) {
+                const messageId = this.messageId++;
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+                messageDiv.setAttribute('data-message-id', messageId);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+                messageDiv.appendChild(contentDiv);
+
+                // Add category tag for bot messages
+                if (!isUser && category) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.innerHTML = `<span class="category-tag category-${category.toLowerCase()}">${category}</span>`;
+                    messageDiv.appendChild(categoryDiv);
+                }
+
+                if (sources && sources.length > 0) {
+                    const sourcesDiv = document.createElement('div');
+                    sourcesDiv.className = 'sources';
+                    sourcesDiv.innerHTML = `
+                        <h4>📚 Fonti:</h4>
+                        ${sources.map(source => `
+                            <div class="source-item">
+                                <div class="source-name">${source.source.split('/').pop()}</div>
+                                <div class="source-snippet">${source.snippet}</div>
+                            </div>
+                        `).join('')}
+                    `;
+                    messageDiv.appendChild(sourcesDiv);
+                }
+
+                // Add action buttons for bot messages
+                if (!isUser && this.documentsProcessed) {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'message-actions';
+                    actionsDiv.innerHTML = `
+                        <button class="action-btn" onclick="urbanAI.copyMessage(${messageId})" title="Copia risposta">📋</button>
+                        <div class="feedback-buttons">
+                            <button class="feedback-btn positive" onclick="urbanAI.giveFeedback(${messageId}, 'positive')" title="Risposta utile">👍</button>
+                            <button class="feedback-btn negative" onclick="urbanAI.giveFeedback(${messageId}, 'negative')" title="Risposta non utile">👎</button>
+                        </div>
+                    `;
+                    messageDiv.appendChild(actionsDiv);
+                }
+
+                // Store in conversation
+                const messageData = {
+                    id: messageId,
+                    content,
+                    isUser,
+                    sources,
+                    category,
+                    timestamp: new Date().toISOString(),
+                    feedback: null
+                };
+                this.conversation.push(messageData);
+                
+                this.elements.chatMessages.appendChild(messageDiv);
+                this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
+                
+                // Save to history if user message
+                if (isUser) {
+                    this.saveToHistory(content);
+                }
+
+                return messageId;
+            }
+
+            async initializeSystem() {
+                this.showLoading(true, 'Inizializzazione sistema...', true);
+                this.updateSystemStatus('Inizializzazione in corso...', 'info');
+                
+                try {
+                    await this.makeRequest('/initialize', { method: 'POST' });
+                    this.isInitialized = true;
+                    this.updateSystemStatus('Sistema inizializzato ✓', 'success');
+                    this.enableButtons();
+                    this.addMessage('Sistema inizializzato con successo! Ora puoi elaborare i documenti.');
+                } catch (error) {
+                    this.updateSystemStatus('Errore durante l\'inizializzazione', 'error');
+                    this.addMessage(`Errore nell'inizializzazione: ${error.message}`);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async processDocuments() {
+                this.showLoading(true, 'Elaborazione documenti... Questo può richiedere alcuni minuti.', true);
+                this.addMessage('Elaborazione documenti in corso... Questo può richiedere alcuni minuti.');
+                
+                try {
+                    const result = await this.makeRequest('/process-documents', { method: 'POST' });
+                    this.documentsProcessed = true;
+                    this.enableButtons();
+                    this.addMessage(`Documenti elaborati con successo! Processati ${result.chunksProcessed} frammenti di testo. Ora puoi fare domande!`);
+                } catch (error) {
+                    this.addMessage(`Errore nell'elaborazione documenti: ${error.message}`);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async getDocumentSummary() {
+                this.showLoading(true);
+                this.addMessage('Sto generando il riassunto dei documenti...');
+                
+                try {
+                    const result = await this.makeRequest('/summarize', { method: 'GET' });
+                    this.addMessage(`📋 **Riassunto Documenti:**\n\n${result.summary}`);
+                } catch (error) {
+                    this.addMessage(`Errore nel generare il riassunto: ${error.message}`);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async getKeyPoints() {
+                const topic = prompt('Su quale argomento vuoi i punti chiave?', 'pianificazione urbanistica');
+                if (!topic) return;
+                
+                this.showLoading(true);
+                this.addMessage(`Sto estraendo i punti chiave su: "${topic}"`);
+                
+                try {
+                    const result = await this.makeRequest('/extract-key-points', {
+                        method: 'POST',
+                        body: JSON.stringify({ topic })
+                    });
+                    this.addMessage(`🎯 **Punti Chiave - ${result.topic}:**\n\n${result.keyPoints}`, false, result.sources);
+                } catch (error) {
+                    this.addMessage(`Errore nell'estrazione punti chiave: ${error.message}`);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async sendMessage() {
+                const question = this.elements.chatInput.value.trim();
+                if (!question) return;
+
+                this.elements.chatInput.value = '';
+                this.addMessage(question, true);
+                this.showTyping(true);
+
+                try {
+                    const result = await this.makeRequest('/query', {
+                        method: 'POST',
+                        body: JSON.stringify({ question })
+                    });
+                    
+                    this.showTyping(false);
+                    const category = this.categorizeResponse(question, result.answer);
+                    this.addMessage(result.answer, false, result.sources, category);
+                } catch (error) {
+                    this.showTyping(false);
+                    this.addMessage(`Errore nella query: ${error.message}`);
+                }
+            }
+
+            categorizeResponse(question, answer) {
+                const questionLower = question.toLowerCase();
+                const answerLower = answer.toLowerCase();
+                
+                if (questionLower.includes('normat') || questionLower.includes('legge') || questionLower.includes('decreto') || 
+                    answerLower.includes('normat') || answerLower.includes('legge')) {
+                    return 'Normativa';
+                }
+                
+                if (questionLower.includes('procedura') || questionLower.includes('come') || questionLower.includes('iter') ||
+                    answerLower.includes('procedura') || answerLower.includes('passaggi')) {
+                    return 'Procedura';
+                }
+                
+                if (questionLower.includes('tecnic') || questionLower.includes('calcol') || questionLower.includes('parametr') ||
+                    answerLower.includes('tecnic') || answerLower.includes('calcol')) {
+                    return 'Tecnica';
+                }
+                
+                return 'Generale';
+            }
+
+            saveToHistory(question) {
+                let history = JSON.parse(localStorage.getItem('urbanai_history') || '[]');
+                history.unshift({
+                    question,
+                    timestamp: new Date().toISOString()
+                });
+                history = history.slice(0, 20); // Keep only last 20
+                localStorage.setItem('urbanai_history', JSON.stringify(history));
+                this.updateHistoryDisplay();
+            }
+
+            loadHistory() {
+                this.updateHistoryDisplay();
+            }
+
+            updateHistoryDisplay() {
+                const history = JSON.parse(localStorage.getItem('urbanai_history') || '[]');
+                this.elements.historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    this.elements.historyList.innerHTML = '<div style="padding: 10px; text-align: center; color: #999; font-size: 0.8rem;">Nessuna domanda nella cronologia</div>';
+                    return;
+                }
+                
+                history.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.title = item.question;
+                    historyItem.textContent = item.question.length > 50 ? 
+                        item.question.substring(0, 50) + '...' : item.question;
+                    historyItem.onclick = () => {
+                        this.elements.chatInput.value = item.question;
+                        this.elements.chatInput.focus();
+                    };
+                    this.elements.historyList.appendChild(historyItem);
+                });
+            }
+
+            clearHistory() {
+                if (confirm('Sei sicuro di voler cancellare tutta la cronologia?')) {
+                    localStorage.removeItem('urbanai_history');
+                    this.updateHistoryDisplay();
+                }
+            }
+
+            copyMessage(messageId) {
+                const message = this.conversation.find(m => m.id === messageId);
+                if (message) {
+                    navigator.clipboard.writeText(message.content).then(() => {
+                        // Show temporary feedback
+                        const button = document.querySelector(`[data-message-id="${messageId}"] .action-btn`);
+                        const originalText = button.textContent;
+                        button.textContent = '✓';
+                        setTimeout(() => button.textContent = originalText, 1000);
+                    });
+                }
+            }
+
+            giveFeedback(messageId, type) {
+                const message = this.conversation.find(m => m.id === messageId);
+                if (message) {
+                    message.feedback = type;
+                    
+                    // Update UI
+                    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                    const buttons = messageElement.querySelectorAll('.feedback-btn');
+                    buttons.forEach(btn => btn.classList.remove('selected'));
+                    const selectedButton = messageElement.querySelector(`.feedback-btn.${type}`);
+                    selectedButton.classList.add('selected');
+                    
+                    console.log(`Feedback ${type} salvato per messaggio ${messageId}`);
+                }
+            }
+
+            async exportToPDF() {
+                if (this.conversation.length === 0) {
+                    alert('Nessuna conversazione da esportare!');
+                    return;
+                }
+                
+                const content = this.conversation
+                    .filter(msg => msg.isUser || (!msg.isUser && msg.content))
+                    .map(msg => {
+                        const type = msg.isUser ? 'DOMANDA' : 'RISPOSTA';
+                        const category = msg.category ? ` [${msg.category}]` : '';
+                        const timestamp = new Date(msg.timestamp).toLocaleString('it-IT');
+                        return `${type}${category} (${timestamp}):\n${msg.content}\n\n`;
+                    })
+                    .join('---\n\n');
+                
+                // Create and download file
+                const blob = new Blob([`CONVERSAZIONE URBANAI\n\nGenerato il: ${new Date().toLocaleString('it-IT')}\n\n${content}`], 
+                    { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `urbanai-conversazione-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Global reference for onclick handlers
+        let urbanAI;
+
+        // Initialize the application when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            urbanAI = new UrbanAI();
+        });
+    </script>
+</body>
+</html>
