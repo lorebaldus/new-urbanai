@@ -158,19 +158,10 @@
               font-size: 16px;
               background: transparent;
               font-family: inherit;
-              resize: none;
-              overflow: hidden;
-              min-height: 24px;
-              max-height: 120px;
-              white-space: nowrap;
-              overflow-x: hidden;
           }
 
           .chat-input::placeholder {
               color: #6c757d;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
           }
 
           .send-btn {
@@ -188,7 +179,6 @@
               font-size: 18px;
               font-weight: bold;
               transition: all 0.3s ease;
-              -webkit-tap-highlight-color: transparent;
           }
 
           .send-btn:hover {
@@ -247,11 +237,8 @@
                   font-size: 20px;
               }
               .chat-input {
-                  font-size: 16px; /* Prevent zoom on iOS */
-                  -webkit-appearance: none;
+                  font-size: 16px;
                   padding: 12px 16px;
-                  white-space: pre-wrap;
-                  overflow-x: visible;
               }
               .input-wrapper {
                   border-radius: 20px;
@@ -286,8 +273,8 @@
                       <h2>Benvenuto in UrbanAI</h2>
                       <p>Il tuo assistente intelligente specializzato
   in pianificazione urbana e normative edilizie italiane.<br>
-                      Chiedimi informazioni su permessi di costruire,
-  piani regolatori, vincoli paesaggistici e molto altro!</p>
+                      Scrivi "Ciao" per iniziare o fai una domanda
+  specifica!</p>
                   </div>
               </div>
 
@@ -297,111 +284,186 @@
 
               <div class="input-container">
                   <div class="input-wrapper">
-                      <textarea 
+                      <input 
+                          type="text" 
                           class="chat-input" 
                           id="chatInput" 
-                          placeholder="Fai una domanda su urbanistica 
-  e normative edilizie..."
-                          rows="1"
-                      ></textarea>
-                      <button class="send-btn" id="sendBtn">↑</button>
+                          placeholder="Scrivi la tua domanda su 
+  urbanistica..."
+                          autocomplete="off"
+                      />
+                      <button class="send-btn" id="sendBtn" 
+  type="button">↑</button>
                   </div>
               </div>
           </div>
       </div>
 
       <script>
-  let chatInput, sendBtn, chatMessages, typing;
+          document.addEventListener('DOMContentLoaded', function() {
+              const chatInput = document.getElementById('chatInput');
+              const sendBtn = document.getElementById('sendBtn');
+              const chatMessages =
+  document.getElementById('chatMessages');
+              const typing = document.getElementById('typing');
 
-  document.addEventListener('DOMContentLoaded', () => {
-      chatInput = document.getElementById('chatInput');
-      sendBtn = document.getElementById('sendBtn');
-      chatMessages = document.getElementById('chatMessages');
-      typing = document.getElementById('typing');
+              // Verifica che gli elementi esistano
+              if (!chatInput || !sendBtn || !chatMessages || !typing)
+  {
+                  console.error('Elementi mancanti!', {chatInput,
+  sendBtn, chatMessages, typing});
+                  return;
+              }
 
-      function addMessage(content, isUser = false) {
-          const welcome = document.querySelector('.welcome');
-          if (welcome) welcome.remove();
+              console.log('✅ Tutti gli elementi trovati, 
+  inizializzando...');
 
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+              function addMessage(content, isUser = false) {
+                  const welcome = document.querySelector('.welcome');
+                  if (welcome) welcome.remove();
 
-          const avatar = document.createElement('div');
-          avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
-          avatar.textContent = isUser ? 'U' : 'AI';
+                  const messageDiv = document.createElement('div');
+                  messageDiv.className = `message ${isUser ? 'user' : 
+  'bot'}`;
 
-          const contentDiv = document.createElement('div');
-          contentDiv.className = 'message-content';
-          contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+                  const avatar = document.createElement('div');
+                  avatar.className = `avatar ${isUser ? 'user' : 
+  'bot'}`;
+                  avatar.textContent = isUser ? 'U' : 'AI';
 
-          messageDiv.appendChild(avatar);
-          messageDiv.appendChild(contentDiv);
-          chatMessages.appendChild(messageDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+                  const contentDiv = document.createElement('div');
+                  contentDiv.className = 'message-content';
+                  contentDiv.innerHTML = content.replace(/\n/g,
+  '<br>');
 
-      function showTyping(show) {
-          typing.style.display = show ? 'block' : 'none';
-      }
+                  messageDiv.appendChild(avatar);
+                  messageDiv.appendChild(contentDiv);
+                  chatMessages.appendChild(messageDiv);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
 
-      // FILTRO PERMISSIVO
-      function shouldBlock(question) {
-          const blocked = ['ricetta', 'cucinare', 'bitcoin',
-  'medicina', 'videogiochi', 'calcio'];
-          return blocked.some(word =>
-  question.toLowerCase().includes(word));
-      }
+              function showTyping(show) {
+                  typing.style.display = show ? 'block' : 'none';
+                  if (show) {
+                      chatMessages.scrollTop =
+  chatMessages.scrollHeight;
+                  }
+              }
 
-      async function sendMessage() {
-          const question = chatInput.value.trim();
-          if (!question) return;
+              // FILTRO INTELLIGENTE - Blocca solo cose ovviamente 
+  sbagliate
+              function shouldBlock(question) {
+                  const questionLower = question.toLowerCase();
 
-          if (shouldBlock(question)) {
-              chatInput.value = '';
-              addMessage(question, true);
-              addMessage('Mi dispiace, posso aiutarti solo con 
-  questioni urbanistiche!');
-              return;
-          }
+                  // Lista ridotta di argomenti CHIARAMENTE non 
+  urbanistici
+                  const obviouslyWrongTopics = [
+                      'ricetta', 'cucinare', 'ristorante', 'menu',
+  'cibo',
+                      'bitcoin', 'crypto', 'borsa', 'investimenti',
+                      'malattia', 'farmaco', 'dottore',
+                      'videogiochi', 'gaming', 'giocare',
+                      'cantante', 'musica', 'film', 'cinema',
+                      'calcio', 'tennis', 'sport',
+                      'moda', 'vestiti', 'shopping'
+                  ];
 
-          chatInput.value = '';
-          addMessage(question, true);
-          showTyping(true);
+                  return obviouslyWrongTopics.some(topic =>
+  questionLower.includes(topic));
+              }
 
-          try {
-              await fetch('/api/initialize', { method: 'POST' });
+              async function sendMessage() {
+                  const question = chatInput.value.trim();
+                  if (!question) return;
 
-              const response = await fetch('/api/query', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ question })
+                  console.log('📤 Invio messaggio:', question);
+
+                  // Solo blocca argomenti OVVIAMENTE sbagliati
+                  if (shouldBlock(question)) {
+                      chatInput.value = '';
+                      addMessage(question, true);
+                      addMessage('🏗️ Mi dispiace, sono specializzato 
+  in <strong>pianificazione urbana e normative 
+  edilizie</strong>.<br><br>Posso aiutarti con:<br>• Permessi di 
+  costruire<br>• Piani regolatori<br>• Vincoli paesaggistici<br>• 
+  Zonizzazioni<br>• Normative edilizie<br><br>Prova a farmi una 
+  domanda su questi argomenti!');
+                      return;
+                  }
+
+                  chatInput.value = '';
+                  addMessage(question, true);
+                  showTyping(true);
+
+                  try {
+                      // Inizializzazione automatica
+                      await fetch('/api/initialize', { method: 'POST'
+  });
+
+                      // Invio query
+                      const response = await fetch('/api/query', {
+                          method: 'POST',
+                          headers: { 'Content-Type':
+  'application/json' },
+                          body: JSON.stringify({ question })
+                      });
+
+                      const result = await response.json();
+                      showTyping(false);
+
+                      if (result.success) {
+                          addMessage(result.answer);
+                      } else {
+                          addMessage('❌ Errore: ' + (result.error ||
+  'Risposta non valida'));
+                      }
+
+                  } catch (error) {
+                      console.error('❌ Errore:', error);
+                      showTyping(false);
+                      addMessage('❌ Errore di connessione: ' +
+  error.message);
+                  }
+              }
+
+              // EVENT LISTENERS - APPROCCIO DEFINITIVO
+
+              // 1. Click sul pulsante
+              sendBtn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  console.log('🖱️ Click pulsante');
+                  sendMessage();
               });
 
-              const result = await response.json();
-              showTyping(false);
-              addMessage(result.answer || 'Errore nella risposta');
+              // 2. Enter sulla tastiera - MULTIPLE APPROACH
+              chatInput.addEventListener('keydown', function(e) {
+                  console.log('⌨️ Key pressed:', e.key, 'Code:',
+  e.code);
 
-          } catch (error) {
-              showTyping(false);
-              addMessage('Errore: ' + error.message);
-          }
-      }
+                  if (e.key === 'Enter' || e.code === 'Enter' ||
+  e.keyCode === 13) {
+                      e.preventDefault();
+                      console.log('✅ Enter detected - sending 
+  message');
+                      sendMessage();
+                  }
+              });
 
-      // EVENT LISTENERS SEMPLICI
-      sendBtn.onclick = () => {
-          console.log('Button clicked!');
-          sendMessage();
-      };
+              // 3. Backup keypress event
+              chatInput.addEventListener('keypress', function(e) {
+                  if (e.key === 'Enter' || e.keyCode === 13) {
+                      e.preventDefault();
+                      console.log('✅ Keypress Enter backup - sending 
+  message');
+                      sendMessage();
+                  }
+              });
 
-      chatInput.onkeydown = (e) => {
-          console.log('Key pressed:', e.key);
-          if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              console.log('Sending message via Enter!');
-              sendMessage();
-          }
-      };
-  });
-  </script>
+              // 4. Focus sull'input al caricamento
+              chatInput.focus();
+
+              console.log('🎉 UrbanAI inizializzato con successo!');
+          });
+      </script>
   </body>
   </html>
