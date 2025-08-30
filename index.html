@@ -41,9 +41,6 @@
               font-size: 24px;
               font-weight: 300;
               color: #2c3e50;
-              display: flex;
-              align-items: center;
-              gap: 10px;
           }
 
           .status {
@@ -198,8 +195,6 @@
               font-style: italic;
           }
 
-          .typing.show { display: block; }
-
           .welcome {
               text-align: center;
               padding: 60px 40px;
@@ -223,7 +218,6 @@
               to { opacity: 1; transform: translateY(0); }
           }
 
-          /* Mobile fixes */
           @media (max-width: 768px) {
               .chat-container {
                   margin: 10px;
@@ -298,31 +292,30 @@
       </div>
 
       <script>
-          console.log('🚀 Script caricato!');
+          console.log('Script caricato!');
 
           let chatInput, chatMessages, typing, chatForm;
 
           function addMessage(content, isUser = false) {
-              console.log(`📝 Aggiungendo messaggio: "${content}" 
-  (isUser: ${isUser})`);
+              console.log('Aggiungendo messaggio:', content);
 
               if (!chatMessages) {
-                  console.error('❌ chatMessages non trovato!');
+                  console.error('chatMessages non trovato!');
                   return;
               }
 
               const welcome = chatMessages.querySelector('.welcome');
               if (welcome) {
-                  console.log('🗑️ Rimuovendo welcome message');
                   welcome.remove();
               }
 
               const messageDiv = document.createElement('div');
-              messageDiv.className = `message ${isUser ? 'user' : 
-  'bot'}`;
+              messageDiv.className = 'message ' + (isUser ? 'user' :
+  'bot');
 
               const avatar = document.createElement('div');
-              avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
+              avatar.className = 'avatar ' + (isUser ? 'user' :
+  'bot');
               avatar.textContent = isUser ? 'U' : 'AI';
 
               const contentDiv = document.createElement('div');
@@ -334,11 +327,11 @@
               chatMessages.appendChild(messageDiv);
               chatMessages.scrollTop = chatMessages.scrollHeight;
 
-              console.log('✅ Messaggio aggiunto al DOM');
+              console.log('Messaggio aggiunto');
           }
 
           function showTyping(show) {
-              console.log(`💭 Typing indicator: ${show}`);
+              console.log('Typing:', show);
               if (typing) {
                   typing.style.display = show ? 'block' : 'none';
                   if (show && chatMessages) {
@@ -350,36 +343,33 @@
 
           function shouldBlock(question) {
               const questionLower = question.toLowerCase();
-              const obviouslyWrongTopics = [
-                  'ricetta', 'cucinare', 'bitcoin', 'videogiochi',
-  'calcio'
-              ];
+              const obviouslyWrongTopics = ['ricetta', 'cucinare',
+  'bitcoin', 'videogiochi', 'calcio'];
               return obviouslyWrongTopics.some(topic =>
   questionLower.includes(topic));
           }
 
           async function sendMessage() {
-              console.log('📤 sendMessage() chiamata');
+              console.log('sendMessage chiamata');
 
               if (!chatInput) {
-                  console.error('❌ chatInput non trovato!');
+                  console.error('chatInput non trovato!');
                   return;
               }
 
               const question = chatInput.value.trim();
-              console.log(`📝 Domanda: "${question}"`);
+              console.log('Domanda:', question);
 
               if (!question) {
-                  console.log('⚠️ Domanda vuota, esco');
+                  console.log('Domanda vuota');
                   return;
               }
 
-              // Test immediato per vedere se addMessage funziona
-              console.log('🧪 Test addMessage...');
+              console.log('Test addMessage...');
               addMessage(question, true);
 
               if (shouldBlock(question)) {
-                  console.log('🚫 Domanda bloccata dal filtro');
+                  console.log('Domanda bloccata');
                   chatInput.value = '';
                   addMessage('Mi dispiace, sono specializzato in 
   pianificazione urbana e normative edilizie.');
@@ -390,20 +380,19 @@
               showTyping(true);
 
               try {
-                  console.log('🔄 Inizializzazione sistema...');
+                  console.log('Inizializzazione sistema...');
                   await fetch('/api/initialize', { method: 'POST' });
 
-                  console.log('📡 Invio query al backend...');
+                  console.log('Invio query...');
                   const response = await fetch('/api/query', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ question })
                   });
 
-                  console.log('📨 Risposta ricevuta:',
-  response.status);
+                  console.log('Risposta ricevuta:', response.status);
                   const result = await response.json();
-                  console.log('📋 Risultato:', result);
+                  console.log('Risultato:', result);
 
                   showTyping(false);
 
@@ -415,7 +404,7 @@
                   }
 
               } catch (error) {
-                  console.error('💥 Errore:', error);
+                  console.error('Errore:', error);
                   showTyping(false);
                   addMessage('Errore di connessione: ' +
   error.message);
@@ -423,14 +412,14 @@
           }
 
           function initializeApp() {
-              console.log('🎯 Inizializzazione app...');
+              console.log('Inizializzazione app...');
 
               chatInput = document.getElementById('chatInput');
               chatMessages = document.getElementById('chatMessages');
               typing = document.getElementById('typing');
               chatForm = document.getElementById('chatForm');
 
-              console.log('🔍 Elementi trovati:', {
+              console.log('Elementi trovati:', {
                   chatInput: !!chatInput,
                   chatMessages: !!chatMessages,
                   typing: !!typing,
@@ -439,44 +428,36 @@
 
               if (!chatInput || !chatMessages || !typing || !chatForm)
    {
-                  console.error('❌ Elementi mancanti!');
+                  console.error('Elementi mancanti!');
                   return;
               }
 
-              // Event listener per form submit (Enter)
               chatForm.addEventListener('submit', function(e) {
-                  console.log('🎯 FORM SUBMIT - Enter premuto!');
+                  console.log('FORM SUBMIT - Enter premuto!');
                   e.preventDefault();
                   sendMessage();
                   return false;
               });
 
-              // Anche click sul bottone
               const sendBtn = chatForm.querySelector('.send-btn');
               if (sendBtn) {
                   sendBtn.addEventListener('click', function(e) {
-                      console.log('🖱️ CLICK BOTTONE - Bottone 
-  cliccato!');
+                      console.log('CLICK BOTTONE');
                       e.preventDefault();
                       sendMessage();
                   });
               }
 
               chatInput.focus();
-              console.log('✅ App inizializzata con successo!');
+              console.log('App inizializzata!');
           }
 
-          // AVVIO
           if (document.readyState === 'loading') {
-              console.log('⏳ DOM in loading, aspetto 
-  DOMContentLoaded...');
               document.addEventListener('DOMContentLoaded',
   initializeApp);
           } else {
-              console.log('✅ DOM pronto, inizializzo subito');
               initializeApp();
           }
       </script>
   </body>
   </html>
-
