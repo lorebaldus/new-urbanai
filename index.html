@@ -41,6 +41,9 @@
               font-size: 24px;
               font-weight: 300;
               color: #2c3e50;
+              display: flex;
+              align-items: center;
+              gap: 10px;
           }
 
           .status {
@@ -220,6 +223,7 @@
               to { opacity: 1; transform: translateY(0); }
           }
 
+          /* Mobile fixes */
           @media (max-width: 768px) {
               .chat-container {
                   margin: 10px;
@@ -285,21 +289,35 @@
                           placeholder="Scrivi la tua domanda"
                           autocomplete="off"
                       />
-                      <button class="send-btn" id="sendBtn">↑</button>
+                      <button class="send-btn" id="sendBtn" 
+  type="button">↑</button>
                   </div>
               </div>
           </div>
       </div>
 
       <script>
-          let chatInput, chatMessages, typing;
+          // Variabili globali
+          let chatInput, sendBtn, chatMessages, typing;
 
           function initializeApp() {
+              console.log('🔄 Inizializzazione app...');
+
+              // Trova elementi
               chatInput = document.getElementById('chatInput');
+              sendBtn = document.getElementById('sendBtn');
               chatMessages = document.getElementById('chatMessages');
               typing = document.getElementById('typing');
 
-              chatInput.focus();
+              // Verifica che esistano
+              if (!chatInput || !sendBtn || !chatMessages || !typing)
+  {
+                  console.error('❌ Elementi mancanti!');
+                  return;
+              }
+
+              console.log('✅ Elementi trovati, attacco eventi...');
+              setupEventListeners();
           }
 
           function addMessage(content, isUser = false) {
@@ -334,9 +352,15 @@
           function shouldBlock(question) {
               const questionLower = question.toLowerCase();
               const obviouslyWrongTopics = [
-                  'ricetta', 'cucinare', 'bitcoin', 'videogiochi',
-  'calcio'
+                  'ricetta', 'cucinare', 'ristorante', 'menu', 'cibo',
+                  'bitcoin', 'crypto', 'borsa', 'investimenti',
+                  'malattia', 'farmaco', 'dottore',
+                  'videogiochi', 'gaming', 'giocare',
+                  'cantante', 'musica', 'film', 'cinema',
+                  'calcio', 'tennis', 'sport',
+                  'moda', 'vestiti', 'shopping'
               ];
+
               return obviouslyWrongTopics.some(topic =>
   questionLower.includes(topic));
           }
@@ -345,11 +369,16 @@
               const question = chatInput.value.trim();
               if (!question) return;
 
+              console.log('📤 Invio:', question);
+
               if (shouldBlock(question)) {
                   chatInput.value = '';
                   addMessage(question, true);
-                  addMessage('Mi dispiace, sono specializzato in 
-  pianificazione urbana e normative edilizie.');
+                  addMessage('🏗️ Mi dispiace, sono specializzato in 
+  <strong>pianificazione urbana e normative 
+  edilizie</strong>.<br><br>Posso aiutarti con:<br>• Permessi di 
+  costruire<br>• Piani regolatori<br>• Vincoli paesaggistici<br>• 
+  Zonizzazioni<br>• Normative edilizie');
                   return;
               }
 
@@ -372,35 +401,61 @@
                   if (result.success) {
                       addMessage(result.answer);
                   } else {
-                      addMessage('Errore: ' + (result.error ||
+                      addMessage('❌ Errore: ' + (result.error ||
   'Risposta non valida'));
                   }
 
               } catch (error) {
+                  console.error('❌ Errore:', error);
                   showTyping(false);
-                  addMessage('Errore di connessione: ' +
+                  addMessage('❌ Errore di connessione: ' +
   error.message);
               }
           }
 
-          document.addEventListener('DOMContentLoaded', function() {
-              initializeApp();
-
-              // Enter key
-              chatInput.addEventListener('keydown', function(e) {
-                  if (e.key === 'Enter') {
-                      e.preventDefault();
-                      sendMessage();
-                  }
-              });
-
-              // Click button
-
-  document.getElementById('sendBtn').addEventListener('click',
-  function() {
+          function setupEventListeners() {
+              // CLICK PULSANTE
+              sendBtn.onclick = function() {
+                  console.log('🖱️ Click button');
                   sendMessage();
-              });
-          });
+              };
+
+              // ENTER TASTIERA - APPROCCIO DIRETTO
+              chatInput.onkeydown = function(event) {
+                  console.log('⌨️ Key:', event.key, 'Code:',
+  event.code, 'KeyCode:', event.keyCode);
+
+                  if (event.key === 'Enter' || event.keyCode === 13) {
+                      event.preventDefault();
+                      console.log('✅ ENTER RILEVATO - Invio 
+  messaggio');
+                      sendMessage();
+                      return false;
+                  }
+              };
+
+              // BACKUP EVENTI
+              chatInput.onkeypress = function(event) {
+                  if (event.key === 'Enter' || event.keyCode === 13) {
+                      event.preventDefault();
+                      console.log('✅ BACKUP KEYPRESS - Invio 
+  messaggio');
+                      sendMessage();
+                      return false;
+                  }
+              };
+
+              chatInput.focus();
+              console.log('🎉 Event listeners attaccati!');
+          }
+
+          // AVVIO APP
+          if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded',
+  initializeApp);
+          } else {
+              initializeApp();
+          }
       </script>
   </body>
   </html>
