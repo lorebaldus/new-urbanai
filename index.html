@@ -6,239 +6,241 @@
   initial-scale=1.0">
       <title>UrbanAI - Assistente Pianificazione Urbana</title>
       <style>
-  * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-  }
+          * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+          }
 
-  body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      color: #333;
-  }
+          body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana,
+  sans-serif;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2
+  100%);
+              min-height: 100vh;
+              color: #333;
+          }
 
-  .header {
-      background: rgba(255, 255, 255, 0.95);
-      border-bottom: 1px solid #e5e5e5;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
+          .header {
+              background: rgba(255, 255, 255, 0.95);
+              border-bottom: 1px solid #e5e5e5;
+              padding: 15px 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              z-index: 100;
+              backdrop-filter: blur(10px);
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          }
 
-  .logo {
-      font-size: 24px;
-      font-weight: 300;
-      color: #2c3e50;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-  }
+          .logo {
+              font-size: 24px;
+              font-weight: 300;
+              color: #2c3e50;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+          }
 
-  .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: #d5edda;
-      color: #155724;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-  }
+          .status {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 8px 16px;
+              background: #d5edda;
+              color: #155724;
+              border-radius: 20px;
+              font-size: 14px;
+              font-weight: 500;
+          }
 
-  .main {
-      display: flex;
-      height: 100vh;
-      padding-top: 80px;
-  }
+          .main {
+              display: flex;
+              height: 100vh;
+              padding-top: 80px;
+          }
 
-  .chat-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 0 20px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 15px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-  }
+          .chat-container {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 0 20px;
+              background: rgba(255, 255, 255, 0.95);
+              border-radius: 15px;
+              margin-top: 20px;
+              margin-bottom: 20px;
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+              backdrop-filter: blur(10px);
+          }
 
-  .chat-messages {
-      flex: 1;
-      padding: 30px 0;
-      overflow-y: auto;
-  }
+          .chat-messages {
+              flex: 1;
+              padding: 30px 0;
+              overflow-y: auto;
+          }
 
-  .message {
-      margin-bottom: 20px;
-      display: flex;
-      gap: 12px;
-      animation: fadeIn 0.5s ease-in;
-  }
+          .message {
+              margin-bottom: 20px;
+              display: flex;
+              gap: 12px;
+              animation: fadeIn 0.5s ease-in;
+          }
 
-  .message.user {
-      flex-direction: row-reverse;
-  }
+          .message.user {
+              flex-direction: row-reverse;
+          }
 
-  .avatar {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 600;
-      flex-shrink: 0;
-  }
+          .avatar {
+              width: 35px;
+              height: 35px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              font-weight: 600;
+              flex-shrink: 0;
+          }
 
-  .avatar.bot {
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-  }
+          .avatar.bot {
+              background: linear-gradient(135deg, #3498db, #2980b9);
+              color: white;
+          }
 
-  .avatar.user {
-      background: linear-gradient(135deg, #27ae60, #229954);
-      color: white;
-  }
+          .avatar.user {
+              background: linear-gradient(135deg, #27ae60, #229954);
+              color: white;
+          }
 
-  .message-content {
-      background: #f8f9fa;
-      padding: 15px 20px;
-      border-radius: 18px;
-      max-width: 80%;
-      line-height: 1.6;
-      border: 1px solid #e9ecef;
-  }
+          .message-content {
+              background: #f8f9fa;
+              padding: 15px 20px;
+              border-radius: 18px;
+              max-width: 80%;
+              line-height: 1.6;
+              border: 1px solid #e9ecef;
+          }
 
-  .message.user .message-content {
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      border: none;
-  }
+          .message.user .message-content {
+              background: linear-gradient(135deg, #3498db, #2980b9);
+              color: white;
+              border: none;
+          }
 
-  .input-container {
-      padding: 20px 0;
-      border-top: 1px solid #dee2e6;
-      background: rgba(255, 255, 255, 0.8);
-  }
+          .input-container {
+              padding: 20px 0;
+              border-top: 1px solid #dee2e6;
+              background: rgba(255, 255, 255, 0.8);
+          }
 
-  .input-wrapper {
-      position: relative;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 25px;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
+          .input-wrapper {
+              position: relative;
+              background: white;
+              border: 1px solid #ddd;
+              border-radius: 25px;
+              padding: 4px;
+              display: flex;
+              align-items: center;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          }
 
-  .chat-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      padding: 15px 20px;
-      font-size: 16px;
-      background: transparent;
-      font-family: inherit;
-      resize: none;
-      overflow: hidden;
-      min-height: 24px;
-      max-height: 120px;
-      white-space: nowrap;
-      overflow-x: hidden;
-  }
+          .chat-input {
+              flex: 1;
+              border: none;
+              outline: none;
+              padding: 15px 20px;
+              font-size: 16px;
+              background: transparent;
+              font-family: inherit;
+              resize: none;
+              overflow: hidden;
+              min-height: 24px;
+              max-height: 120px;
+              white-space: nowrap;
+              overflow-x: hidden;
+          }
 
-  .chat-input::placeholder {
-      color: #6c757d;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-  }
+          .chat-input::placeholder {
+              color: #6c757d;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+          }
 
-  .send-btn {
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 8px;
-      font-size: 18px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-  }
+          .send-btn {
+              background: linear-gradient(135deg, #3498db, #2980b9);
+              color: white;
+              border: none;
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 8px;
+              font-size: 18px;
+              font-weight: bold;
+              transition: all 0.3s ease;
+          }
 
-  .send-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-  }
+          .send-btn:hover {
+              transform: scale(1.05);
+              box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+          }
 
-  .typing {
-      display: none;
-      padding: 20px;
-      text-align: center;
-      color: #7f8c8d;
-      font-style: italic;
-  }
+          .typing {
+              display: none;
+              padding: 20px;
+              text-align: center;
+              color: #7f8c8d;
+              font-style: italic;
+          }
 
-  .typing.show { display: block; }
+          .typing.show { display: block; }
 
-  .welcome {
-      text-align: center;
-      padding: 60px 40px;
-      color: #7f8c8d;
-  }
+          .welcome {
+              text-align: center;
+              padding: 60px 40px;
+              color: #7f8c8d;
+          }
 
-  .welcome h2 {
-      font-size: 32px;
-      font-weight: 300;
-      color: #2c3e50;
-      margin-bottom: 15px;
-  }
+          .welcome h2 {
+              font-size: 32px;
+              font-weight: 300;
+              color: #2c3e50;
+              margin-bottom: 15px;
+          }
 
-  .welcome p {
-      font-size: 18px;
-      line-height: 1.6;
-  }
+          .welcome p {
+              font-size: 18px;
+              line-height: 1.6;
+          }
 
-  @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-  }
+          @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+          }
 
-  @media (max-width: 768px) {
-      .chat-container {
-          margin: 10px;
-          border-radius: 10px;
-      }
-      .header {
-          padding: 12px 16px;
-      }
-      .logo {
-          font-size: 20px;
-      }
-  }
-  </style>
+          @media (max-width: 768px) {
+              .chat-container {
+                  margin: 10px;
+                  border-radius: 10px;
+              }
+              .header {
+                  padding: 12px 16px;
+              }
+              .logo {
+                  font-size: 20px;
+              }
+          }
+      </style>
   </head>
   <body>
       <div class="header">
@@ -251,10 +253,10 @@
               <div class="chat-messages" id="chatMessages">
                   <div class="welcome">
                       <h2>Benvenuto in UrbanAI</h2>
-                      <p>Il tuo assistente intelligente per la
-  pianificazione urbana e le normative.<br>
-                      Scrivi la tua domanda qui sotto per
-  iniziare!</p>
+                      <p>Il tuo assistente intelligente specializzato
+  in pianificazione urbana e normative edilizie italiane.<br>
+                      Chiedimi informazioni su permessi di costruire,
+  piani regolatori, vincoli paesaggistici e molto altro!</p>
                   </div>
               </div>
 
@@ -267,8 +269,8 @@
                       <textarea 
                           class="chat-input" 
                           id="chatInput" 
-                          placeholder="Scrivi la tua domanda sui 
-  documenti urbanistici..."
+                          placeholder="Fai una domanda su urbanistica 
+  e normative edilizie..."
                           rows="1"
                       ></textarea>
                       <button class="send-btn" id="sendBtn">↑</button>
@@ -277,84 +279,167 @@
           </div>
       </div>
 
-       <script>
-  document.addEventListener('DOMContentLoaded', () => {
-      const chatInput = document.getElementById('chatInput');
-      const sendBtn = document.getElementById('sendBtn');
-      const chatMessages = document.getElementById('chatMessages');
-      const typing = document.getElementById('typing');
+      <script>
+          document.addEventListener('DOMContentLoaded', () => {
+              const chatInput = document.getElementById('chatInput');
+              const sendBtn = document.getElementById('sendBtn');
+              const chatMessages =
+  document.getElementById('chatMessages');
+              const typing = document.getElementById('typing');
 
-      function addMessage(content, isUser = false) {
-          const welcome = document.querySelector('.welcome');
-          if (welcome) welcome.remove();
+              // Keywords non-urbanistiche per filtro frontend
+              const nonUrbanKeywords = [
+                  'cena', 'ricetta', 'cucina', 'cucinare',
+  'ristorante', 'menu',
+                  'viaggio', 'vacanza', 'turismo', 'hotel', 'volo',
+                  'sport', 'calcio', 'tennis', 'palestra', 'fitness',
+                  'medicina', 'salute', 'dottore', 'malattia',
+  'farmaco',
+                  'finanza', 'investimenti', 'borsa', 'crypto',
+  'bitcoin',
+                  'amore', 'relazioni', 'appuntamento', 'matrimonio',
+                  'musica', 'cantante', 'film', 'cinema',
+  'televisione',
+                  'moda', 'vestiti', 'shopping', 'trucco', 'bellezza',
+                  'auto', 'macchina', 'motore', 'benzina',
+  'meccanico',
+                  'tecnologia', 'smartphone', 'computer', 'internet',
+  'social',
+                  'animali', 'cane', 'gatto', 'veterinario',
+                  'giochi', 'videogiochi', 'gaming', 'console'
+              ];
 
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+              function addMessage(content, isUser = false) {
+                  const welcome = document.querySelector('.welcome');
+                  if (welcome) welcome.remove();
 
-          const avatar = document.createElement('div');
-          avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
-          avatar.textContent = isUser ? 'U' : 'AI';
+                  const messageDiv = document.createElement('div');
+                  messageDiv.className = `message ${isUser ? 'user' : 
+  'bot'}`;
 
-          const contentDiv = document.createElement('div');
-          contentDiv.className = 'message-content';
-          contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+                  const avatar = document.createElement('div');
+                  avatar.className = `avatar ${isUser ? 'user' : 
+  'bot'}`;
+                  avatar.textContent = isUser ? 'U' : 'AI';
 
-          messageDiv.appendChild(avatar);
-          messageDiv.appendChild(contentDiv);
-          chatMessages.appendChild(messageDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+                  const contentDiv = document.createElement('div');
+                  contentDiv.className = 'message-content';
+                  contentDiv.innerHTML = content.replace(/\n/g,
+  '<br>');
 
-      function showTyping(show) {
-          typing.style.display = show ? 'block' : 'none';
-      }
+                  messageDiv.appendChild(avatar);
+                  messageDiv.appendChild(contentDiv);
+                  chatMessages.appendChild(messageDiv);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
 
-      async function sendMessage() {
-          const question = chatInput.value.trim();
-          if (!question) return;
+              function showTyping(show) {
+                  typing.style.display = show ? 'block' : 'none';
+              }
 
-          chatInput.value = '';
-          addMessage(question, true);
-          showTyping(true);
+              function isUrbanRelated(question) {
+                  const questionLower = question.toLowerCase();
 
-          try {
-              // Try initialize first
-              try {
-                  await fetch('/api/initialize', { method: 'POST' });
-              } catch (e) {}
+                  // Check for non-urban keywords
+                  const hasNonUrbanKeywords =
+  nonUrbanKeywords.some(keyword =>
+                      questionLower.includes(keyword)
+                  );
 
-              const response = await fetch('/api/query', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ question })
+                  if (hasNonUrbanKeywords) return false;
+
+                  // Check for urban planning keywords (positive 
+  indicators)
+                  const urbanKeywords = [
+                      'urban', 'edili', 'costrui', 'permess', 'piano',
+   'regolator',
+                      'zona', 'vincol', 'paesagg', 'territorio',
+  'comune', 'prg', 'pgt',
+                      'standard', 'urbanizzazi', 'residenzial',
+  'commercial', 'industrial',
+                      'verde', 'parcheggi', 'densità', 'indice',
+  'volumetri', 'altezz',
+                      'distanz', 'confin', 'lottizzazi', 'comparto',
+  'espropri'
+                  ];
+
+                  const hasUrbanKeywords = urbanKeywords.some(keyword 
+  =>
+                      questionLower.includes(keyword)
+                  );
+
+                  // If it has urban keywords, it's definitely 
+  urban-related
+                  if (hasUrbanKeywords) return true;
+
+                  // If it's a generic question without specific 
+  keywords, let the backend handle it
+                  return true;
+              }
+
+              async function sendMessage() {
+                  const question = chatInput.value.trim();
+                  if (!question) return;
+
+                  // Pre-filter non-urban topics
+                  if (!isUrbanRelated(question)) {
+                      chatInput.value = '';
+                      addMessage(question, true);
+                      addMessage('🏗️ Mi dispiace, sono UrbanAI e posso
+   aiutarti solo con questioni di <strong>pianificazione urbana e 
+  normative edilizie</strong>.<br><br>Prova a chiedermi informazioni 
+  su:<br>• Permessi di costruire<br>• Piani regolatori (PRG/PGT)<br>• 
+  Vincoli paesaggistici<br>• Zonizzazioni e destinazioni d\'uso<br>• 
+  Normative edilizie<br>• Standard urbanistici');
+                      return;
+                  }
+
+                  chatInput.value = '';
+                  addMessage(question, true);
+                  showTyping(true);
+
+                  try {
+                      // Try initialize first
+                      try {
+                          await fetch('/api/initialize', { method:
+  'POST' });
+                      } catch (e) {}
+
+                      const response = await fetch('/api/query', {
+                          method: 'POST',
+                          headers: { 'Content-Type':
+  'application/json' },
+                          body: JSON.stringify({ question })
+                      });
+
+                      const result = await response.json();
+                      showTyping(false);
+                      addMessage(result.answer || 'Errore nella 
+  risposta');
+
+                  } catch (error) {
+                      showTyping(false);
+                      addMessage('Errore: ' + error.message);
+                  }
+              }
+
+              // Event listeners
+              sendBtn.addEventListener('click', sendMessage);
+
+              chatInput.addEventListener('keypress', (e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                  }
               });
 
-              const result = await response.json();
-              showTyping(false);
-              addMessage(result.answer || 'Errore nella risposta');
-
-          } catch (error) {
-              showTyping(false);
-              addMessage('Errore: ' + error.message);
-          }
-      }
-
-      // Event listeners
-      sendBtn.addEventListener('click', sendMessage);
-
-      chatInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage();
-          }
-      });
-
-      // Auto-resize textarea
-      chatInput.addEventListener('input', () => {
-          chatInput.style.height = 'auto';
-          chatInput.style.height = chatInput.scrollHeight + 'px';
-      });
-  });
-  </script>
+              // Auto-resize textarea
+              chatInput.addEventListener('input', () => {
+                  chatInput.style.height = 'auto';
+                  chatInput.style.height = chatInput.scrollHeight +
+  'px';
+              });
+          });
+      </script>
   </body>
   </html>
