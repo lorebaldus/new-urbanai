@@ -298,35 +298,24 @@
       </div>
 
       <script>
+          console.log('🚀 Script caricato!');
+
           let chatInput, chatMessages, typing, chatForm;
 
-          function initializeApp() {
-              chatInput = document.getElementById('chatInput');
-              chatMessages = document.getElementById('chatMessages');
-              typing = document.getElementById('typing');
-              chatForm = document.getElementById('chatForm');
+          function addMessage(content, isUser = false) {
+              console.log(`📝 Aggiungendo messaggio: "${content}" 
+  (isUser: ${isUser})`);
 
-              if (!chatInput || !chatMessages || !typing || !chatForm)
-   {
-                  console.error('❌ Elementi mancanti!');
+              if (!chatMessages) {
+                  console.error('❌ chatMessages non trovato!');
                   return;
               }
 
-              // Aggiungi event listener al form per il submit (Enter)
-              chatForm.addEventListener('submit', function(e) {
-                  e.preventDefault();
-                  console.log('📤 FORM SUBMIT - Enter premuto!');
-                  sendMessage();
-                  return false;
-              });
-
-              chatInput.focus();
-              console.log('✅ App inizializzata con form submit!');
-          }
-
-          function addMessage(content, isUser = false) {
-              const welcome = document.querySelector('.welcome');
-              if (welcome) welcome.remove();
+              const welcome = chatMessages.querySelector('.welcome');
+              if (welcome) {
+                  console.log('🗑️ Rimuovendo welcome message');
+                  welcome.remove();
+              }
 
               const messageDiv = document.createElement('div');
               messageDiv.className = `message ${isUser ? 'user' : 
@@ -344,12 +333,18 @@
               messageDiv.appendChild(contentDiv);
               chatMessages.appendChild(messageDiv);
               chatMessages.scrollTop = chatMessages.scrollHeight;
+
+              console.log('✅ Messaggio aggiunto al DOM');
           }
 
           function showTyping(show) {
-              typing.style.display = show ? 'block' : 'none';
-              if (show) {
-                  chatMessages.scrollTop = chatMessages.scrollHeight;
+              console.log(`💭 Typing indicator: ${show}`);
+              if (typing) {
+                  typing.style.display = show ? 'block' : 'none';
+                  if (show && chatMessages) {
+                      chatMessages.scrollTop =
+  chatMessages.scrollHeight;
+                  }
               }
           }
 
@@ -364,33 +359,52 @@
           }
 
           async function sendMessage() {
-              const question = chatInput.value.trim();
-              if (!question) return;
+              console.log('📤 sendMessage() chiamata');
 
-              console.log('📤 Invio messaggio:', question);
+              if (!chatInput) {
+                  console.error('❌ chatInput non trovato!');
+                  return;
+              }
+
+              const question = chatInput.value.trim();
+              console.log(`📝 Domanda: "${question}"`);
+
+              if (!question) {
+                  console.log('⚠️ Domanda vuota, esco');
+                  return;
+              }
+
+              // Test immediato per vedere se addMessage funziona
+              console.log('🧪 Test addMessage...');
+              addMessage(question, true);
 
               if (shouldBlock(question)) {
+                  console.log('🚫 Domanda bloccata dal filtro');
                   chatInput.value = '';
-                  addMessage(question, true);
                   addMessage('Mi dispiace, sono specializzato in 
   pianificazione urbana e normative edilizie.');
                   return;
               }
 
               chatInput.value = '';
-              addMessage(question, true);
               showTyping(true);
 
               try {
+                  console.log('🔄 Inizializzazione sistema...');
                   await fetch('/api/initialize', { method: 'POST' });
 
+                  console.log('📡 Invio query al backend...');
                   const response = await fetch('/api/query', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ question })
                   });
 
+                  console.log('📨 Risposta ricevuta:',
+  response.status);
                   const result = await response.json();
+                  console.log('📋 Risultato:', result);
+
                   showTyping(false);
 
                   if (result.success) {
@@ -401,19 +415,68 @@
                   }
 
               } catch (error) {
+                  console.error('💥 Errore:', error);
                   showTyping(false);
                   addMessage('Errore di connessione: ' +
   error.message);
               }
           }
 
+          function initializeApp() {
+              console.log('🎯 Inizializzazione app...');
+
+              chatInput = document.getElementById('chatInput');
+              chatMessages = document.getElementById('chatMessages');
+              typing = document.getElementById('typing');
+              chatForm = document.getElementById('chatForm');
+
+              console.log('🔍 Elementi trovati:', {
+                  chatInput: !!chatInput,
+                  chatMessages: !!chatMessages,
+                  typing: !!typing,
+                  chatForm: !!chatForm
+              });
+
+              if (!chatInput || !chatMessages || !typing || !chatForm)
+   {
+                  console.error('❌ Elementi mancanti!');
+                  return;
+              }
+
+              // Event listener per form submit (Enter)
+              chatForm.addEventListener('submit', function(e) {
+                  console.log('🎯 FORM SUBMIT - Enter premuto!');
+                  e.preventDefault();
+                  sendMessage();
+                  return false;
+              });
+
+              // Anche click sul bottone
+              const sendBtn = chatForm.querySelector('.send-btn');
+              if (sendBtn) {
+                  sendBtn.addEventListener('click', function(e) {
+                      console.log('🖱️ CLICK BOTTONE - Bottone 
+  cliccato!');
+                      e.preventDefault();
+                      sendMessage();
+                  });
+              }
+
+              chatInput.focus();
+              console.log('✅ App inizializzata con successo!');
+          }
+
           // AVVIO
           if (document.readyState === 'loading') {
+              console.log('⏳ DOM in loading, aspetto 
+  DOMContentLoaded...');
               document.addEventListener('DOMContentLoaded',
   initializeApp);
           } else {
+              console.log('✅ DOM pronto, inizializzo subito');
               initializeApp();
           }
       </script>
   </body>
   </html>
+
