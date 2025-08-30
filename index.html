@@ -311,115 +311,192 @@
       </div>
 
       <script>
-  document.addEventListener('DOMContentLoaded', () => {
-      const chatInput = document.getElementById('chatInput');
-      const sendBtn = document.getElementById('sendBtn');
-      const chatMessages = document.getElementById('chatMessages');
-      const typing = document.getElementById('typing');
+          document.addEventListener('DOMContentLoaded', () => {
+              const chatInput = document.getElementById('chatInput');
+              const sendBtn = document.getElementById('sendBtn');
+              const chatMessages =
+  document.getElementById('chatMessages');
+              const typing = document.getElementById('typing');
 
-      function addMessage(content, isUser = false) {
-          const welcome = document.querySelector('.welcome');
-          if (welcome) welcome.remove();
+              function addMessage(content, isUser = false) {
+                  const welcome = document.querySelector('.welcome');
+                  if (welcome) welcome.remove();
 
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+                  const messageDiv = document.createElement('div');
+                  messageDiv.className = `message ${isUser ? 'user' : 
+  'bot'}`;
 
-          const avatar = document.createElement('div');
-          avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
-          avatar.textContent = isUser ? 'U' : 'AI';
+                  const avatar = document.createElement('div');
+                  avatar.className = `avatar ${isUser ? 'user' : 
+  'bot'}`;
+                  avatar.textContent = isUser ? 'U' : 'AI';
 
-          const contentDiv = document.createElement('div');
-          contentDiv.className = 'message-content';
-          contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+                  const contentDiv = document.createElement('div');
+                  contentDiv.className = 'message-content';
+                  contentDiv.innerHTML = content.replace(/\n/g,
+  '<br>');
 
-          messageDiv.appendChild(avatar);
-          messageDiv.appendChild(contentDiv);
-          chatMessages.appendChild(messageDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+                  messageDiv.appendChild(avatar);
+                  messageDiv.appendChild(contentDiv);
+                  chatMessages.appendChild(messageDiv);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
 
-      function showTyping(show) {
-          typing.style.display = show ? 'block' : 'none';
-      }
+              function showTyping(show) {
+                  typing.style.display = show ? 'block' : 'none';
+                  if (show) {
+                      chatMessages.scrollTop =
+  chatMessages.scrollHeight;
+                  }
+              }
 
-      async function sendMessage() {
-          const question = chatInput.value.trim();
-          if (!question) return;
+              // FILTRO MIGLIORATO - Più permissivo
+              function isUrbanRelated(question) {
+                  const questionLower = question.toLowerCase();
 
-          console.log('Sending message:', question); // DEBUG
+                  // Lista RIDOTTA solo per argomenti CHIARAMENTE 
+  non-urbanistici
+                  const clearlyNonUrbanKeywords = [
+                      'ricetta', 'cucinare', 'ristorante', 'menu',
+  'cibo', 'mangiare',
+                      'malattia', 'farmaco', 'dottore', 'medicina',
+  'salute',
+                      'bitcoin', 'crypto', 'investimenti', 'borsa',
+  'finanza',
+                      'videogiochi', 'gaming', 'console', 'giocare',
+                      'cantante', 'musica', 'film', 'cinema', 'serie 
+  tv',
+                      'calcio', 'tennis', 'sport', 'palestra',
+                      'moda', 'vestiti', 'shopping', 'trucco',
+                      'viaggio', 'vacanza', 'hotel', 'volo'
+                  ];
 
-          chatInput.value = '';
-          addMessage(question, true);
-          showTyping(true);
+                  // Solo se contiene CHIARAMENTE parole 
+  non-urbanistiche
+                  const hasClearlyNonUrbanKeywords =
+  clearlyNonUrbanKeywords.some(keyword =>
+                      questionLower.includes(keyword)
+                  );
 
-          try {
-              await fetch('/api/initialize', { method: 'POST' });
+                  // Se ha parole chiaramente non-urbanistiche, blocca
+                  if (hasClearlyNonUrbanKeywords) return false;
 
-              const response = await fetch('/api/query', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ question })
+                  // TUTTO IL RESTO È PERMESSO - lascia decidere al 
+  backend
+                  return true;
+              }
+
+              async function sendMessage() {
+                  const question = chatInput.value.trim();
+                  if (!question) return;
+
+                  console.log('Sending message:', question); // DEBUG
+
+                  // Pre-filter solo per argomenti CHIARAMENTE 
+  non-urbanistici
+                  if (!isUrbanRelated(question)) {
+                      chatInput.value = '';
+                      addMessage(question, true);
+                      addMessage('🏗️ Mi dispiace, sono UrbanAI e posso
+   aiutarti solo con questioni di <strong>pianificazione urbana e 
+  normative edilizie</strong>.<br><br>Prova a chiedermi informazioni 
+  su:<br>• Permessi di costruire<br>• Piani regolatori (PRG/PGT)<br>• 
+  Vincoli paesaggistici<br>• Zonizzazioni e destinazioni d\'uso<br>• 
+  Normative edilizie<br>• Standard urbanistici');
+                      return;
+                  }
+
+                  chatInput.value = '';
+                  chatInput.style.height = 'auto';
+                  addMessage(question, true);
+                  showTyping(true);
+
+                  try {
+                      // Try initialize first
+                      try {
+                          await fetch('/api/initialize', { method:
+  'POST' });
+                      } catch (e) {}
+
+                      const response = await fetch('/api/query', {
+                          method: 'POST',
+                          headers: { 'Content-Type':
+  'application/json' },
+                          body: JSON.stringify({ question })
+                      });
+
+                      const result = await response.json();
+                      showTyping(false);
+                      addMessage(result.answer || 'Errore nella 
+  risposta');
+
+                  } catch (error) {
+                      showTyping(false);
+                      addMessage('Errore: ' + error.message);
+                  }
+              }
+
+              // TUTTI I POSSIBILI EVENT LISTENERS PER ENTER!
+              sendBtn.onclick = sendMessage;
+              sendBtn.addEventListener('click', sendMessage);
+              sendBtn.addEventListener('touchend', sendMessage);
+
+              // ENTER - TUTTI I METODI
+              chatInput.addEventListener('keydown', function(e) {
+                  console.log('Keydown:', e.key, e.keyCode); // DEBUG
+                  if (e.key === 'Enter' || e.keyCode === 13) {
+                      if (!e.shiftKey) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          sendMessage();
+                      }
+                  }
               });
 
-              const result = await response.json();
-              showTyping(false);
-              addMessage(result.answer || 'Errore nella risposta');
+              chatInput.addEventListener('keypress', function(e) {
+                  console.log('Keypress:', e.key, e.keyCode); // DEBUG
+                  if (e.key === 'Enter' || e.keyCode === 13) {
+                      if (!e.shiftKey) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          sendMessage();
+                      }
+                  }
+              });
 
-          } catch (error) {
-              showTyping(false);
-              addMessage('Errore: ' + error.message);
-          }
-      }
+              chatInput.addEventListener('keyup', function(e) {
+                  if (e.key === 'Enter' || e.keyCode === 13) {
+                      if (!e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage();
+                      }
+                  }
+              });
 
-      // TUTTI I POSSIBILI EVENT LISTENERS PER ENTER!
-      sendBtn.onclick = sendMessage;
-      sendBtn.addEventListener('click', sendMessage);
-      sendBtn.addEventListener('touchend', sendMessage);
+              // Auto-resize textarea e fix mobile
+              chatInput.addEventListener('input', function(e) {
+                  // Auto-resize
+                  chatInput.style.height = 'auto';
+                  chatInput.style.height =
+  Math.min(chatInput.scrollHeight, 120) + 'px';
 
-      // ENTER - TUTTI I METODI
-      chatInput.addEventListener('keydown', function(e) {
-          console.log('Keydown:', e.key, e.keyCode); // DEBUG
-          if (e.key === 'Enter' || e.keyCode === 13) {
-              if (!e.shiftKey) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  sendMessage();
-              }
-          }
-      });
+                  // Mobile enter detection
+                  if (e.inputType === 'insertLineBreak') {
+                      e.preventDefault();
+                      sendMessage();
+                  }
+              });
 
-      chatInput.addEventListener('keypress', function(e) {
-          console.log('Keypress:', e.key, e.keyCode); // DEBUG
-          if (e.key === 'Enter' || e.keyCode === 13) {
-              if (!e.shiftKey) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  sendMessage();
-              }
-          }
-      });
-
-      chatInput.addEventListener('keyup', function(e) {
-          if (e.key === 'Enter' || e.keyCode === 13) {
-              if (!e.shiftKey) {
+              // Touch event for mobile
+              sendBtn.addEventListener('touchstart', (e) => {
                   e.preventDefault();
                   sendMessage();
-              }
-          }
-      });
+              });
 
-      // MOBILE SPECIFIC
-      chatInput.addEventListener('input', function(e) {
-          if (e.inputType === 'insertLineBreak') {
-              e.preventDefault();
-              sendMessage();
-          }
-      });
-
-      // DEBUG: Log all events
-      chatInput.addEventListener('keydown', (e) =>
+              // DEBUG: Log all events
+              chatInput.addEventListener('keydown', (e) =>
   console.log('Event:', e.type, e.key));
-  });
-  </script>
+          });
+      </script>
   </body>
   </html>
