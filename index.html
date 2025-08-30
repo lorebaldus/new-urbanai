@@ -6,7 +6,12 @@
   initial-scale=1.0">
       <title>UrbanAI - Assistente Pianificazione Urbana</title>
       <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
+          * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+          }
+
           body {
               font-family: 'Segoe UI', Tahoma, Geneva, Verdana,
   sans-serif;
@@ -15,8 +20,10 @@
               min-height: 100vh;
               color: #333;
           }
+
           .header {
               background: rgba(255, 255, 255, 0.95);
+              border-bottom: 1px solid #e5e5e5;
               padding: 15px 20px;
               display: flex;
               justify-content: space-between;
@@ -29,47 +36,63 @@
               backdrop-filter: blur(10px);
               box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           }
+
           .logo {
               font-size: 24px;
               font-weight: 300;
               color: #2c3e50;
           }
+
           .status {
+              display: flex;
+              align-items: center;
+              gap: 8px;
               padding: 8px 16px;
               background: #d5edda;
               color: #155724;
               border-radius: 20px;
               font-size: 14px;
+              font-weight: 500;
           }
+
           .main {
               display: flex;
               height: 100vh;
               padding-top: 80px;
           }
+
           .chat-container {
               flex: 1;
               display: flex;
               flex-direction: column;
               max-width: 800px;
-              margin: 20px auto;
+              margin: 0 auto;
               padding: 0 20px;
               background: rgba(255, 255, 255, 0.95);
               border-radius: 15px;
+              margin-top: 20px;
+              margin-bottom: 20px;
               box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+              backdrop-filter: blur(10px);
           }
+
           .chat-messages {
               flex: 1;
               padding: 30px 0;
               overflow-y: auto;
           }
+
           .message {
               margin-bottom: 20px;
               display: flex;
               gap: 12px;
+              animation: fadeIn 0.5s ease-in;
           }
+
           .message.user {
               flex-direction: row-reverse;
           }
+
           .avatar {
               width: 35px;
               height: 35px;
@@ -81,14 +104,17 @@
               font-weight: 600;
               flex-shrink: 0;
           }
+
           .avatar.bot {
               background: linear-gradient(135deg, #3498db, #2980b9);
               color: white;
           }
+
           .avatar.user {
               background: linear-gradient(135deg, #27ae60, #229954);
               color: white;
           }
+
           .message-content {
               background: #f8f9fa;
               padding: 15px 20px;
@@ -97,16 +123,21 @@
               line-height: 1.6;
               border: 1px solid #e9ecef;
           }
+
           .message.user .message-content {
               background: linear-gradient(135deg, #3498db, #2980b9);
               color: white;
               border: none;
           }
+
           .input-container {
               padding: 20px 0;
               border-top: 1px solid #dee2e6;
+              background: rgba(255, 255, 255, 0.8);
           }
-          .chat-form {
+
+          .input-wrapper {
+              position: relative;
               background: white;
               border: 1px solid #ddd;
               border-radius: 25px;
@@ -115,6 +146,7 @@
               align-items: center;
               box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           }
+
           .chat-input {
               flex: 1;
               border: none;
@@ -122,7 +154,13 @@
               padding: 15px 20px;
               font-size: 16px;
               background: transparent;
+              font-family: inherit;
           }
+
+          .chat-input::placeholder {
+              color: #6c757d;
+          }
+
           .send-btn {
               background: linear-gradient(135deg, #3498db, #2980b9);
               color: white;
@@ -136,15 +174,86 @@
               justify-content: center;
               margin-right: 8px;
               font-size: 18px;
+              font-weight: bold;
               transition: all 0.3s ease;
           }
-          .typing { display: none; padding: 20px; text-align: center;
-  color: #7f8c8d; }
-          .welcome { text-align: center; padding: 60px 40px; color:
-  #7f8c8d; }
-          .welcome h2 { font-size: 32px; font-weight: 300; color:
-  #2c3e50; margin-bottom: 15px; }
-          .welcome p { font-size: 18px; line-height: 1.6; }
+
+          .send-btn:hover {
+              transform: scale(1.05);
+              box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+          }
+
+          .send-btn:active {
+              transform: scale(0.95);
+          }
+
+          .typing {
+              display: none;
+              padding: 20px;
+              text-align: center;
+              color: #7f8c8d;
+              font-style: italic;
+          }
+
+          .typing.show { display: block; }
+
+          .welcome {
+              text-align: center;
+              padding: 60px 40px;
+              color: #7f8c8d;
+          }
+
+          .welcome h2 {
+              font-size: 32px;
+              font-weight: 300;
+              color: #2c3e50;
+              margin-bottom: 15px;
+          }
+
+          .welcome p {
+              font-size: 18px;
+              line-height: 1.6;
+          }
+
+          @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+          }
+
+          @media (max-width: 768px) {
+              .chat-container {
+                  margin: 10px;
+                  border-radius: 10px;
+                  padding: 0 15px;
+              }
+              .header {
+                  padding: 12px 16px;
+              }
+              .logo {
+                  font-size: 20px;
+              }
+              .chat-input {
+                  font-size: 16px;
+                  padding: 12px 16px;
+              }
+              .input-wrapper {
+                  border-radius: 20px;
+              }
+              .send-btn {
+                  width: 36px;
+                  height: 36px;
+                  font-size: 16px;
+              }
+              .welcome {
+                  padding: 40px 20px;
+              }
+              .welcome h2 {
+                  font-size: 24px;
+              }
+              .welcome p {
+                  font-size: 16px;
+              }
+          }
       </style>
   </head>
   <body>
@@ -152,6 +261,7 @@
           <div class="logo">UrbanAI</div>
           <div class="status">Pronto</div>
       </div>
+
       <div class="main">
           <div class="chat-container">
               <div class="chat-messages" id="chatMessages">
@@ -161,37 +271,50 @@
   in pianificazione urbana e normative edilizie italiane.</p>
                   </div>
               </div>
-              <div class="typing" id="typing">UrbanAI sta
-  scrivendo...</div>
+
+              <div class="typing" id="typing">
+                  UrbanAI sta scrivendo...
+              </div>
+
               <div class="input-container">
-                  <form class="chat-form" id="chatForm">
-                      <input type="text" class="chat-input" 
-  id="chatInput" placeholder="Scrivi la tua domanda" 
-  autocomplete="off" required />
-                      <button class="send-btn" 
-  type="submit">&uarr;</button>
-                  </form>
+                  <div class="input-wrapper">
+                      <input 
+                          type="text" 
+                          class="chat-input" 
+                          id="chatInput" 
+                          placeholder="Scrivi la tua domanda"
+                          autocomplete="off"
+                      />
+                      <button class="send-btn" id="sendBtn">↑</button>
+                  </div>
               </div>
           </div>
       </div>
-      <script>
-          var chatInput, chatMessages, typing, chatForm;
 
-          function addMessage(content, isUser) {
-              console.log('Adding message: ' + content);
-              var welcome = chatMessages.querySelector('.welcome');
+      <script>
+          let chatInput, chatMessages, typing;
+
+          function initializeApp() {
+              chatInput = document.getElementById('chatInput');
+              chatMessages = document.getElementById('chatMessages');
+              typing = document.getElementById('typing');
+
+              chatInput.focus();
+          }
+
+          function addMessage(content, isUser = false) {
+              const welcome = document.querySelector('.welcome');
               if (welcome) welcome.remove();
 
-              var messageDiv = document.createElement('div');
-              messageDiv.className = 'message' + (isUser ? ' user' : '
-   bot');
+              const messageDiv = document.createElement('div');
+              messageDiv.className = `message ${isUser ? 'user' : 
+  'bot'}`;
 
-              var avatar = document.createElement('div');
-              avatar.className = 'avatar' + (isUser ? ' user' : ' 
-  bot');
+              const avatar = document.createElement('div');
+              avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
               avatar.textContent = isUser ? 'U' : 'AI';
 
-              var contentDiv = document.createElement('div');
+              const contentDiv = document.createElement('div');
               contentDiv.className = 'message-content';
               contentDiv.innerHTML = content.replace(/\n/g, '<br>');
 
@@ -203,67 +326,81 @@
 
           function showTyping(show) {
               typing.style.display = show ? 'block' : 'none';
+              if (show) {
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
           }
 
-          function sendMessage() {
-              console.log('Send message called');
-              var question = chatInput.value.trim();
+          function shouldBlock(question) {
+              const questionLower = question.toLowerCase();
+              const obviouslyWrongTopics = [
+                  'ricetta', 'cucinare', 'bitcoin', 'videogiochi',
+  'calcio'
+              ];
+              return obviouslyWrongTopics.some(topic =>
+  questionLower.includes(topic));
+          }
+
+          async function sendMessage() {
+              const question = chatInput.value.trim();
               if (!question) return;
 
-              console.log('Question: ' + question);
-              addMessage(question, true);
+              if (shouldBlock(question)) {
+                  chatInput.value = '';
+                  addMessage(question, true);
+                  addMessage('Mi dispiace, sono specializzato in 
+  pianificazione urbana e normative edilizie.');
+                  return;
+              }
+
               chatInput.value = '';
+              addMessage(question, true);
               showTyping(true);
 
-              fetch('/api/initialize', { method: 'POST' })
-                  .then(function() {
-                      return fetch('/api/query', {
-                          method: 'POST',
-                          headers: { 'Content-Type':
-  'application/json' },
-                          body: JSON.stringify({ question: question })
-                      });
-                  })
-                  .then(function(response) { return response.json();
-  })
-                  .then(function(result) {
-                      showTyping(false);
-                      if (result.success) {
-                          addMessage(result.answer, false);
-                      } else {
-                          addMessage('Errore: ' + (result.error ||
-  'Risposta non valida'), false);
-                      }
-                  })
-                  .catch(function(error) {
-                      console.error('Error:', error);
-                      showTyping(false);
-                      addMessage('Errore di connessione: ' +
-  error.message, false);
+              try {
+                  await fetch('/api/initialize', { method: 'POST' });
+
+                  const response = await fetch('/api/query', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ question })
                   });
+
+                  const result = await response.json();
+                  showTyping(false);
+
+                  if (result.success) {
+                      addMessage(result.answer);
+                  } else {
+                      addMessage('Errore: ' + (result.error ||
+  'Risposta non valida'));
+                  }
+
+              } catch (error) {
+                  showTyping(false);
+                  addMessage('Errore di connessione: ' +
+  error.message);
+              }
           }
 
-          function initApp() {
-              chatInput = document.getElementById('chatInput');
-              chatMessages = document.getElementById('chatMessages');
-              typing = document.getElementById('typing');
-              chatForm = document.getElementById('chatForm');
+          document.addEventListener('DOMContentLoaded', function() {
+              initializeApp();
 
-              chatForm.addEventListener('submit', function(e) {
-                  e.preventDefault();
-                  sendMessage();
-                  return false;
+              // Enter key
+              chatInput.addEventListener('keydown', function(e) {
+                  if (e.key === 'Enter') {
+                      e.preventDefault();
+                      sendMessage();
+                  }
               });
 
-              chatInput.focus();
-              console.log('App initialized');
-          }
+              // Click button
 
-          if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', initApp);
-          } else {
-              initApp();
-          }
+  document.getElementById('sendBtn').addEventListener('click',
+  function() {
+                  sendMessage();
+              });
+          });
       </script>
   </body>
   </html>
