@@ -262,8 +262,8 @@
   </head>
   <body>
       <div class="header">
-          <div class="logo">🏙️ UrbanAI</div>
-          <div class="status">✅ Pronto</div>
+          <div class="logo">UrbanAI</div>
+          <div class="status">Pronto</div>
       </div>
 
       <div class="main">
@@ -272,9 +272,7 @@
                   <div class="welcome">
                       <h2>Benvenuto in UrbanAI</h2>
                       <p>Il tuo assistente intelligente specializzato
-  in pianificazione urbana e normative edilizie italiane.<br>
-                      Scrivi "Ciao" per iniziare o fai una domanda
-  specifica!</p>
+  in pianificazione urbana e normative edilizie italiane.</p>
                   </div>
               </div>
 
@@ -288,8 +286,7 @@
                           type="text" 
                           class="chat-input" 
                           id="chatInput" 
-                          placeholder="Scrivi la tua domanda su 
-  urbanistica..."
+                          placeholder="Scrivi la tua domanda"
                           autocomplete="off"
                       />
                       <button class="send-btn" id="sendBtn" 
@@ -300,170 +297,165 @@
       </div>
 
       <script>
-          document.addEventListener('DOMContentLoaded', function() {
-              const chatInput = document.getElementById('chatInput');
-              const sendBtn = document.getElementById('sendBtn');
-              const chatMessages =
-  document.getElementById('chatMessages');
-              const typing = document.getElementById('typing');
+          // Variabili globali
+          let chatInput, sendBtn, chatMessages, typing;
 
-              // Verifica che gli elementi esistano
+          function initializeApp() {
+              console.log('🔄 Inizializzazione app...');
+
+              // Trova elementi
+              chatInput = document.getElementById('chatInput');
+              sendBtn = document.getElementById('sendBtn');
+              chatMessages = document.getElementById('chatMessages');
+              typing = document.getElementById('typing');
+
+              // Verifica che esistano
               if (!chatInput || !sendBtn || !chatMessages || !typing)
   {
-                  console.error('Elementi mancanti!', {chatInput,
-  sendBtn, chatMessages, typing});
+                  console.error('❌ Elementi mancanti!');
                   return;
               }
 
-              console.log('✅ Tutti gli elementi trovati, 
-  inizializzando...');
+              console.log('✅ Elementi trovati, attacco eventi...');
+              setupEventListeners();
+          }
 
-              function addMessage(content, isUser = false) {
-                  const welcome = document.querySelector('.welcome');
-                  if (welcome) welcome.remove();
+          function addMessage(content, isUser = false) {
+              const welcome = document.querySelector('.welcome');
+              if (welcome) welcome.remove();
 
-                  const messageDiv = document.createElement('div');
-                  messageDiv.className = `message ${isUser ? 'user' : 
+              const messageDiv = document.createElement('div');
+              messageDiv.className = `message ${isUser ? 'user' : 
   'bot'}`;
 
-                  const avatar = document.createElement('div');
-                  avatar.className = `avatar ${isUser ? 'user' : 
-  'bot'}`;
-                  avatar.textContent = isUser ? 'U' : 'AI';
+              const avatar = document.createElement('div');
+              avatar.className = `avatar ${isUser ? 'user' : 'bot'}`;
+              avatar.textContent = isUser ? 'U' : 'AI';
 
-                  const contentDiv = document.createElement('div');
-                  contentDiv.className = 'message-content';
-                  contentDiv.innerHTML = content.replace(/\n/g,
-  '<br>');
+              const contentDiv = document.createElement('div');
+              contentDiv.className = 'message-content';
+              contentDiv.innerHTML = content.replace(/\n/g, '<br>');
 
-                  messageDiv.appendChild(avatar);
-                  messageDiv.appendChild(contentDiv);
-                  chatMessages.appendChild(messageDiv);
+              messageDiv.appendChild(avatar);
+              messageDiv.appendChild(contentDiv);
+              chatMessages.appendChild(messageDiv);
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+
+          function showTyping(show) {
+              typing.style.display = show ? 'block' : 'none';
+              if (show) {
                   chatMessages.scrollTop = chatMessages.scrollHeight;
               }
+          }
 
-              function showTyping(show) {
-                  typing.style.display = show ? 'block' : 'none';
-                  if (show) {
-                      chatMessages.scrollTop =
-  chatMessages.scrollHeight;
-                  }
-              }
+          function shouldBlock(question) {
+              const questionLower = question.toLowerCase();
+              const obviouslyWrongTopics = [
+                  'ricetta', 'cucinare', 'ristorante', 'menu', 'cibo',
+                  'bitcoin', 'crypto', 'borsa', 'investimenti',
+                  'malattia', 'farmaco', 'dottore',
+                  'videogiochi', 'gaming', 'giocare',
+                  'cantante', 'musica', 'film', 'cinema',
+                  'calcio', 'tennis', 'sport',
+                  'moda', 'vestiti', 'shopping'
+              ];
 
-              // FILTRO INTELLIGENTE - Blocca solo cose ovviamente 
-  sbagliate
-              function shouldBlock(question) {
-                  const questionLower = question.toLowerCase();
-
-                  // Lista ridotta di argomenti CHIARAMENTE non 
-  urbanistici
-                  const obviouslyWrongTopics = [
-                      'ricetta', 'cucinare', 'ristorante', 'menu',
-  'cibo',
-                      'bitcoin', 'crypto', 'borsa', 'investimenti',
-                      'malattia', 'farmaco', 'dottore',
-                      'videogiochi', 'gaming', 'giocare',
-                      'cantante', 'musica', 'film', 'cinema',
-                      'calcio', 'tennis', 'sport',
-                      'moda', 'vestiti', 'shopping'
-                  ];
-
-                  return obviouslyWrongTopics.some(topic =>
+              return obviouslyWrongTopics.some(topic =>
   questionLower.includes(topic));
-              }
+          }
 
-              async function sendMessage() {
-                  const question = chatInput.value.trim();
-                  if (!question) return;
+          async function sendMessage() {
+              const question = chatInput.value.trim();
+              if (!question) return;
 
-                  console.log('📤 Invio messaggio:', question);
+              console.log('📤 Invio:', question);
 
-                  // Solo blocca argomenti OVVIAMENTE sbagliati
-                  if (shouldBlock(question)) {
-                      chatInput.value = '';
-                      addMessage(question, true);
-                      addMessage('🏗️ Mi dispiace, sono specializzato 
-  in <strong>pianificazione urbana e normative 
-  edilizie</strong>.<br><br>Posso aiutarti con:<br>• Permessi di 
-  costruire<br>• Piani regolatori<br>• Vincoli paesaggistici<br>• 
-  Zonizzazioni<br>• Normative edilizie<br><br>Prova a farmi una 
-  domanda su questi argomenti!');
-                      return;
-                  }
-
+              if (shouldBlock(question)) {
                   chatInput.value = '';
                   addMessage(question, true);
-                  showTyping(true);
-
-                  try {
-                      // Inizializzazione automatica
-                      await fetch('/api/initialize', { method: 'POST'
-  });
-
-                      // Invio query
-                      const response = await fetch('/api/query', {
-                          method: 'POST',
-                          headers: { 'Content-Type':
-  'application/json' },
-                          body: JSON.stringify({ question })
-                      });
-
-                      const result = await response.json();
-                      showTyping(false);
-
-                      if (result.success) {
-                          addMessage(result.answer);
-                      } else {
-                          addMessage('❌ Errore: ' + (result.error ||
-  'Risposta non valida'));
-                      }
-
-                  } catch (error) {
-                      console.error('❌ Errore:', error);
-                      showTyping(false);
-                      addMessage('❌ Errore di connessione: ' +
-  error.message);
-                  }
+                  addMessage('Mi dispiace, sono specializzato in 
+  <strong>pianificazione urbana e normative 
+  edilizie</strong>.<br><br>Posso aiutarti con:<br>• Permessi di 
+  costruire<br>• Piani regolatori<br>• Vincoli paesaggistici<br>• 
+  Zonizzazioni<br>• Normative edilizie');
+                  return;
               }
 
-              // EVENT LISTENERS - APPROCCIO DEFINITIVO
+              chatInput.value = '';
+              addMessage(question, true);
+              showTyping(true);
 
-              // 1. Click sul pulsante
-              sendBtn.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  console.log('🖱️ Click pulsante');
+              try {
+                  await fetch('/api/initialize', { method: 'POST' });
+
+                  const response = await fetch('/api/query', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ question })
+                  });
+
+                  const result = await response.json();
+                  showTyping(false);
+
+                  if (result.success) {
+                      addMessage(result.answer);
+                  } else {
+                      addMessage('Errore: ' + (result.error ||
+  'Risposta non valida'));
+                  }
+
+              } catch (error) {
+                  console.error('❌ Errore:', error);
+                  showTyping(false);
+                  addMessage('Errore di connessione: ' +
+  error.message);
+              }
+          }
+
+          function setupEventListeners() {
+              // CLICK PULSANTE
+              sendBtn.onclick = function() {
+                  console.log('🖱️ Click button');
                   sendMessage();
-              });
+              };
 
-              // 2. Enter sulla tastiera - MULTIPLE APPROACH
-              chatInput.addEventListener('keydown', function(e) {
-                  console.log('⌨️ Key pressed:', e.key, 'Code:',
-  e.code);
+              // ENTER TASTIERA - APPROCCIO DIRETTO
+              chatInput.onkeydown = function(event) {
+                  console.log('⌨️ Key:', event.key, 'Code:',
+  event.code, 'KeyCode:', event.keyCode);
 
-                  if (e.key === 'Enter' || e.code === 'Enter' ||
-  e.keyCode === 13) {
-                      e.preventDefault();
-                      console.log('✅ Enter detected - sending 
-  message');
+                  if (event.key === 'Enter' || event.keyCode === 13) {
+                      event.preventDefault();
+                      console.log('✅ ENTER RILEVATO - Invio 
+  messaggio');
                       sendMessage();
+                      return false;
                   }
-              });
+              };
 
-              // 3. Backup keypress event
-              chatInput.addEventListener('keypress', function(e) {
-                  if (e.key === 'Enter' || e.keyCode === 13) {
-                      e.preventDefault();
-                      console.log('✅ Keypress Enter backup - sending 
-  message');
+              // BACKUP EVENTI
+              chatInput.onkeypress = function(event) {
+                  if (event.key === 'Enter' || event.keyCode === 13) {
+                      event.preventDefault();
+                      console.log('✅ BACKUP KEYPRESS - Invio 
+  messaggio');
                       sendMessage();
+                      return false;
                   }
-              });
+              };
 
-              // 4. Focus sull'input al caricamento
               chatInput.focus();
+              console.log('🎉 Event listeners attaccati!');
+          }
 
-              console.log('🎉 UrbanAI inizializzato con successo!');
-          });
+          // AVVIO APP
+          if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded',
+  initializeApp);
+          } else {
+              initializeApp();
+          }
       </script>
   </body>
   </html>
