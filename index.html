@@ -10,30 +10,30 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh; display: flex; flex-direction: column;
     }
     .header {
-      background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
-      padding: 1rem 2rem; box-shadow: 0 2px 20px rgba(0,0,0,.1);
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+      padding: 1rem 2rem; box-shadow: 0 2px 20px rgba(0,0,0,0.1);
       display: flex; align-items: center; justify-content: space-between;
     }
     .logo h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; }
     .status { display: flex; align-items: center; gap: 8px; color: #4a5568; }
     .status-dot { width: 8px; height: 8px; background: #48bb78; border-radius: 50%; animation: pulse 2s infinite; }
-    .status-dot.degraded { background:#ed8936; }
-    .status-dot.offline { background:#e53e3e; }
+    .status-dot.degraded { background: #ed8936; }
+    .status-dot.offline { background: #e53e3e; }
     @keyframes pulse { 0%{opacity:1} 50%{opacity:.5} 100%{opacity:1} }
 
-    .main-container { flex:1; display:flex; flex-direction:column; max-width:1200px; margin:0 auto; width:100%; padding:2rem; gap:2rem; }
+    .main-container { flex: 1; display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; width: 100%; padding: 2rem; gap: 2rem; }
     .chat-container {
       background: rgba(255,255,255,.95); border-radius: 20px; box-shadow: 0 8px 40px rgba(0,0,0,.12);
       display:flex; flex-direction:column; height:600px; overflow:hidden;
     }
     .chat-header { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:1.5rem 2rem; display:flex; align-items:center; gap:12px; }
-    .chat-header i { font-size:1.5rem; }
-    .chat-header h2 { font-size:1.3rem; font-weight:600; }
+    .chat-header i { font-size: 1.5rem; }
+    .chat-header h2 { font-size: 1.3rem; font-weight: 600; }
 
     .messages { flex:1; padding:2rem; overflow-y:auto; background:#f8fafc; }
     .message { margin-bottom:1.5rem; display:flex; gap:12px; }
@@ -66,8 +66,7 @@
     .typing-indicator { display:none; align-items:center; gap:12px; margin-bottom:1.5rem; }
     .typing-dots { display:flex; gap:4px; }
     .typing-dot { width:8px; height:8px; background:#cbd5e0; border-radius:50%; animation:typing 1.5s infinite ease-in-out; }
-    .typing-dot:nth-child(2){ animation-delay:.2s; }
-    .typing-dot:nth-child(3){ animation-delay:.4s; }
+    .typing-dot:nth-child(2){ animation-delay:.2s; } .typing-dot:nth-child(3){ animation-delay:.4s; }
     @keyframes typing { 0%,60%,100%{ transform:translateY(0); opacity:.4 } 30%{ transform:translateY(-10px); opacity:1 } }
 
     .error-message { background:#fed7d7; color:#c53030; padding:1rem; border-radius:8px; margin-top:1rem; display:none; }
@@ -116,7 +115,7 @@
 
       <div class="input-container">
         <!-- FORM: Enter e click attivano submit -->
-        <form id="chatForm" class="input-form" autocomplete="off">
+        <form id="chatForm" class="input-form" autocomplete="off" novalidate>
           <div class="input-wrapper">
             <textarea id="questionInput" placeholder="Scrivi la tua domanda urbanistica qui..." rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
           </div>
@@ -130,18 +129,18 @@
   <script>
     "use strict";
     (function(){
-      function qs(id){ return document.getElementById(id); }
+      function $(id){ return document.getElementById(id); }
 
       class UrbanAI {
         constructor() {
-          this.messagesContainer = qs("messagesContainer");
-          this.questionInput     = qs("questionInput");
-          this.sendBtn           = qs("sendBtn");
-          this.chatForm          = qs("chatForm");
-          this.errorMessage      = qs("errorMessage");
-          this.typingIndicator   = qs("typingIndicator");
-          this.statusDot         = qs("statusDot");
-          this.statusText        = qs("statusText");
+          this.messagesContainer = $("messagesContainer");
+          this.questionInput     = $("questionInput");
+          this.sendBtn           = $("sendBtn");
+          this.chatForm          = $("chatForm");
+          this.errorMessage      = $("errorMessage");
+          this.typingIndicator   = $("typingIndicator");
+          this.statusDot         = $("statusDot");
+          this.statusText        = $("statusText");
 
           this.sending = false;
           this.apiBase = this.getApiBase();
@@ -150,7 +149,6 @@
           this.autoResizeTextarea();
           this.validateInput();
           try { this.questionInput.focus(); } catch(e){}
-
           this.pingBackend();
         }
 
@@ -180,33 +178,41 @@
         }
 
         initializeEventListeners() {
-          // 1) Submit del form (Enter e click)
-          this.chatForm.addEventListener("submit", (e) => {
+          var self = this;
+
+          // 1) Submit del form (Enter e click confluiscono qui)
+          this.chatForm.addEventListener("submit", function(e){
             e.preventDefault();
-            this.sendMessage();
+            self.sendMessage();
           });
 
-          // 2) Backup: Enter sulla textarea
-          this.questionInput.addEventListener("keydown", (e) => {
+          // 2) Backup: Enter sulla textarea forza il submit anche se il bottone è disabilitato
+          this.questionInput.addEventListener("keydown", function(e){
             var isEnter = (e.key === "Enter" || e.code === "Enter" || e.code === "NumpadEnter" || e.keyCode === 13);
             var isComposing = (e.isComposing === true || e.keyCode === 229);
             if (isEnter && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !isComposing) {
               e.preventDefault();
               e.stopPropagation();
-              this.sendMessage();
+              if (self.chatForm && typeof self.chatForm.requestSubmit === "function") {
+                self.chatForm.requestSubmit();
+              } else {
+                // vecchi browser
+                var evt = new Event("submit", { bubbles:true, cancelable:true });
+                self.chatForm.dispatchEvent(evt);
+              }
             }
           });
 
-          // 3) Abilita bottone e autoresize
-          this.questionInput.addEventListener("input", () => {
-            this.validateInput();
-            this.autoResizeTextarea();
+          // 3) Abilita/disabilita bottone e autoresize
+          this.questionInput.addEventListener("input", function(){
+            self.validateInput();
+            self.autoResizeTextarea();
           });
         }
 
         validateInput() {
-          var question = (this.questionInput.value || "").trim();
-          this.sendBtn.disabled = (question.length === 0) || this.sending;
+          var q = (this.questionInput.value || "").trim();
+          this.sendBtn.disabled = (q.length === 0) || this.sending;
           this.hideError();
         }
 
@@ -218,6 +224,7 @@
 
         async sendMessage() {
           if (this.sending) return;
+
           var question = (this.questionInput.value || "").trim();
           if (!question) return;
 
@@ -229,7 +236,6 @@
           this.questionInput.value = "";
           this.autoResizeTextarea();
           this.hideError();
-
           this.showTypingIndicator();
 
           try {
@@ -247,11 +253,11 @@
               this.addMessage(this.localFallback(question), "assistant", {});
               this.showError("Il server ha risposto ma senza risultato utile (success=false).");
             }
-          } catch (error) {
+          } catch (err) {
             this.hideTypingIndicator();
             this.sending = false;
             this.validateInput();
-            console.error("Errore chiamata API:", error);
+            console.error("Errore chiamata API:", err);
             this.addMessage(this.localFallback(question, true), "assistant", {});
             this.showError("Connessione all'API non riuscita. Risposta generata in locale.");
             this.setStatus("Offline (uso fallback locale)", "offline");
@@ -273,7 +279,7 @@
           return await resp.json();
         }
 
-        // Fallback locale minimale (solo per non lasciare l'utente senza risposta)
+        // Fallback locale minimo
         localFallback(q, offline) {
           var t = (q || "").trim().toLowerCase();
           var saluti = ["ciao","buongiorno","salve","hey","hola","buonasera","ehi","hi","hello"];
@@ -290,10 +296,10 @@
         }
 
         addMessage(content, sender, metadata) {
-          var messageDiv = document.createElement("div");
-          messageDiv.className = "message " + sender;
-          var avatarIcon = sender === "user" ? "fas fa-user" : "fas fa-robot";
+          var wrapper = document.createElement("div");
+          wrapper.className = "message " + sender;
 
+          var avatarIcon = sender === "user" ? "fas fa-user" : "fas fa-robot";
           var metadataHTML = "";
           if (metadata && metadata.knowledgeBaseUsed) {
             metadataHTML = '<div class="info-badge" style="margin-top:8px;"><i class="fas fa-database"></i> ' + String(metadata.sourcesFound) + " fonti dalla Gazzetta Ufficiale</div>";
@@ -301,15 +307,15 @@
 
           var html = ''
             + '<div class="message-avatar"><i class="' + avatarIcon + '"></i></div>'
-            + '<div class="message-content">' + this.formatMessage(String(content || "")) + metadataHTML + '</div>';
+            + '<div class="message-content">' + this.escapeBasic(String(content || "")).replace(/\n/g,"<br>") + metadataHTML + '</div>';
 
-          messageDiv.innerHTML = html;
-          this.messagesContainer.appendChild(messageDiv);
+          wrapper.innerHTML = html;
+          this.messagesContainer.appendChild(wrapper);
           this.scrollToBottom();
         }
 
-        formatMessage(content) {
-          return content.replace(/\n/g, "<br>");
+        escapeBasic(s) {
+          return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
         }
 
         showTypingIndicator() { this.typingIndicator.style.display = "flex"; this.scrollToBottom(); }
@@ -319,7 +325,9 @@
         scrollToBottom() { this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight; }
       }
 
-      document.addEventListener("DOMContentLoaded", function(){ new UrbanAI(); });
+      document.addEventListener("DOMContentLoaded", function(){
+        new UrbanAI();
+      });
     })();
   </script>
 </body>
