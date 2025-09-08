@@ -1,0 +1,10 @@
+node_modules/
+*.pdf
+foglio_ordinario/
+regioni/
+serie_generale/
+scripts/performance.db
+scripts/pinecone_status.json
+scripts/processing_progress.json
+.DS_Store
+*.log
