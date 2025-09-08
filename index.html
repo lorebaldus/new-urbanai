@@ -247,7 +247,6 @@
         }
 
         initializeEventListeners() {
-          // PRIMARY: Form submit handler (most reliable for Enter key)
           this.chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const message = this.questionInput.value.trim();
@@ -256,7 +255,6 @@
             }
           });
 
-          // BACKUP: Direct button click
           this.sendBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const message = this.questionInput.value.trim();
@@ -265,7 +263,6 @@
             }
           });
 
-          // BACKUP: Enter key handler (for textarea directly)
           this.questionInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
               e.preventDefault();
@@ -276,7 +273,6 @@
             }
           });
 
-          // Input validation
           this.questionInput.addEventListener('input', () => {
             this.validateInput();
             this.autoResizeTextarea();
@@ -323,7 +319,7 @@
                 sourcesFound: response.sourcesFound
               });
             } else {
-              this.addMessage(this.localFallback(question), 'assistant', { });
+              this.addMessage(this.localFallback(question), 'assistant', {});
               this.showError('Il server ha risposto ma senza risultato utile.');
             }
           } catch (error) {
@@ -331,7 +327,7 @@
             this.sending = false;
             this.validateInput();
             console.error('Errore chiamata API:', error);
-            this.addMessage(this.localFallback(question, true), 'assistant', { });
+            this.addMessage(this.localFallback(question, true), 'assistant', {});
             this.showError('Connessione API non riuscita. Risposta generata in locale.');
             this.setStatus('Offline (uso fallback locale)', 'offline');
           }
@@ -354,7 +350,7 @@
         localFallback(q, offline=false) {
           const t = q.trim().toLowerCase();
 
-          const saluti = ['ciao','buongiorno','salve','hey','hola','buonasera','ehi','hi','hello'];
+          const saluti = ['ciao', 'buongiorno', 'salve', 'hey', 'hola', 'buonasera', 'ehi', 'hi', 'hello'];
           if (saluti.includes(t)) {
             return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e pianificazione. Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità offline)_':''}`;
           }
