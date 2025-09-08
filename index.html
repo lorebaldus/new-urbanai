@@ -348,8 +348,7 @@
             } else {
               // Server ha risposto ma con success=false: prova fallback locale
               this.addMessage(this.localFallback(question), 'assistant', { });
-              this.showError('Il server ha risposto ma senza risultato utile
-  (success=false).');
+              this.showError('Il server ha risposto ma senza risultato utile (success=false).');
             }
           } catch (error) {
             this.hideTypingIndicator();
