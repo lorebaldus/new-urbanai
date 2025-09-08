@@ -1,13 +1,13 @@
 // UrbanAI Serverless Query with 160k+ Knowledge Base
-const { Pinecone } = require('@pinecone-database/pinecone');
-const OpenAI = require('openai');
+import { Pinecone } from '@pinecone-database/pinecone';
+import OpenAI from 'openai';
 
 const PINECONE_CONFIG = {
     apiKey: "pcsk_3WPEJY_K1FqNAfqCWnqUz6PbrfWqSTB98WXdCsAH9HsvhcUh3Aw9W3WtbvbSkQfRFnXb2T",
     indexName: "urban-ai"
 };
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
