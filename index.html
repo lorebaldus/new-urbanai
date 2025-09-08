@@ -88,7 +88,6 @@
       padding: 2rem; background: white; border-top: 1px solid #e2e8f0;
     }
 
-    /* Il form fa da contenitore input */
     .input-form { display: flex; gap: 12px; align-items: flex-end; }
     .input-wrapper { flex: 1; position: relative; }
 
@@ -195,232 +194,225 @@
   </div>
 
   <script>
-    class UrbanAI {
-      constructor() {
-        this.messagesContainer = document.getElementById('messagesContainer');
-        this.questionInput = document.getElementById('questionInput');
-        this.sendBtn = document.getElementById('sendBtn');
-        this.chatForm = document.getElementById('chatForm');
-        this.errorMessage = document.getElementById('errorMessage');
-        this.typingIndicator = document.getElementById('typingIndicator');
-        this.statusDot = document.getElementById('statusDot');
-        this.statusText = document.getElementById('statusText');
+    "use strict";
 
-        this.sending = false;
-        this.apiBase = this.getApiBase();
+    (function(){
+      class UrbanAI {
+        constructor() {
+          this.messagesContainer = document.getElementById("messagesContainer");
+          this.questionInput = document.getElementById("questionInput");
+          this.sendBtn = document.getElementById("sendBtn");
+          this.chatForm = document.getElementById("chatForm");
+          this.errorMessage = document.getElementById("errorMessage");
+          this.typingIndicator = document.getElementById("typingIndicator");
+          this.statusDot = document.getElementById("statusDot");
+          this.statusText = document.getElementById("statusText");
 
-        this.initializeEventListeners();
-        this.autoResizeTextarea();
-        this.questionInput.focus();
-        this.pingBackend();
-      }
+          this.sending = false;
+          this.apiBase = this.getApiBase();
 
-      getApiBase() {
-        const meta = document.querySelector('meta[name="urbanai-api"]');
-        if (meta && meta.content) return meta.content.replace(/\/+$/, '');
-        if (location.protocol === 'file:') return 'http://localhost:3000';
-        return '';
-      }
-      apiUrl(path) { return `${this.apiBase}${path.startsWith('/') ? path : '/'+path}`; }
-
-      async pingBackend() {
-        try {
-          const r = await fetch(this.apiUrl('/api/initialize'), { method: 'POST' });
-          if (r.ok) this.setStatus('Sistema Attivo', 'online');
-          else this.setStatus('API raggiungibile (init non disponibile)', 'degraded');
-        } catch {
-          this.setStatus('Offline (uso fallback locale)', 'offline');
-        }
-      }
-
-      setStatus(text, mode) {
-        this.statusText.textContent = text;
-        this.statusDot.classList.remove('degraded','offline');
-        if (mode === 'degraded') this.statusDot.classList.add('degraded');
-        if (mode === 'offline')  this.statusDot.classList.add('offline');
-      }
-
-      initializeEventListeners() {
-        // 1) Submit del form: Enter e click inviano sempre qui
-        this.chatForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          this.sendMessage();
-        });
-
-        // 2) Backup: Enter sulla textarea (in alcuni browser il submit non scatta)
-        this.questionInput.addEventListener('keydown', (e) => {
-          const isEnter = (e.key === 'Enter' || e.code === 'Enter' || e.keyCode === 13 || e.code === 'NumpadEnter');
-          const isComposing = (e.isComposing === true || e.keyCode === 229);
-          if (isEnter && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !isComposing) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.sendMessage();
-          }
-        });
-
-        // 3) Abilita bottone e autoresize
-        this.questionInput.addEventListener('input', () => {
-          this.validateInput();
+          this.initializeEventListeners();
           this.autoResizeTextarea();
-        });
+          this.validateInput(); // stato iniziale del bottone
+          this.questionInput.focus();
+          this.pingBackend();
+        }
 
-        // 4) Click esplicito sul bottone (già coperto dal form)
-        this.sendBtn.addEventListener('click', (e) => {
-          // se per qualche ragione il browser non considera il bottone "submit"
-          e.preventDefault();
-          this.sendMessage();
-        });
-      }
+        getApiBase() {
+          var meta = document.querySelector('meta[name="urbanai-api"]');
+          if (meta && meta.content) return meta.content.replace(/\/+$/, "");
+          if (location.protocol === "file:") return "http://localhost:3000";
+          return "";
+        }
+        apiUrl(path) { return this.apiBase + (path.charAt(0) === "/" ? path : ("/" + path)); }
 
-      validateInput() {
-        const question = this.questionInput.value.trim();
-        this.sendBtn.disabled = question.length === 0 || this.sending;
-        this.hideError();
-      }
-
-      autoResizeTextarea() {
-        const ta = this.questionInput;
-        ta.style.height = 'auto';
-        ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
-      }
-
-      async sendMessage() {
-        if (this.sending) return;
-
-        const question = this.questionInput.value.trim();
-        if (!question) return;
-
-        this.sending = true;
-        this.sendBtn.disabled = true;
-
-        this.addMessage(question, 'user');
-
-        this.questionInput.value = '';
-        this.autoResizeTextarea();
-        this.hideError();
-
-        this.showTypingIndicator();
-
-        try {
-          const response = await this.queryAPI(question);
-          this.hideTypingIndicator();
-          this.sending = false;
-          this.validateInput();
-
-          if (response.success) {
-            this.addMessage(response.answer, 'assistant', {
-              knowledgeBaseUsed: response.knowledgeBaseUsed,
-              sourcesFound: response.sourcesFound
-            });
-          } else {
-            this.addMessage(this.localFallback(question), 'assistant', {});
-            this.showError(`Il server ha risposto ma senza risultato utile (success=false).`);
+        async pingBackend() {
+          try {
+            const r = await fetch(this.apiUrl("/api/initialize"), { method: "POST" });
+            if (r.ok) this.setStatus("Sistema Attivo", "online");
+            else this.setStatus("API raggiungibile (init non disponibile)", "degraded");
+          } catch (e) {
+            this.setStatus("Offline (uso fallback locale)", "offline");
           }
-        } catch (error) {
-          this.hideTypingIndicator();
-          this.sending = false;
-          this.validateInput();
-          console.error('Errore chiamata API:', error);
-          this.addMessage(this.localFallback(question, true), 'assistant', {});
-          this.showError(`Connessione all'API non riuscita. Risposta generata in locale.`);
-          this.setStatus('Offline (uso fallback locale)', 'offline');
         }
+
+        setStatus(text, mode) {
+          this.statusText.textContent = text;
+          this.statusDot.classList.remove("degraded","offline");
+          if (mode === "degraded") this.statusDot.classList.add("degraded");
+          if (mode === "offline")  this.statusDot.classList.add("offline");
+        }
+
+        initializeEventListeners() {
+          // 1) Submit del form (Enter e click confluiscono qui)
+          this.chatForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            this.sendMessage();
+          });
+
+          // 2) Backup: Enter sulla textarea
+          this.questionInput.addEventListener("keydown", (e) => {
+            const isEnter = (e.key === "Enter" || e.code === "Enter" || e.code === "NumpadEnter" || e.keyCode === 13);
+            const isComposing = (e.isComposing === true || e.keyCode === 229);
+            if (isEnter && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !isComposing) {
+              e.preventDefault();
+              e.stopPropagation();
+              this.sendMessage();
+            }
+          });
+
+          // 3) Abilita bottone e autoresize
+          this.questionInput.addEventListener("input", () => {
+            this.validateInput();
+            this.autoResizeTextarea();
+          });
+
+          // 4) Click esplicito sul bottone
+          this.sendBtn.addEventListener("click", (e) => {
+            // se per qualche ragione il browser non considera il bottone "submit"
+            // lasciamo comunque che il form gestisca: ma come fallback chiamiamo sendMessage
+            if (this.sendBtn.disabled) return;
+            // il form submit scatterà comunque; niente preventDefault qui
+          });
+        }
+
+        validateInput() {
+          const question = (this.questionInput.value || "").trim();
+          this.sendBtn.disabled = (question.length === 0) || this.sending;
+          this.hideError();
+        }
+
+        autoResizeTextarea() {
+          const ta = this.questionInput;
+          ta.style.height = "auto";
+          ta.style.height = Math.min(ta.scrollHeight, 120) + "px";
+        }
+
+        async sendMessage() {
+          if (this.sending) return;
+
+          const question = (this.questionInput.value || "").trim();
+          if (!question) return;
+
+          this.sending = true;
+          this.sendBtn.disabled = true;
+
+          this.addMessage(question, "user");
+
+          this.questionInput.value = "";
+          this.autoResizeTextarea();
+          this.hideError();
+
+          this.showTypingIndicator();
+
+          try {
+            const response = await this.queryAPI(question);
+            this.hideTypingIndicator();
+            this.sending = false;
+            this.validateInput();
+
+            if (response && response.success) {
+              this.addMessage(response.answer, "assistant", {
+                knowledgeBaseUsed: response.knowledgeBaseUsed,
+                sourcesFound: response.sourcesFound
+              });
+            } else {
+              this.addMessage(this.localFallback(question), "assistant", {});
+              this.showError("Il server ha risposto ma senza risultato utile (success=false).");
+            }
+          } catch (error) {
+            this.hideTypingIndicator();
+            this.sending = false;
+            this.validateInput();
+            console.error("Errore chiamata API:", error);
+            this.addMessage(this.localFallback(question, true), "assistant", {});
+            this.showError("Connessione all'API non riuscita. Risposta generata in locale.");
+            this.setStatus("Offline (uso fallback locale)", "offline");
+          }
+        }
+
+        async queryAPI(question) {
+          const resp = await fetch(this.apiUrl("/api/query"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: question })
+          });
+          if (!resp.ok) {
+            const text = await resp.text().catch(function(){ return ""; });
+            console.error("HTTP non-OK:", resp.status, resp.statusText, text);
+            throw new Error("HTTP " + resp.status + " " + resp.statusText);
+          }
+          return await resp.json();
+        }
+
+        // --- Fallback locale essenziale ---
+        localFallback(q, offline) {
+          const t = (q || "").trim().toLowerCase();
+
+          const saluti = ["ciao","buongiorno","salve","hey","hola","buonasera","ehi","hi","hello"];
+          if (saluti.indexOf(t) !== -1) {
+            return "Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e pianificazione. Come posso aiutarti oggi?" + (offline ? "\n\n_(Nota: modalità offline)_" : "");
+          }
+
+          if (t.indexOf("cosa puoi fare") !== -1 || t.indexOf("cosa sai fare") !== -1 || t.indexOf("come puoi aiutarmi") !== -1 || t.indexOf("puoi aiutare") !== -1 || t.indexOf("aiutarmi") !== -1) {
+            return "Posso aiutarti a:\n• Comprendere i **titoli edilizi** (Permesso di costruire, SCIA, CILA, edilizia libera)\n• Verificare **distanze**, **altezze**, **indici** e **zonizzazione** (PRG/PGT)\n• Individuare **vincoli** (paesaggistici, sismici, idraulici) e l'iter autorizzativo\n• Preparare **check-list** e prime valutazioni di fattibilità\n" + (offline ? "\n_(Nota: modalità offline, sintesi generata lato frontend)_" : "");
+          }
+
+          if (t.indexOf("confine") !== -1 || t.indexOf("distanza dal confine") !== -1 || (t.indexOf("distanza") !== -1 && (t.indexOf("costruire") !== -1 || t.indexOf("costruzione") !== -1 || t.indexOf("nuova costruzione") !== -1))) {
+            return "Distanze dal confine – indicazioni generali:\n• **Codice Civile (art. 873)**: distanza minima tra costruzioni di **3 m**, salvo norme locali più restrittive.\n• **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici antistanti** in zona B e C, minimo **10 m**.\n• I **Regolamenti edilizi/PRG/PGT** possono fissare distanze dal confine (es. 5 m) o consentire la **costruzione sul confine** con condizioni.\nOperativamente: indica **Comune** e **zona** per verifiche puntuali su NTA e Regolamento edilizio." + (offline ? "\n_(Modalità offline: controlla le fonti locali)_" : "");
+          }
+
+          if (t.indexOf("permesso di costruire") !== -1 || t.indexOf("scia") !== -1 || t.indexOf("cila") !== -1 || t.indexOf("c.i.l.a") !== -1 || t.indexOf("dia") !== -1) {
+            return "Titoli edilizi – panoramica:\n• **Edilizia libera**: opere minori definite dalla normativa.\n• **CILA**: manutenzione straordinaria senza parti strutturali.\n• **SCIA**: interventi più rilevanti, anche su strutture; esiste la **SCIA alternativa** al PdC in alcuni casi.\n• **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, ampliamenti, cambi d'uso rilevanti.\nServe sempre verificare **vincoli** e **zonizzazione** del Comune." + (offline ? "\n_(Modalità offline)_" : "");
+          }
+
+          return "Posso aiutarti con distanze, titoli edilizi (CILA/SCIA/PdC), vincoli e PRG/PGT. Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova costruzione, ampliamento, cambio d'uso) e ti do un primo inquadramento." + (offline ? "\n_(Modalità offline)_" : "");
+        }
+
+        addMessage(content, sender, metadata) {
+          const messageDiv = document.createElement("div");
+          messageDiv.className = "message " + sender;
+
+          const avatarIcon = sender === "user" ? "fas fa-user" : "fas fa-robot";
+
+          var metadataHTML = "";
+          if (metadata && metadata.knowledgeBaseUsed) {
+            metadataHTML =
+              '<div class="info-badge" style="margin-top: 8px;">' +
+                '<i class="fas fa-database"></i> ' +
+                String(metadata.sourcesFound) + " fonti dalla Gazzetta Ufficiale" +
+              "</div>";
+          }
+
+          messageDiv.innerHTML =
+            '<div class="message-avatar"><i class="' + avatarIcon + '"></i></div>' +
+            '<div class="message-content">' +
+              this.formatMessage(String(content || "")) +
+              metadataHTML +
+            "</div>";
+
+          this.messagesContainer.appendChild(messageDiv);
+          this.scrollToBottom();
+        }
+
+        formatMessage(content) {
+          return content
+            .replace(/\n/g, "<br>")
+            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+            .replace(/\*(.*?)\*/g, "<em>$1</em>");
+        }
+
+        showTypingIndicator() { this.typingIndicator.style.display = "flex"; this.scrollToBottom(); }
+        hideTypingIndicator() { this.typingIndicator.style.display = "none"; }
+        showError(message) { this.errorMessage.textContent = message; this.errorMessage.style.display = "block"; }
+        hideError() { this.errorMessage.style.display = "none"; }
+        scrollToBottom() { this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight; }
       }
 
-      async queryAPI(question) {
-        const resp = await fetch(this.apiUrl('/api/query'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question })
-        });
-        if (!resp.ok) {
-          const text = await resp.text().catch(()=>'');
-          console.error('HTTP non-OK:', resp.status, resp.statusText, text);
-          throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
-        }
-        return await resp.json();
-      }
-
-      // --- Fallback locale essenziale ---
-      localFallback(q, offline=false) {
-        const t = q.trim().toLowerCase();
-
-        const saluti = ['ciao','buongiorno','salve','hey','hola','buonasera','ehi','hi','hello'];
-        if (saluti.includes(t)) {
-          return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e pianificazione. Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità offline)_':''}`;
-        }
-
-        if (t.includes('cosa puoi fare') || t.includes('cosa sai fare') || t.includes('come puoi aiutarmi') || t.includes('puoi aiutare') || t.includes('aiutarmi')) {
-          return `Posso aiutarti a:
-• Comprendere i **titoli edilizi** (Permesso di costruire, SCIA, CILA, edilizia libera)
-• Verificare **distanze**, **altezze**, **indici** e **zonizzazione** (PRG/PGT)
-• Individuare **vincoli** (paesaggistici, sismici, idraulici) e l'iter autorizzativo
-• Preparare **check-list** e prime valutazioni di fattibilità
-${offline ? '\n_(Nota: modalità offline, sintesi generata lato frontend)_' : ''}`;
-        }
-
-        if (t.includes('confine') || t.includes('distanza dal confine') || (t.includes('distanza') && (t.includes('costruire') || t.includes('costruzione') || t.includes('nuova costruzione')))) {
-          return `Distanze dal confine – indicazioni generali:
-• **Codice Civile (art. 873)**: distanza minima tra costruzioni di **3 m**, salvo norme locali più restrittive.
-• **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici antistanti** in zona B e C, minimo **10 m**.
-• I **Regolamenti edilizi/PRG/PGT** possono fissare distanze dal confine (es. 5 m) o consentire la **costruzione sul confine** con condizioni.
-Operativamente: indica **Comune** e **zona** per verifiche puntuali su NTA e Regolamento edilizio.${offline ? '\n_(Modalità offline: controlla le fonti locali)_':''}`;
-        }
-
-        if (t.includes('permesso di costruire') || t.includes('scia') || t.includes('cila') || t.includes('c.i.l.a') || t.includes('dia')) {
-          return `Titoli edilizi – panoramica:
-• **Edilizia libera**: opere minori definite dalla normativa.
-• **CILA**: manutenzione straordinaria senza parti strutturali.
-• **SCIA**: interventi più rilevanti, anche su strutture; esiste la **SCIA alternativa** al PdC in alcuni casi.
-• **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, ampliamenti, cambi d'uso rilevanti.
-Serve sempre verificare **vincoli** e **zonizzazione** del Comune.${offline ? '\n_(Modalità offline)_':''}`;
-        }
-
-        return `Posso aiutarti con distanze, titoli edilizi (CILA/SCIA/PdC), vincoli e PRG/PGT. Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova costruzione, ampliamento, cambio d'uso) e ti do un primo inquadramento.${offline ? '\n_(Modalità offline)_':''}`;
-      }
-
-      addMessage(content, sender, metadata = null) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
-
-        let metadataHTML = '';
-        if (metadata && metadata.knowledgeBaseUsed) {
-          metadataHTML = `
-            <div class="info-badge" style="margin-top: 8px;">
-              <i class="fas fa-database"></i>
-              ${metadata.sourcesFound} fonti dalla Gazzetta Ufficiale
-            </div>
-          `;
-        }
-
-        messageDiv.innerHTML = `
-          <div class="message-avatar"><i class="${avatarIcon}"></i></div>
-          <div class="message-content">
-            ${this.formatMessage(content)}
-            ${metadataHTML}
-          </div>
-        `;
-
-        this.messagesContainer.appendChild(messageDiv);
-        this.scrollToBottom();
-      }
-
-      formatMessage(content) {
-        return content
-          .replace(/\n/g, '<br>')
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
-      }
-
-      showTypingIndicator() { this.typingIndicator.style.display = 'flex'; this.scrollToBottom(); }
-      hideTypingIndicator() { this.typingIndicator.style.display = 'none'; }
-      showError(message) { this.errorMessage.textContent = message; this.errorMessage.style.display = 'block'; }
-      hideError() { this.errorMessage.style.display = 'none'; }
-      scrollToBottom() { this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight; }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => { new UrbanAI(); });
+      document.addEventListener("DOMContentLoaded", function(){
+        new UrbanAI();
+      });
+    })();
   </script>
 </body>
 </html>
