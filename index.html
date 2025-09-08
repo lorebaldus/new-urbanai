@@ -156,6 +156,8 @@
   </div>
 
   <script>
+    'use strict';
+
     class UrbanAI {
       constructor() {
         this.messagesContainer = document.getElementById('messagesContainer');
@@ -206,39 +208,30 @@
       }
 
       initializeEventListeners() {
-        // 1) Submit del form (funziona per click e per requestSubmit())
+        // Submit del form (vale sia per click che per tastiera)
         this.chatForm.addEventListener('submit', (e) => {
           e.preventDefault();
           this.sendMessage();
         });
 
-        // 2) Invio da tastiera: Enter invia, Shift+Enter va a capo
+        // Enter invia, Shift+Enter va a capo (gestione IME inclusa)
         this.questionInput.addEventListener('keydown', (e) => {
           const isEnterKey = (e.key === 'Enter' || e.code === 'Enter' || e.keyCode === 13);
           const isComposing = e.isComposing === true || e.keyCode === 229;
-
           if (isEnterKey && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !isComposing) {
             e.preventDefault();
-            e.stopPropagation();
-            // Invochiamo il submit del form per un'unica codepath
             if (typeof this.chatForm.requestSubmit === 'function') {
               this.chatForm.requestSubmit();
             } else {
-              // fallback per browser legacy
               this.sendMessage();
             }
           }
         });
 
-        // Abilita/disabilita il bottone durante la digitazione
+        // Abilita/disabilita il bottone e autoresize
         this.questionInput.addEventListener('input', () => {
           this.validateInput();
           this.autoResizeTextarea();
-        });
-
-        // Click esplicito sul bottone (comunque coperto dal submit del form)
-        this.sendBtn.addEventListener('click', (e) => {
-          // lasciamo al submit del form gestire la logica
         });
       }
 
@@ -256,7 +249,6 @@
 
       async sendMessage() {
         if (this.sending) return;
-
         const question = this.questionInput.value.trim();
         if (!question) return;
 
@@ -286,12 +278,11 @@
             this.showError('Il server ha risposto ma senza risultato utile (success=false).');
           }
         } catch (error) {
-          console.error('Errore chiamata API:', error);
           this.hideTypingIndicator();
           this.sending = false;
           this.validateInput();
           this.addMessage(this.localFallback(question, true), 'assistant', {});
-          this.showError('Connessione all’API non riuscita. Risposta generata in locale.');
+          this.showError("Connessione all'API non riuscita. Risposta generata in locale.");
           this.setStatus('Offline (uso fallback locale)', 'offline');
         }
       }
@@ -393,12 +384,9 @@ Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova costruz
       }
 
       formatMessage(content) {
-        // sanifica prima, poi applica miniformattazioni markdown (*, **)
         let safe = this.escapeHTML(String(content));
         safe = safe.replace(/\n/g, '<br>');
-        // strong: **testo**
         safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // emphasis: *testo*
         safe = safe.replace(/\*(.*?)\*/g, '<em>$1</em>');
         return safe;
       }
