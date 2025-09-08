@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-  <html lang="it">
-  <head>
+<html lang="it">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UrbanAI - Assistente Urbanistico Intelligente</title>
-    <link 
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
-  rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -37,7 +35,7 @@
         animation: pulse 2s infinite;
       }
       .status-dot.degraded { background: #ed8936; }
-      .status-dot.offline  { background: #e53e3e; }
+      .status-dot.offline { background: #e53e3e; }
 
       @keyframes pulse { 0%{opacity:1;} 50%{opacity:.5;} 100%{opacity:1;} }
 
@@ -55,8 +53,7 @@
 
       .chat-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white; padding: 1.5rem 2rem; display: flex; align-items: center; gap:
-  12px;
+        color: white; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 12px;
       }
       .chat-header i { font-size: 1.5rem; }
       .chat-header h2 { font-size: 1.3rem; font-weight: 600; }
@@ -92,45 +89,40 @@
       .input-wrapper { flex: 1; position: relative; }
 
       #questionInput {
-        width: 100%; padding: 1rem 1.5rem; border: 2px solid #e2e8f0; border-radius:
-  25px;
+        width: 100%; padding: 1rem 1.5rem; border: 2px solid #e2e8f0; border-radius: 25px;
         font-size: 1rem; outline: none; transition: all 0.3s ease;
         resize: none; min-height: 50px; max-height: 120px; font-family: inherit;
       }
-      #questionInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px
-  rgba(102,126,234,.1); }
+      #questionInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,.1); }
 
       #sendBtn {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white; border: none; width: 50px; height: 50px; border-radius: 50%;
         cursor: pointer; display: flex; align-items: center; justify-content: center;
-        font-size: 1.2rem; transition: all 0.3s ease; box-shadow: 0 4px 15px
-  rgba(102,126,234,.3);
+        font-size: 1.2rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102,126,234,.3);
       }
-      #sendBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px
-  20px rgba(102,126,234,.4); }
+      #sendBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,.4); }
       #sendBtn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
-      .typing-indicator { display: none; align-items: center; gap: 12px; margin-bottom:
-  1.5rem; }
+      .typing-indicator { display: none; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
       .typing-dots { display: flex; gap: 4px; }
       .typing-dot { width: 8px; height: 8px; background: #cbd5e0; border-radius: 50%;
-  animation: typing 1.5s infinite ease-in-out; }
+        animation: typing 1.5s infinite ease-in-out; }
       .typing-dot:nth-child(2){ animation-delay: .2s; } .typing-dot:nth-child(3){
-  animation-delay: .4s; }
+        animation-delay: .4s; }
       @keyframes typing { 0%,60%,100%{ transform: translateY(0); opacity: .4;} 30%{
-  transform: translateY(-10px); opacity: 1;} }
+        transform: translateY(-10px); opacity: 1;} }
 
       .error-message {
         background: #fed7d7; color: #c53030; padding: 1rem; border-radius: 8px;
-  margin-top: 1rem; display: none;
+        margin-top: 1rem; display: none;
       }
 
       .info-badge {
         background: rgba(102,126,234,.1); color: #667eea; padding: .5rem 1rem;
-  border-radius: 20px;
+        border-radius: 20px;
         font-size: .9rem; display: inline-flex; align-items: center; gap: 6px;
-  margin-top: .5rem;
+        margin-top: .5rem;
       }
 
       @media (max-width: 768px) {
@@ -145,8 +137,8 @@
       .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
       .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <header class="header">
       <div class="logo">
         <h1>UrbanAI</h1>
@@ -168,10 +160,8 @@
           <div class="welcome-message">
             <p><strong>Benvenuto in UrbanAI!</strong></p>
             <p>
-              Sono il tuo assistente specializzato in urbanistica e normative edilizie
-  italiane.<br>
-              Puoi farmi domande su permessi di costruire, piani regolatori, normative
-  comunali,
+              Sono il tuo assistente specializzato in urbanistica e normative edilizie italiane.<br>
+              Puoi farmi domande su permessi di costruire, piani regolatori, normative comunali,
               vincoli territoriali e molto altro.
             </p>
           </div>
@@ -181,11 +171,9 @@
               <i class="fas fa-robot"></i>
             </div>
             <div class="typing-dots">
-              <div class="typing-dot"></div><div class="typing-dot"></div><div 
-  class="typing-dot"></div>
+              <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
             </div>
-            <span style="color: #718096; font-style: italic;">UrbanAI sta
-  elaborando...</span>
+            <span style="color: #718096; font-style: italic;">UrbanAI sta elaborando...</span>
           </div>
         </div>
 
@@ -195,8 +183,7 @@
               <textarea
                 id="questionInput"
                 placeholder="Scrivi la tua domanda urbanistica qui..."
-                rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" 
-  spellcheck="false"
+                rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
               ></textarea>
             </div>
             <button type="submit" id="sendBtn" disabled>
@@ -256,7 +243,7 @@
           this.statusText.textContent = text;
           this.statusDot.classList.remove('degraded','offline');
           if (mode === 'degraded') this.statusDot.classList.add('degraded');
-          if (mode === 'offline')  this.statusDot.classList.add('offline');
+          if (mode === 'offline') this.statusDot.classList.add('offline');
         }
 
         initializeEventListeners() {
@@ -345,8 +332,7 @@
             this.validateInput();
             console.error('Errore chiamata API:', error);
             this.addMessage(this.localFallback(question, true), 'assistant', { });
-            this.showError('Connessione API non riuscita. Risposta generata in 
-  locale.');
+            this.showError('Connessione API non riuscita. Risposta generata in locale.');
             this.setStatus('Offline (uso fallback locale)', 'offline');
           }
         }
@@ -368,58 +354,43 @@
         localFallback(q, offline=false) {
           const t = q.trim().toLowerCase();
 
-          const saluti =
-  ['ciao','buongiorno','salve','hey','hola','buonasera','ehi','hi','hello'];
+          const saluti = ['ciao','buongiorno','salve','hey','hola','buonasera','ehi','hi','hello'];
           if (saluti.includes(t)) {
-            return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e 
-  pianificazione. Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità 
-  offline)_':''}`;
+            return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e pianificazione. Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità offline)_':''}`;
           }
 
           if (t.includes('cosa puoi fare') || t.includes('cosa sai fare') ||
-  t.includes('come puoi aiutarmi') || t.includes('puoi aiutare') ||
-  t.includes('aiutarmi')) {
+              t.includes('come puoi aiutarmi') || t.includes('puoi aiutare') ||
+              t.includes('aiutarmi')) {
             return `Posso aiutarti a:
-  • Comprendere i **titoli edilizi** (Permesso di costruire, SCIA, CILA, edilizia 
-  libera)
-  • Verificare **distanze**, **altezze**, **indici** e **zonizzazione** (PRG/PGT)
-  • Individuare **vincoli** (paesaggistici, sismici, idraulici) e l'iter autorizzativo
-  • Preparare **check-list** e prime valutazioni di fattibilità
-  ${offline ? '\n_(Nota: modalità offline, sintesi generata lato frontend)_' : ''}`;
+• Comprendere i **titoli edilizi** (Permesso di costruire, SCIA, CILA, edilizia libera)
+• Verificare **distanze**, **altezze**, **indici** e **zonizzazione** (PRG/PGT)
+• Individuare **vincoli** (paesaggistici, sismici, idraulici) e l'iter autorizzativo
+• Preparare **check-list** e prime valutazioni di fattibilità
+${offline ? '\n_(Nota: modalità offline, sintesi generata lato frontend)_' : ''}`;
           }
 
           if (t.includes('confine') || t.includes('distanza dal confine') ||
-  (t.includes('distanza') && (t.includes('costruire') || t.includes('costruzione') ||
-  t.includes('nuova costruzione')))) {
+              (t.includes('distanza') && (t.includes('costruire') || t.includes('costruzione') ||
+              t.includes('nuova costruzione')))) {
             return `Distanze dal confine – indicazioni generali:
-  • **Codice Civile (art. 873)**: distanza minima tra costruzioni di **3 m**, salvo 
-  norme locali più restrittive.
-  • **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici antistanti** in 
-  zona B e C, minimo **10 m**.
-  • I **Regolamenti edilizi/PRG/PGT** possono fissare distanze dal confine (es. 5 m) o 
-  consentire la **costruzione sul confine** con condizioni.
-  Operativamente: indica **Comune** e **zona** per verifiche puntuali su NTA e 
-  Regolamento edilizio.${offline ? '\n_(Modalità offline: controlla le fonti 
-  locali)_':''}`;
+• **Codice Civile (art. 873)**: distanza minima tra costruzioni di **3 m**, salvo norme locali più restrittive.
+• **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici antistanti** in zona B e C, minimo **10 m**.
+• I **Regolamenti edilizi/PRG/PGT** possono fissare distanze dal confine (es. 5 m) o consentire la **costruzione sul confine** con condizioni.
+Operativamente: indica **Comune** e **zona** per verifiche puntuali su NTA e Regolamento edilizio.${offline ? '\n_(Modalità offline: controlla le fonti locali)_':''}`;
           }
 
           if (t.includes('permesso di costruire') || t.includes('scia') ||
-  t.includes('cila') || t.includes('c.i.l.a') || t.includes('dia')) {
+              t.includes('cila') || t.includes('c.i.l.a') || t.includes('dia')) {
             return `Titoli edilizi – panoramica:
-  • **Edilizia libera**: opere minori definite dalla normativa.
-  • **CILA**: manutenzione straordinaria senza parti strutturali.
-  • **SCIA**: interventi più rilevanti, anche su strutture; esiste la **SCIA 
-  alternativa** al PdC in alcuni casi.
-  • **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, ampliamenti,
-   cambi d'uso rilevanti.
-  Serve sempre verificare **vincoli** e **zonizzazione** del Comune.${offline ? 
-  '\n_(Modalità offline)_':''}`;
+• **Edilizia libera**: opere minori definite dalla normativa.
+• **CILA**: manutenzione straordinaria senza parti strutturali.
+• **SCIA**: interventi più rilevanti, anche su strutture; esiste la **SCIA alternativa** al PdC in alcuni casi.
+• **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, ampliamenti, cambi d'uso rilevanti.
+Serve sempre verificare **vincoli** e **zonizzazione** del Comune.${offline ? '\n_(Modalità offline)_':''}`;
           }
 
-          return `Posso aiutarti con distanze, titoli edilizi (CILA/SCIA/PdC), vincoli e
-   PRG/PGT. Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova 
-  costruzione, ampliamento, cambio d'uso) e ti do un primo inquadramento.${offline ? 
-  '\n_(Modalità offline)_':''}`;
+          return `Posso aiutarti con distanze, titoli edilizi (CILA/SCIA/PdC), vincoli e PRG/PGT. Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova costruzione, ampliamento, cambio d'uso) e ti do un primo inquadramento.${offline ? '\n_(Modalità offline)_':''}`;
         }
 
         addMessage(content, sender, metadata = null) {
@@ -457,17 +428,14 @@
             .replace(/\*(.*?)\*/g, '<em>$1</em>');
         }
 
-        showTypingIndicator() { this.typingIndicator.style.display = 'flex';
-  this.scrollToBottom(); }
+        showTypingIndicator() { this.typingIndicator.style.display = 'flex'; this.scrollToBottom(); }
         hideTypingIndicator() { this.typingIndicator.style.display = 'none'; }
-        showError(message) { this.errorMessage.textContent = message;
-  this.errorMessage.style.display = 'block'; }
+        showError(message) { this.errorMessage.textContent = message; this.errorMessage.style.display = 'block'; }
         hideError() { this.errorMessage.style.display = 'none'; }
-        scrollToBottom() { this.messagesContainer.scrollTop =
-  this.messagesContainer.scrollHeight; }
+        scrollToBottom() { this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight; }
       }
 
       document.addEventListener('DOMContentLoaded', () => { new UrbanAI(); });
     </script>
-  </body>
-  </html>
+</body>
+</html>
