@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UrbanAI - Assistente Urbanistico Intelligente v2.1</title>
+  <title>UrbanAI - Assistente Urbanistico Intelligente v2.2</title>
   <!-- Facoltativo: imposta manualmente la base dell'API
   <meta name="urbanai-api" content="https://tuo-dominio.tld"> -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -87,7 +87,9 @@
     .input-container {
       padding: 2rem; background: white; border-top: 1px solid #e2e8f0;
     }
-    .input-group { display: flex; gap: 12px; align-items: flex-end; }
+
+    /* Il form fa da contenitore input */
+    .input-form { display: flex; gap: 12px; align-items: flex-end; }
     .input-wrapper { flex: 1; position: relative; }
 
     #questionInput {
@@ -174,7 +176,8 @@
       </div>
 
       <div class="input-container">
-        <div class="input-group">
+        <!-- FORM: gestisce invio da tasto Invio e da bottone -->
+        <form id="chatForm" class="input-form" autocomplete="off">
           <div class="input-wrapper">
             <textarea
               id="questionInput"
@@ -182,10 +185,10 @@
               rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
             ></textarea>
           </div>
-          <button id="sendBtn" disabled>
+          <button id="sendBtn" type="submit" disabled>
             <i class="fas fa-paper-plane"></i>
           </button>
-        </div>
+        </form>
         <div class="error-message" id="errorMessage"></div>
       </div>
     </div>
@@ -197,6 +200,7 @@
         this.messagesContainer = document.getElementById('messagesContainer');
         this.questionInput = document.getElementById('questionInput');
         this.sendBtn = document.getElementById('sendBtn');
+        this.chatForm = document.getElementById('chatForm');
         this.errorMessage = document.getElementById('errorMessage');
         this.typingIndicator = document.getElementById('typingIndicator');
         this.statusDot = document.getElementById('statusDot');
@@ -237,18 +241,25 @@
       }
 
       initializeEventListeners() {
-        this.sendBtn.addEventListener('click', () => this.sendMessage());
+        // 1) Invio del form (funziona sempre, anche con click sul bottone)
+        this.chatForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.sendMessage();
+        });
 
-        // ENTER invia (senza Shift), supporto legacy e IME
+        // 2) Enter nel textarea: invia (Shift+Enter = nuova riga)
         this.questionInput.addEventListener('keydown', (e) => {
-          const isEnter =
-            e.key === 'Enter' || e.code === 'Enter' || e.keyCode === 13;
-          if (isEnter && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !e.isComposing) {
+          const isEnter = (e.key === 'Enter' || e.code === 'Enter' || e.keyCode === 13);
+          const composing = e.isComposing || e.keyCode === 229; // IME
+          if (isEnter && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !composing) {
             e.preventDefault();
-            this.sendMessage();
+            // Trigger submit in modo standard
+            if (this.chatForm.requestSubmit) this.chatForm.requestSubmit();
+            else this.sendMessage();
           }
         });
 
+        // Abilita bottone e autoresize
         this.questionInput.addEventListener('input', () => {
           this.validateInput();
           this.autoResizeTextarea();
