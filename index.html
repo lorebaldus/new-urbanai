@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UrbanAI - Assistente Urbanistico Intelligente</title>
-    <!-- Facoltativo: imposta manualmente la base dell'API
-    <meta name="urbanai-api" content="https://tuo-dominio.tld"> -->
     <link 
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
   rel="stylesheet">
@@ -31,7 +29,6 @@
       }
 
       .logo { display: flex; align-items: center; gap: 12px; }
-      /* Icona edificio rimossa */
       .logo h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; }
 
       .status { display: flex; align-items: center; gap: 8px; color: #4a5568; }
@@ -39,8 +36,8 @@
         width: 8px; height: 8px; background: #48bb78; border-radius: 50%;
         animation: pulse 2s infinite;
       }
-      .status-dot.degraded { background: #ed8936; } /* arancione */
-      .status-dot.offline  { background: #e53e3e; } /* rosso */
+      .status-dot.degraded { background: #ed8936; }
+      .status-dot.offline  { background: #e53e3e; }
 
       @keyframes pulse { 0%{opacity:1;} 50%{opacity:.5;} 100%{opacity:1;} }
 
@@ -87,7 +84,6 @@
         text-align: center; color: #718096; padding: 2rem;
         font-size: 1.1rem; line-height: 1.6;
       }
-      /* Icona edificio al centro rimossa */
 
       .input-container {
         padding: 2rem; background: white; border-top: 1px solid #e2e8f0;
@@ -153,7 +149,6 @@
   <body>
     <header class="header">
       <div class="logo">
-        <!-- Icona rimossa -->
         <h1>UrbanAI</h1>
       </div>
       <div class="status">
@@ -179,7 +174,6 @@
   comunali,
               vincoli territoriali e molto altro.
             </p>
-            <!-- Banner "160.000+ documenti..." rimosso -->
           </div>
 
           <div class="typing-indicator" id="typingIndicator">
@@ -232,15 +226,13 @@
           this.initializeEventListeners();
           this.autoResizeTextarea();
           this.questionInput.focus();
-          this.pingBackend(); // aggiorna stato
+          this.pingBackend();
         }
 
         getApiBase() {
           const meta = document.querySelector('meta[name="urbanai-api"]');
           if (meta && meta.content) return meta.content.replace(/\/+$/, '');
-          // Se aperto da file://, usa localhost:3000
           if (location.protocol === 'file:') return 'http://localhost:3000';
-          // altrimenti stesso origin
           return '';
         }
         apiUrl(path) {
@@ -248,13 +240,11 @@
         }
 
         async pingBackend() {
-          // tenta /api/initialize (POST). Se non esiste, non bloccare.
           try {
             const r = await fetch(this.apiUrl('/api/initialize'), { method: 'POST' });
             if (r.ok) {
               this.setStatus('Sistema Attivo', 'online');
             } else {
-              // server raggiungibile ma init non ok
               this.setStatus('API raggiungibile (init non disponibile)', 'degraded');
             }
           } catch (e) {
@@ -346,18 +336,16 @@
                 sourcesFound: response.sourcesFound
               });
             } else {
-              // Server ha risposto ma con success=false: prova fallback locale
               this.addMessage(this.localFallback(question), 'assistant', { });
-              this.showError('Il server ha risposto ma senza risultato utile (success=false).');
+              this.showError('Il server ha risposto ma senza risultato utile.');
             }
           } catch (error) {
             this.hideTypingIndicator();
             this.sending = false;
             this.validateInput();
             console.error('Errore chiamata API:', error);
-            // Fallback locale: non lasciamo l'utente senza risposta
             this.addMessage(this.localFallback(question, true), 'assistant', { });
-            this.showError('Connessione all'API non riuscita. Risposta generata in
+            this.showError('Connessione API non riuscita. Risposta generata in 
   locale.');
             this.setStatus('Offline (uso fallback locale)', 'offline');
           }
@@ -371,73 +359,61 @@
           });
           if (!resp.ok) {
             const text = await resp.text().catch(()=>'');
-            // Log dettagliato in console per debug (CORS, 404, 500, ecc.)
             console.error('HTTP non-OK:', resp.status, resp.statusText, text);
             throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
           }
           return await resp.json();
         }
 
-        // --- Fallback locale essenziale ---
         localFallback(q, offline=false) {
           const t = q.trim().toLowerCase();
 
-          // Saluti
           const saluti =
   ['ciao','buongiorno','salve','hey','hola','buonasera','ehi','hi','hello'];
           if (saluti.includes(t)) {
-            return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e
-  pianificazione. Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità
+            return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e 
+  pianificazione. Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità 
   offline)_':''}`;
           }
 
-          // Cosa puoi fare
           if (t.includes('cosa puoi fare') || t.includes('cosa sai fare') ||
   t.includes('come puoi aiutarmi') || t.includes('puoi aiutare') ||
   t.includes('aiutarmi')) {
-            return `Posso aiutarti a:
-  • Comprendere i **titoli edilizi** (Permesso di costruire, SCIA, CILA, edilizia
-  libera)
-  • Verificare **distanze**, **altezze**, **indici** e **zonizzazione** (PRG/PGT)
-  • Individuare **vincoli** (paesaggistici, sismici, idraulici) e l'iter autorizzativo
-  • Preparare **check-list** e prime valutazioni di fattibilità
-  ${offline ? '\n_(Nota: modalità offline, sintesi generata lato frontend)_' : ''}`;
+            return `Posso aiutarti a:\n• Comprendere i **titoli edilizi** (Permesso di 
+  costruire, SCIA, CILA, edilizia libera)\n• Verificare **distanze**, **altezze**, 
+  **indici** e **zonizzazione** (PRG/PGT)\n• Individuare **vincoli** (paesaggistici, 
+  sismici, idraulici) e l'iter autorizzativo\n• Preparare **check-list** e prime 
+  valutazioni di fattibilità\n${offline ? '_(Nota: modalità offline, sintesi generata 
+  lato frontend)_' : ''}`;
           }
 
-          // Distanze dal confine / nuova costruzione
           if (t.includes('confine') || t.includes('distanza dal confine') ||
   (t.includes('distanza') && (t.includes('costruire') || t.includes('costruzione') ||
   t.includes('nuova costruzione')))) {
-            return `Distanze dal confine – indicazioni generali:
-  • **Codice Civile (art. 873)**: distanza minima tra costruzioni di **3 m**, salvo
-  norme locali più restrittive.
-  • **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici antistanti** in
-  zona B e C, minimo **10 m**.
-  • I **Regolamenti edilizi/PRG/PGT** possono fissare distanze dal confine (es. 5 m) o
-  consentire la **costruzione sul confine** con condizioni.
-  Operativamente: indica **Comune** e **zona** per verifiche puntuali su NTA e
-  Regolamento edilizio.${offline ? '\n_(Modalità offline: controlla le fonti
-  locali)_':''}`;
+            return `Distanze dal confine – indicazioni generali:\n• **Codice Civile 
+  (art. 873)**: distanza minima tra costruzioni di **3 m**, salvo norme locali più 
+  restrittive.\n• **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici 
+  antistanti** in zona B e C, minimo **10 m**.\n• I **Regolamenti edilizi/PRG/PGT** 
+  possono fissare distanze dal confine (es. 5 m) o consentire la **costruzione sul 
+  confine** con condizioni.\nOperativamente: indica **Comune** e **zona** per verifiche 
+  puntuali su NTA e Regolamento edilizio.${offline ? '\n_(Modalità offline: controlla le
+   fonti locali)_':''}`;
           }
 
-          // Titoli edilizi
           if (t.includes('permesso di costruire') || t.includes('scia') ||
   t.includes('cila') || t.includes('c.i.l.a') || t.includes('dia')) {
-            return `Titoli edilizi – panoramica:
-  • **Edilizia libera**: opere minori definite dalla normativa.
-  • **CILA**: manutenzione straordinaria senza parti strutturali.
-  • **SCIA**: interventi più rilevanti, anche su strutture; esiste la **SCIA
-  alternativa** al PdC in alcuni casi.
-  • **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, ampliamenti,
-   cambi d'uso rilevanti.
-  Serve sempre verificare **vincoli** e **zonizzazione** del Comune.${offline ?
-  '\n_(Modalità offline)_':''}`;
+            return `Titoli edilizi – panoramica:\n• **Edilizia libera**: opere minori 
+  definite dalla normativa.\n• **CILA**: manutenzione straordinaria senza parti 
+  strutturali.\n• **SCIA**: interventi più rilevanti, anche su strutture; esiste la 
+  **SCIA alternativa** al PdC in alcuni casi.\n• **Permesso di Costruire**: nuove 
+  costruzioni, ristrutturazioni pesanti, ampliamenti, cambi d'uso rilevanti.\nServe 
+  sempre verificare **vincoli** e **zonizzazione** del Comune.${offline ? '\n_(Modalità 
+  offline)_':''}`;
           }
 
-          // Fallback generico
           return `Posso aiutarti con distanze, titoli edilizi (CILA/SCIA/PdC), vincoli e
-   PRG/PGT. Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova
-  costruzione, ampliamento, cambio d'uso) e ti do un primo inquadramento.${offline ?
+   PRG/PGT. Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova 
+  costruzione, ampliamento, cambio d'uso) e ti do un primo inquadramento.${offline ? 
   '\n_(Modalità offline)_':''}`;
         }
 
@@ -470,7 +446,6 @@
         }
 
         formatMessage(content) {
-          // Markdown super-semplice
           return content
             .replace(/\n/g, '<br>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
