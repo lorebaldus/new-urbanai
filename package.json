@@ -1,12 +1,17 @@
-{
-  "name": "urbanai",
-  "version": "2.0.0",
-  "type": "module",
-  "dependencies": {
-    "openai": "^4.0.0",
-    "@pinecone-database/pinecone": "^3.0.0"
-  },
-  "engines": {
-    "node": "22.x"
+  {
+    "name": "urbanai",
+    "version": "2.0.0",
+    "type": "module",
+    "dependencies": {
+      "openai": "^4.0.0",
+      "@pinecone-database/pinecone": "^3.0.0",
+      "mongodb": "^6.0.0",
+      "cheerio": "^1.0.0-rc.12",
+      "axios": "^1.6.0",
+      "pdf-parse": "^1.1.1",
+      "langchain": "^0.2.0"
+    },
+    "engines": {
+      "node": "22.x"
+    }
   }
-}
