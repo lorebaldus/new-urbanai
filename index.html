@@ -400,48 +400,133 @@
       }
 
       /* ---------- Fallback locale ---------- */
-      localFallback(q, offline=false) {
-        const t = q.trim().toLowerCase();
+     localFallback(q, offline=false) {
+    const t = q.trim().toLowerCase();
 
-        const saluti = ['ciao', 'buongiorno', 'salve', 'hey', 'hola', 'buonasera', 'ehi', 'hi', 'hello'];
-        if (saluti.includes(t)) {
-          return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, edilizia e pianificazione.
-Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità offline)_' : ''}`;
-        }
+    // CORREZIONE: controlla se il testo CONTIENE uno dei saluti
+    const saluti = ['ciao', 'buongiorno', 'salve', 'hey', 'hola',
+  'buonasera', 'ehi', 'hi', 'hello'];
+    if (saluti.some(saluto => t.includes(saluto))) {
+      return `Ciao! Sono **UrbanAI**, il tuo assistente specializzato in 
+  urbanistica e normative edilizie italiane.
 
-        if (t.includes('cosa puoi fare') || t.includes('cosa sai fare') ||
-            t.includes('come puoi aiutarmi') || t.includes('puoi aiutare') ||
-            t.includes('aiutarmi')) {
-          return `Posso aiutarti a:
-• Comprendere i **titoli edilizi** (Permesso di costruire, SCIA, CILA, edilizia libera)
-• Verificare **distanze**, **altezze**, **indici** e **zonizzazione** (PRG/PGT)
-• Individuare **vincoli** (paesaggistici, sismici, idraulici) e l'iter autorizzativo
-• Preparare **check-list** e prime valutazioni di fattibilità
-${offline ? '_(Nota: modalità offline, sintesi generata lato frontend)_' : ''}`;
-        }
+  🏗️ **Posso aiutarti con:**
+  • **Permessi edilizi** (Permesso di costruire, SCIA, CILA)
+  • **Distanze e altezze** di costruzione
+  • **Vincoli territoriali** e paesaggistici
+  • **Normative comunali** e piani regolatori
+  • **Check-list** per pratiche edilizie
 
-        if (t.includes('confine') || t.includes('distanza dal confine') ||
-            (t.includes('distanza') && (t.includes('costruire') || t.includes('costruzione') || t.includes('nuova costruzione')))) {
-          return `Distanze dal confine – indicazioni generali:
-• **Codice Civile (art. 873)**: distanza minima tra costruzioni di **3 m**, salvo norme locali più restrittive.
-• **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici antistanti** in zona B e C, minimo **10 m**.
-• I **Regolamenti edilizi/PRG/PGT** possono fissare distanze dal confine (es. 5 m) o consentire la **costruzione sul confine** con condizioni.
-Operativamente: indica **Comune** e **zona** per verifiche puntuali su NTA e Regolamento edilizio.${offline ? '\n_(Modalità offline: controlla le fonti locali)_' : ''}`;
-        }
+  Come posso aiutarti oggi?${offline ? '\n\n_(Modalità offline)_' : ''}`;
+    }
 
-        if (t.includes('permesso di costruire') || t.includes('scia') ||
-            t.includes('cila') || t.includes('c.i.l.a') || t.includes('dia')) {
-          return `Titoli edilizi – panoramica:
-• **Edilizia libera**: opere minori definite dalla normativa.
-• **CILA**: manutenzione straordinaria senza parti strutturali.
-• **SCIA**: interventi più rilevanti, anche su strutture; esiste la **SCIA alternativa** al PdC in alcuni casi.
-• **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, ampliamenti, cambi d'uso rilevanti.
-Serve sempre verificare **vincoli** e **zonizzazione** del Comune.${offline ? '\n_(Modalità offline)_' : ''}`;
-        }
+    // CORREZIONE: più varianti per le domande sulle capacità
+    if (t.includes('cosa puoi fare') || t.includes('cosa sai fare') ||
+        t.includes('che sai fare') || t.includes('come puoi aiutarmi') ||
+        t.includes('puoi aiutare') || t.includes('aiutarmi') ||
+        t.includes('capacità') || t.includes('funzioni') || t.includes('cosa
+   fai')) {
+      return `Sono **UrbanAI**, specializzato in urbanistica italiana! 
 
-        return `Posso aiutarti con distanze, titoli edilizi (CILA/SCIA/PdC), vincoli e PRG/PGT.
-Dimmi **Comune**, **zona/indirizzo** e **tipo di intervento** (es. nuova costruzione, ampliamento, cambio d'uso) e ti do un primo inquadramento.${offline ? '\n_(Modalità offline)_' : ''}`;
-      }
+  🏗️ **Le mie competenze:**
+
+  **📋 Titoli edilizi:**
+  • **Permesso di costruire** vs **SCIA** vs **CILA**
+  • **Edilizia libera** e interventi minori
+  • **Cambio destinazione d'uso**
+
+  **📏 Parametri urbanistici:**
+  • **Distanze** dai confini e tra edifici
+  • **Altezze massime** e indici volumetrici
+  • **Superficie coperta** e rapporti urbanistici
+
+  **🏛️ Normative e vincoli:**
+  • **Piani Regolatori** (PRG/PGT)
+  • **Vincoli paesaggistici**, storici, idrogeologici
+  • **Regolamenti edilizi** comunali
+
+  **🔍 Supporto pratico:**
+  • **Check-list** per pratiche edilizie
+  • **Valutazioni di fattibilità**
+  • **Iter autorizzativi**
+
+  Dimmi **comune**, **zona** e **tipo di intervento** per consigli 
+  specifici!${offline ? '\n\n_(Modalità offline)_' : ''}`;
+    }
+
+    // Test/funzionamento
+    if (t.includes('test') || t.includes('funzioni') ||
+  t.includes('funziona') ||
+        t.includes('prova') || t.includes('ok')) {
+      return `✅ **Sistema operativo!** 
+
+  Sono UrbanAI e funziono correttamente. Puoi farmi domande su:
+  • Normative edilizie e urbanistiche
+  • Titoli edilizi (Permesso, SCIA, CILA)
+  • Distanze, altezze, vincoli
+  • Pratiche comunali
+
+  Prova con una domanda specifica!${offline ? '\n_(Test in modalità 
+  offline)_' : ''}`;
+    }
+
+    // Ringraziamenti
+    if (t.includes('grazie') || t.includes('thanks') || t.includes('bene')
+  ||
+        t.includes('perfetto') || t.includes('ok grazie')) {
+      return `Prego! 😊 Sono qui per aiutarti con tutte le questioni 
+  urbanistiche ed edilizie.
+
+  Se hai altre domande su normative, permessi o pratiche edilizie, chiedi 
+  pure!${offline ? '\n_(Modalità offline)_' : ''}`;
+    }
+
+    if (t.includes('confine') || t.includes('distanza dal confine') ||
+        (t.includes('distanza') && (t.includes('costruire') ||
+  t.includes('costruzione') || t.includes('nuova costruzione')))) {
+      return `**Distanze dal confine** – indicazioni generali:
+
+  • **Codice Civile (art. 873)**: distanza minima tra costruzioni di **3 
+  m**, salvo norme locali più restrittive
+  • **DM 1444/1968**: tra **pareti finestrate** e **pareti di edifici 
+  antistanti** in zona B e C, minimo **10 m**
+  • I **Regolamenti edilizi/PRG/PGT** possono fissare distanze dal confine 
+  (es. 5 m) o consentire la **costruzione sul confine** con condizioni
+
+  Per verifiche puntuali serve: **Comune** e **zona** specifica.${offline ? 
+  '\n_(Modalità offline: controlla le fonti locali)_' : ''}`;
+    }
+
+    if (t.includes('permesso di costruire') || t.includes('scia') ||
+        t.includes('cila') || t.includes('c.i.l.a') || t.includes('dia')) {
+      return `**Titoli edilizi** – panoramica:
+
+  • **Edilizia libera**: opere minori definite dalla normativa
+  • **CILA**: manutenzione straordinaria senza parti strutturali
+  • **SCIA**: interventi più rilevanti, anche su strutture; esiste la **SCIA
+   alternativa** al PdC in alcuni casi
+  • **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, 
+  ampliamenti, cambi d'uso rilevanti
+
+  Serve sempre verificare **vincoli** e **zonizzazione** del 
+  Comune.${offline ? '\n_(Modalità offline)_' : ''}`;
+    }
+
+    return `Posso aiutarti con:
+
+  🏗️ **Titoli edilizi** (CILA, SCIA, Permesso di Costruire)
+  📏 **Distanze** e **confini** (normative e regolamenti locali)  
+  🏛️ **Vincoli** (paesaggistici, sismici, idraulici)
+  📋 **Piani regolatori** (PRG/PGT) e **cambi d'uso**
+
+  **Per risposte precise, fornisci:**
+  • **Comune** e zona/indirizzo
+  • **Tipo di intervento** da realizzare
+  • **Domanda specifica** su normative
+
+  Prova con: *"Quali distanze per costruire a [Comune]?"* oppure *"Serve il 
+  permesso per ampliare casa?"*${offline ? '\n_(Modalità offline)_' : ''}`;
+  }
 
       /* ---------- UI helpers ---------- */
       addMessage(content, sender, metadata = null) {
