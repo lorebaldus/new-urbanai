@@ -299,12 +299,15 @@
           this.validateInput();
 
           if (answer) {
-            this.addMessage(answer, 'assistant');
-          } else {
-            // Risposta rifiutata/boilerplate/vuota: fornisco un aiuto non-bloccante senza mostrare errore rosso
-            this.addMessage(this.makeHelpfulFallback(question), 'assistant');
-            // Nessuna showError qui: niente banner rosso per fallback "normali"
-          }
+    // Mostra sempre la risposta dell'API se contiene informazioni utili
+    this.addMessage(answer, 'assistant', {
+      knowledgeBaseUsed: response.knowledgeBaseUsed,
+      sourcesFound: response.sourcesFound
+    });
+  } else {
+    // Solo se davvero vuota usa il fallback
+    this.addMessage(this.makeHelpfulFallback(question), 'assistant');
+  }
         } catch (error) {
           console.error('Errore chiamata API:', error);
           this.hideTypingIndicator();
@@ -388,31 +391,39 @@
        * Normalizza la risposta: elimina rifiuti/guardrail troppo rigidi e boilerplate.
        * Se è un rifiuto del tipo “non posso aiutarti”, restituisce stringa vuota (trigger fallback utile).
        */
-      normalizeAnswer(text, userQuestion) {
-        if (!text) return '';
-        let s = String(text).trim();
+     normalizeAnswer(text, userQuestion) {
+    if (!text) return '';
+    let s = String(text).trim();
 
-        // Rifiuti/guardrail troppo restrittivi (varie formulazioni)
-        const refusalPatterns = [
-          /mi\s*dispiace[,;:]?\s*(ma\s*)?(non|nn)\s*posso\s*(aiutarti|rispondere)/iu,
-          /posso\s*(aiutarti|rispondere)\s*(solo|soltanto).*(urbanistic|ediliz)/iu,
-          /sono\s*urbanai.*(solo|soltanto).*urbanistic/iu,
-          /non\s*(fornisco|do)\s*assistenza.*(fuori|solo).*urbanistic/iu,
-          /non\s*sono\s*abilitat[oa]\s*a\s*risponder/iu
-        ];
-        if (refusalPatterns.some(re => re.test(s))) {
-          s = '';
-        }
+    // CORREZIONE: Filtra solo rifiuti veri, non risposte urbanistiche 
+  legittime
+    const refusalPatterns = [
+      // Solo rifiuti per argomenti completamente OFF-TOPIC
+      /non\s*posso\s*aiutare.*(?:programmazione|coding|medicina|cucina|sport
+  |politica)/iu,
+      /(?:sono|resto)\s*limitato.*(?:urbanistic|ediliz)/iu,
+      // Rimuovi il pattern troppo aggressivo che filtrava tutto
+    ];
 
-        // Boilerplate generici
-        const boilerplate = [
-          /come\s+modello\s+di\s+intelligenza\s+artificiale/iu,
-          /as\s+an\s+ai\s+language\s+model/iu
-        ];
-        boilerplate.forEach(re => { s = s.replace(re, ''); });
+    // IMPORTANTE: NON filtrare le risposte che contengono informazioni 
+  urbanistiche
+    // anche se iniziano con "Mi dispiace"
+    const hasUrbanisticContent = /(?:permess|scia|cila|ediliz|urban|costrui|
+  confin|distanz|vincol|prg|pgt)/iu.test(s);
 
-        return s.trim();
-      }
+    if (!hasUrbanisticContent && refusalPatterns.some(re => re.test(s))) {
+      s = '';
+    }
+
+    // Pulisci solo boilerplate vero
+    const boilerplate = [
+      /come\s+modello\s+di\s+intelligenza\s+artificiale/iu,
+      /as\s+an\s+ai\s+language\s+model/iu
+    ];
+    boilerplate.forEach(re => { s = s.replace(re, ''); });
+
+    return s.trim();
+  }
 
       /* ---------- Fallback/risposte più generaliste ---------- */
       makeHelpfulFallback(q, offline=false) {
@@ -451,20 +462,33 @@
       }
 
       /* ---------- UI helpers ---------- */
-      addMessage(content, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+      addMessage(content, sender, metadata = null) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
 
-        messageDiv.innerHTML = `
-          <div class="message-avatar"><i class="${avatarIcon}"></i></div>
-          <div class="message-content">
-            ${this.formatMessage(content)}
-          </div>
-        `;
-        this.messagesContainer.appendChild(messageDiv);
-        this.scrollToBottom();
-      }
+    let metadataHTML = '';
+    if (metadata && metadata.knowledgeBaseUsed) {
+      metadataHTML = `
+        <div style="margin-top: 8px; padding: 0.5rem 1rem; background: 
+  rgba(102,126,234,.1); color: #667eea; border-radius: 20px; font-size: 
+  0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fas fa-database"></i>
+          ${metadata.sourcesFound} fonti dalla knowledge base
+        </div>
+      `;
+    }
+
+    messageDiv.innerHTML = `
+      <div class="message-avatar"><i class="${avatarIcon}"></i></div>
+      <div class="message-content">
+        ${this.formatMessage(content)}
+        ${metadataHTML}
+      </div>
+    `;
+    this.messagesContainer.appendChild(messageDiv);
+    this.scrollToBottom();
+  }
 
       formatMessage(content) {
         // Sanificazione minima + miniformatting
