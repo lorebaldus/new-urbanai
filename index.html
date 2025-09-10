@@ -7,7 +7,7 @@
   <!-- Opzionale: forzare la base API -->
   <!-- <meta name="urbanai-api" content="https://tuo-dominio.tld"> -->
 
-  <!-- Link corretto (nessun newline) -->
+  <!-- Link corretto a Font Awesome (nessun newline) -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
   <style>
@@ -119,8 +119,6 @@
       margin-top: 1rem; display: none;
     }
 
-    /* RIMOSSO: .info-badge e qualsiasi badge sulle “fonti” */
-
     @media (max-width: 768px) {
       .main-container { padding: 1rem; gap: 1rem; }
       .header { padding: 1rem; }
@@ -178,7 +176,7 @@
           <div class="input-wrapper">
             <textarea
               id="questionInput"
-              placeholder="Scrivi la tua domanda urbanistica qui..."
+              placeholder="Scrivi qui la tua domanda…"
               rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
             ></textarea>
           </div>
@@ -303,17 +301,18 @@
           if (answer) {
             this.addMessage(answer, 'assistant');
           } else {
-            // Risposta rifiutata o vuota -> fornisco comunque un aiuto utile
+            // Risposta rifiutata/boilerplate/vuota: fornisco un aiuto non-bloccante senza mostrare errore rosso
             this.addMessage(this.makeHelpfulFallback(question), 'assistant');
-            this.showError('La risposta del server era poco utile: ho fornito un aiuto iniziale.');
+            // Nessuna showError qui: niente banner rosso per fallback "normali"
           }
         } catch (error) {
           console.error('Errore chiamata API:', error);
           this.hideTypingIndicator();
           this.sending = false;
           this.validateInput();
+          // Solo per errori veri di rete/HTTP mostro il banner rosso
           this.addMessage(this.makeHelpfulFallback(question, true), 'assistant');
-          this.showError('Connessione API non riuscita. Risposta generata in locale.');
+          this.showError('Problema di connessione con il server. Ho fornito un primo orientamento in locale.');
           this.setStatus('Offline (uso fallback locale)', 'offline');
         }
       }
@@ -405,7 +404,7 @@
           s = '';
         }
 
-        // Boilerplate da strumenti/LLM (“as an AI…”, “non sono un avvocato…”)
+        // Boilerplate generici
         const boilerplate = [
           /come\s+modello\s+di\s+intelligenza\s+artificiale/iu,
           /as\s+an\s+ai\s+language\s+model/iu
@@ -415,64 +414,40 @@
         return s.trim();
       }
 
-      /* ---------- Fallback/risposte utili e più aperte ---------- */
+      /* ---------- Fallback/risposte più generaliste ---------- */
       makeHelpfulFallback(q, offline=false) {
         const t = q.trim().toLowerCase();
 
-        // Saluti
+        // Saluti: risposta generalista e semi-formale
         const saluti = ['ciao','buongiorno','salve','hey','hola','buonasera','ehi','hi','hello'];
         if (saluti.includes(t)) {
-          return `Ciao! 👋 Sono UrbanAI. Posso darti un orientamento pratico su **permessi**, **SCIA/CILA/PdC**, **distanze**, **PRG/PGT** e **vincoli**.
-Dimmi pure su cosa ti serve aiuto.${offline ? '\n\n_(Nota: modalità offline)_' : ''}`;
+          return `Ciao, sono UrbanAI: un assistente pensato per temi urbanistici ed edilizi. In cosa posso aiutarti?${offline ? '\n\n_(Nota: modalità offline)_' : ''}`;
         }
 
-        // “Cosa sai fare / Come puoi aiutarmi”
+        // “Cosa sai fare / Come puoi aiutarmi”: risposta concisa e non troppo tecnica
         if (t.includes('cosa puoi fare') || t.includes('cosa sai fare') ||
             t.includes('come puoi aiutarmi') || t.includes('puoi aiutare') || t.includes('aiutarmi')) {
-          return `Posso aiutarti a:
-• Capire **che titolo** serve (CILA, SCIA, PdC) per un intervento
-• Verificare a grandi linee **distanze/indici/altezze** in base alle regole tipo
-• Evidenziare possibili **vincoli** (paesaggistico, sismico, idraulico) e i passi successivi
-• Preparare una piccola **checklist** operativa
-Indicami **Comune**, **zona/indirizzo** e **intervento**: ti do un primo inquadramento.`;
+          return `Sono un assistente per l’urbanistica e l’edilizia. Posso orientarti su procedure, titoli abilitativi e prime verifiche di fattibilità. Dimmi il contesto (Comune e tipo di intervento) e ti do un primo inquadramento.`;
         }
 
-        // Caso specifico frequente: campo da tennis (o padel) → prime indicazioni operative
+        // Esempio ricorrente: campo da tennis/padel
         if (/(campo\s+da\s+tennis|campo\s+tennis|tennistico|padel|campo\s+da\s+padel)/i.test(t)) {
-          return `Campo da tennis: serve il **Permesso di Costruire**?
-• **Nuova realizzazione permanente** (platea, recinzioni, rete, drenaggi): in via generale è **nuova costruzione** → spesso **Permesso di Costruire (PdC)**.
-• **Solo tracciatura/attrezzature amovibili** su area già idonea: talvolta intervento minore; può bastare **CILA/SCIA** o comunicazione, ma dipende dal **Regolamento edilizio** e dalla **zonizzazione**.
-• **Copertura/tensostruttura**: in genere richiede **PdC**; verifica anche eventuale **autorizzazione paesaggistica**.
-• **Illuminazione**: attenzione alle norme su **inquinamento luminoso** e orari.
-Passi pratici:
-1) Indica **Comune** e se l’area è **urbanizzata** o agricola.
-2) Verifica in PRG/PGT l’ammissibilità di **attrezzature sportive** nella zona.
-3) Controlla vincoli (paesaggio/idraulica/sismica) e il Regolamento edilizio locale per il titolo corretto.`;
+          return `Per un nuovo **campo da tennis** fisso e attrezzato serve spesso il **Permesso di Costruire**; per soluzioni leggere o amovibili possono bastare titoli meno onerosi, ma dipende dal Comune e dalla zonizzazione. Indica **Comune** e contesto dell’area e ti aiuto a capire il titolo più adatto.`;
         }
 
-        // Distanze/confini
+        // Distanze/confini (resto conciso)
         if (t.includes('confine') || t.includes('distanza dal confine') ||
             (t.includes('distanza') && (t.includes('costruire') || t.includes('costruzione') || t.includes('nuova costruzione')))) {
-          return `Distanze – promemoria rapido:
-• **Codice Civile (art. 873)**: minima tra costruzioni **3 m** (salvo norme locali più restrittive)
-• **DM 1444/1968**: tra **pareti finestrate** e **pareti antistanti** in zone B/C, almeno **10 m**
-• I **Regolamenti edilizi/PRG/PGT** possono fissare distanze diverse o consentire costruzione **sul confine** con condizioni
-Per un riscontro puntuale: indicami **Comune** e **zona**.`;
+          return `In via generale: **3 m** tra costruzioni (art. 873 c.c.) e **10 m** tra pareti finestrate in alcune zone (DM 1444/1968), salvo norme comunali più restrittive. Dimmi **Comune** e zona per un orientamento mirato.`;
         }
 
-        // Titoli edilizi in generale
+        // Titoli edilizi (conciso)
         if (t.includes('permesso di costruire') || t.includes('scia') || t.includes('cila') || t.includes('c.i.l.a') || t.includes('dia')) {
-          return `Titoli edilizi – orientamento:
-• **Edilizia libera**: opere minori tipizzate
-• **CILA**: manutenzione straordinaria **senza** parti strutturali
-• **SCIA**: interventi più rilevanti (anche su strutture); esiste la **SCIA alternativa** al PdC in alcuni casi
-• **Permesso di Costruire**: nuove costruzioni, ristrutturazioni pesanti, ampliamenti e cambi d’uso rilevanti
-Serve sempre incrociare con **zonizzazione** e **vincoli** del Comune.`;
+          return `Posso aiutarti a capire se serve **CILA**, **SCIA** o **Permesso di Costruire** in base all’intervento e al contesto locale. Indicami Comune e tipologia e ti rispondo.`;
         }
 
-        // Fallback collaborativo (preferire “una risposta in più”)
-        return `Ricevuto: **${q}**.
-Proviamo a inquadrare la questione. Se puoi, indicami **Comune**, **zona/indirizzo** e **tipo di intervento**: così ti do un orientamento operativo subito.`;
+        // Fallback collaborativo e non-bloccante
+        return `Ok, vediamo insieme: **${q}**. Se mi dici **Comune** e natura dell’intervento, ti offro un primo orientamento pratico.`;
       }
 
       /* ---------- UI helpers ---------- */
@@ -481,7 +456,6 @@ Proviamo a inquadrare la questione. Se puoi, indicami **Comune**, **zona/indiriz
         messageDiv.className = `message ${sender}`;
         const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
 
-        // Niente badge “fonti” o bottoni extra
         messageDiv.innerHTML = `
           <div class="message-avatar"><i class="${avatarIcon}"></i></div>
           <div class="message-content">
