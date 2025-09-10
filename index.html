@@ -453,7 +453,7 @@
 
           const saluti = ['ciao', 'buongiorno', 'salve', 'hey', 'hola', 
   'buonasera', 'ehi', 'hi', 'hello'];
-          if (saluti.some(saluto => t.includes(saluto))) {
+          if (saluti.indexOf(t) !== -1 || saluti.some(s => t.indexOf(s) !== -1)) {
             return `Ciao! Sono UrbanAI, il tuo assistente per urbanistica, 
   edilizia e pianificazione.
   Come posso aiutarti oggi?${offline ? '\n\n_(Nota: modalità offline)_' : 
