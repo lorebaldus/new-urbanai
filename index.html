@@ -7,7 +7,7 @@
   <!-- Opzionale: forzare la base API -->
   <!-- <meta name="urbanai-api" content="https://tuo-dominio.tld"> -->
 
-  <!-- Link corretto a Font Awesome (nessun newline nel path) -->
+  <!-- Link a Font Awesome (unica riga, nessun newline) -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
 
   <style>
@@ -210,9 +210,13 @@
       this.showTypingIndicator();
 
       try {
-        const response = await this.queryAPI(question);
+        const response  = await this.queryAPI(question);
         const rawAnswer = this.extractAnswer(response);
-        const answer = this.normalizeAnswer(rawAnswer, question);
+        let   answer    = this.normalizeAnswer(rawAnswer, question);
+
+        // Classifica l'intento e adatta la risposta se il backend è "apologetico"
+        const intent = this.detectIntent(question);
+        answer = this.adjustAnswerForIntent(answer, intent, question);
 
         this.hideTypingIndicator();
         this.sending = false;
@@ -248,10 +252,7 @@
         try {
           const resp = await fetch(this.apiUrl(path), {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json,text/plain;q=0.9,*/*;q=0.8'
-            },
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json,text/plain;q=0.9,*/*;q=0.8' },
             body: JSON.stringify(payload)
           });
 
@@ -301,21 +302,20 @@
     }
 
     /**
-     * Normalizzazione minimale: niente guardrail aggressivi.
-     * Mantiene il contenuto, pulisce solo boilerplate ovvio.
+     * Normalizzazione minima: pulisce boilerplate e fa piccole correzioni.
      */
     normalizeAnswer(text, userQuestion) {
       if (!text) return '';
       let s = String(text).trim();
 
-      // Rimuovi boilerplate molto generico, senza toccare il resto
+      // Rimuovi boilerplate generici
       const boilerplate = [
         /come\s+modello\s+di\s+intelligenza\s+artificiale/iu,
         /as\s+an\s+ai\s+language\s+model/iu
       ];
       boilerplate.forEach(re => { s = s.replace(re, ''); });
 
-      // Se l’utente ha scritto "padel", evita che un eventuale modello generi "tennis"
+      // Se l’utente ha scritto "padel", evita che il testo parli di "tennis" per errore
       if (/(padel|pádel|paddle)/i.test(userQuestion)) {
         s = s.replace(/\bcampo da tennis\b/gi, 'campo da padel').replace(/\btennis\b/gi, 'padel');
       }
@@ -324,19 +324,50 @@
     }
 
     /**
-     * Fallback amichevole per saluti/cosa sai fare/casi tipici.
+     * Classificazione semplice dell'intento dell'utente.
+     */
+    detectIntent(q) {
+      const t = q.trim().toLowerCase();
+      const isGreeting = ['ciao','salve','hey','hola','ehi','hi','hello','buongiorno','buonasera'].includes(t);
+      if (isGreeting) return 'greet';
+      if (/cosa\s+(puoi|sai)\s+fare|come\s+puoi\s+aiutarmi|puoi\s+aiutare|aiutarmi/iu.test(t)) return 'capabilities';
+      if (/aiuto|help|supporto/iu.test(t)) return 'help';
+      return 'other';
+    }
+
+    /**
+     * Se il backend risponde con “Mi dispiace/non posso…”, sostituiamo con risposte adeguate
+     * per greet/capabilities/help. Altrimenti lasciamo la risposta.
+     */
+    adjustAnswerForIntent(answer, intent, userQuestion) {
+      const isApologyOrRefusal = /(mi\s+dispiace|non\s+posso\s+aiutarti|posso\s+aiutarti\s+solo|non\s+posso\s+fornire)/iu.test(answer);
+      if (intent === 'greet') {
+        if (!answer || isApologyOrRefusal) return this.replyGreet();
+      }
+      if (intent === 'capabilities' || intent === 'help') {
+        if (!answer || isApologyOrRefusal) return this.replyCapabilities();
+      }
+      return answer;
+    }
+
+    /* ---------- Risposte predefinite per intent ---------- */
+    replyGreet() {
+      return 'Ciao, sono UrbanAI: un assistente per temi urbanistici ed edilizi in Italia. Dimmi pure come posso aiutarti.';
+    }
+    replyCapabilities() {
+      return 'Posso aiutarti a orientarti tra **titoli abilitativi** (CILA, SCIA, Permesso di Costruire), verifiche **PRG/PGT** e **regolamenti edilizi**, prime valutazioni su **distanze, altezze, indici** e possibili **vincoli**. Dimmi **Comune** e **tipo di intervento** e preparo un primo inquadramento pratico.';
+    }
+
+    /**
+     * Fallback amichevole quando l’API non risponde o è fuori uso.
      */
     makeHelpfulFallback(q, offline=false) {
       const t = q.trim().toLowerCase();
       const saluti = ['ciao','buongiorno','salve','hey','hola','buonasera','ehi','hi','hello'];
-      if (saluti.includes(t)) {
-        return `Ciao, sono UrbanAI: un assistente pensato per temi urbanistici ed edilizi. In cosa posso aiutarti?${offline ? '\n\n_(Nota: modalità offline)_' : ''}`;
-      }
-      if (t.includes('cosa puoi fare') || t.includes('cosa sai fare') || t.includes('come puoi aiutarmi') || t.includes('puoi aiutare') || t.includes('aiutarmi')) {
-        return 'Sono un assistente per l’urbanistica e l’edilizia. Posso orientarti su procedure, titoli abilitativi e prime verifiche di fattibilità. Dimmi il **Comune** e la tipologia di intervento e preparo un primo inquadramento.';
-      }
+      if (saluti.includes(t)) return this.replyGreet() + (offline ? '\n\n_(Nota: modalità offline)_' : '');
+      if (/cosa\s+(puoi|sai)\s+fare|come\s+puoi\s+aiutarmi|puoi\s+aiutare|aiutarmi/iu.test(t)) return this.replyCapabilities();
       if (/(campo\s+da\s+tennis|campo\s+tennis|tennistico|padel|campo\s+da\s+padel)/i.test(t)) {
-        return 'Per un **campo da padel/tennis** fisso e attrezzato serve spesso il **Permesso di Costruire**; per soluzioni amovibili possono bastare titoli meno onerosi. Serve verificare regolamento edilizio e zonizzazione del Comune. Indicami il **Comune** e il contesto e dettaglio meglio.';
+        return 'Per un **campo da padel** fisso e attrezzato serve spesso il **Permesso di Costruire**; per soluzioni amovibili possono bastare titoli meno onerosi. Serve verificare regolamento edilizio e zonizzazione del Comune. Indicami il **Comune** e il contesto e dettaglio meglio.';
       }
       if (t.includes('confine') || t.includes('distanza dal confine') || (t.includes('distanza') && (t.includes('costruire') || t.includes('costruzione') || t.includes('nuova costruzione')))) {
         return 'In generale: **3 m** tra costruzioni (art. 873 c.c.) e **10 m** tra pareti finestrate in alcune zone (DM 1444/1968), salvo norme comunali più restrittive. Dimmi **Comune** e zona per un orientamento mirato.';
