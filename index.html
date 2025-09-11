@@ -246,14 +246,14 @@
           this.sendMessage();
         });
 
-        // Enter invia, Shift+Enter va a capo (gestione IME)
+        // Enter invia, Shift+Enter va a capo (gestione IME + tastierino numerico)
         this.questionInput.addEventListener('keydown', (e) => {
-          const isEnterKey  = (e.key === 'Enter' || e.code === 'Enter' || e.keyCode === 13);
+          const isEnterKey  = (e.key === 'Enter' || e.code === 'Enter' || e.code === 'NumpadEnter' || e.keyCode === 13);
           const isComposing = e.isComposing === true || e.keyCode === 229;
           if (isEnterKey && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !isComposing) {
             e.preventDefault();
-            if (typeof this.chatForm.requestSubmit === 'function') this.chatForm.requestSubmit();
-            else this.sendMessage();
+            // Preferiamo chiamare direttamente la logica di invio
+            this.sendMessage();
           }
         });
 
@@ -299,15 +299,15 @@
           this.validateInput();
 
           if (answer) {
-    // Mostra sempre la risposta dell'API se contiene informazioni utili
-    this.addMessage(answer, 'assistant', {
-      knowledgeBaseUsed: response.knowledgeBaseUsed,
-      sourcesFound: response.sourcesFound
-    });
-  } else {
-    // Solo se davvero vuota usa il fallback
-    this.addMessage(this.makeHelpfulFallback(question), 'assistant');
-  }
+            // Mostra sempre la risposta dell'API se contiene informazioni utili
+            this.addMessage(answer, 'assistant', {
+              knowledgeBaseUsed: response.knowledgeBaseUsed,
+              sourcesFound: response.sourcesFound
+            });
+          } else {
+            // Solo se davvero vuota usa il fallback
+            this.addMessage(this.makeHelpfulFallback(question), 'assistant');
+          }
         } catch (error) {
           console.error('Errore chiamata API:', error);
           this.hideTypingIndicator();
@@ -390,40 +390,34 @@
       /**
        * Normalizza la risposta: elimina rifiuti/guardrail troppo rigidi e boilerplate.
        * Se è un rifiuto del tipo “non posso aiutarti”, restituisce stringa vuota (trigger fallback utile).
+       * (FIX) Nessuna regex spezzata su più righe.
        */
-     normalizeAnswer(text, userQuestion) {
-    if (!text) return '';
-    let s = String(text).trim();
+      normalizeAnswer(text, userQuestion) {
+        if (!text) return '';
+        let s = String(text).trim();
 
-    // CORREZIONE: Filtra solo rifiuti veri, non risposte urbanistiche 
-  legittime
-    const refusalPatterns = [
-      // Solo rifiuti per argomenti completamente OFF-TOPIC
-      /non\s*posso\s*aiutare.*(?:programmazione|coding|medicina|cucina|sport
-  |politica)/iu,
-      /(?:sono|resto)\s*limitato.*(?:urbanistic|ediliz)/iu,
-      // Rimuovi il pattern troppo aggressivo che filtrava tutto
-    ];
+        // CORREZIONE: Filtra solo rifiuti veri, non risposte urbanistiche legittime
+        const refusalPatterns = [
+          /non\s*posso\s*aiutare.*(?:programmazione|coding|medicina|cucina|sport|politica)/iu,
+          /(?:sono|resto)\s*limitato.*(?:urbanistic|ediliz)/iu
+        ];
 
-    // IMPORTANTE: NON filtrare le risposte che contengono informazioni 
-  urbanistiche
-    // anche se iniziano con "Mi dispiace"
-    const hasUrbanisticContent = /(?:permess|scia|cila|ediliz|urban|costrui|
-  confin|distanz|vincol|prg|pgt)/iu.test(s);
+        // NON filtrare risposte che contengono contenuto urbanistico utile
+        const hasUrbanisticContent = /(?:permess|scia|cila|ediliz|urban|costrui|confin|distanz|vincol|prg|pgt)/iu.test(s);
 
-    if (!hasUrbanisticContent && refusalPatterns.some(re => re.test(s))) {
-      s = '';
-    }
+        if (!hasUrbanisticContent && refusalPatterns.some(re => re.test(s))) {
+          s = '';
+        }
 
-    // Pulisci solo boilerplate vero
-    const boilerplate = [
-      /come\s+modello\s+di\s+intelligenza\s+artificiale/iu,
-      /as\s+an\s+ai\s+language\s+model/iu
-    ];
-    boilerplate.forEach(re => { s = s.replace(re, ''); });
+        // Pulisci solo boilerplate vero
+        const boilerplate = [
+          /come\s+modello\s+di\s+intelligenza\s+artificiale/iu,
+          /as\s+an\s+ai\s+language\s+model/iu
+        ];
+        boilerplate.forEach(re => { s = s.replace(re, ''); });
 
-    return s.trim();
-  }
+        return s.trim();
+      }
 
       /* ---------- Fallback/risposte più generaliste ---------- */
       makeHelpfulFallback(q, offline=false) {
@@ -463,32 +457,31 @@
 
       /* ---------- UI helpers ---------- */
       addMessage(content, sender, metadata = null) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
 
-    let metadataHTML = '';
-    if (metadata && metadata.knowledgeBaseUsed) {
-      metadataHTML = `
-        <div style="margin-top: 8px; padding: 0.5rem 1rem; background: 
-  rgba(102,126,234,.1); color: #667eea; border-radius: 20px; font-size: 
-  0.9rem; display: inline-flex; align-items: center; gap: 6px;">
-          <i class="fas fa-database"></i>
-          ${metadata.sourcesFound} fonti dalla knowledge base
-        </div>
-      `;
-    }
+        // Badge fonti opzionale (non influisce su Invio)
+        let metadataHTML = '';
+        if (metadata && metadata.knowledgeBaseUsed) {
+          metadataHTML = `
+            <div style="margin-top: 8px; padding: 0.5rem 1rem; background: rgba(102,126,234,.1); color: #667eea; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fas fa-database"></i>
+              ${String(metadata.sourcesFound ?? '')} fonti dalla knowledge base
+            </div>
+          `;
+        }
 
-    messageDiv.innerHTML = `
-      <div class="message-avatar"><i class="${avatarIcon}"></i></div>
-      <div class="message-content">
-        ${this.formatMessage(content)}
-        ${metadataHTML}
-      </div>
-    `;
-    this.messagesContainer.appendChild(messageDiv);
-    this.scrollToBottom();
-  }
+        messageDiv.innerHTML = `
+          <div class="message-avatar"><i class="${avatarIcon}"></i></div>
+          <div class="message-content">
+            ${this.formatMessage(content)}
+            ${metadataHTML}
+          </div>
+        `;
+        this.messagesContainer.appendChild(messageDiv);
+        this.scrollToBottom();
+      }
 
       formatMessage(content) {
         // Sanificazione minima + miniformatting
