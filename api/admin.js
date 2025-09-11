@@ -25,15 +25,17 @@ import { MongoClient, ObjectId } from 'mongodb';
 
               res.json({ documents, stats });
 
-             } else if (req.method === 'POST') {
-  const { action, url, documentId } = req.body;
+          } else if (req.method === 'POST') {
+              const { action, url, documentId } = req.body;
 
-  // Definisci baseUrl qui
+              const baseUrl = req.headers.host?.includes('localhost')
+                  ? `http://${req.headers.host}`
+                  : 'https://urbanator.it';
 
-  if (action === 'scrape_and_process') {
-          // Pipeline completa: scrape → process → embed
-          const results = await runFullPipeline(url, baseUrl);
-          res.json(results);
+              if (action === 'scrape_and_process') {
+                  // Pipeline completa: scrape → process → embed
+                  const results = await runFullPipeline(url, baseUrl);
+                  res.json(results);
 
               } else if (action === 'process_document' && documentId) {
                   // Solo processing
@@ -60,16 +62,12 @@ import { MongoClient, ObjectId } from 'mongodb';
       }
   }
 
-  async function runFullPipeline(url) {
+  async function runFullPipeline(url, baseUrl) {
       const results = { steps: [] };
 
       try {
           // Step 1: Scrape
-          const baseUrl = req.headers.host?.includes('localhost')
-    ? `http://${req.headers.host}`
-    : 'https://urbanator.it';
-
-  const scrapeResponse = await fetch(`${baseUrl}/api/scrape`, {
+          const scrapeResponse = await fetch(`${baseUrl}/api/scrape`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ url, type: 'normattiva' })
