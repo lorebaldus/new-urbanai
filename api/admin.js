@@ -63,7 +63,11 @@ import { MongoClient, ObjectId } from 'mongodb';
 
       try {
           // Step 1: Scrape
-          const scrapeResponse = await fetch(`${process.env.VERCEL_URL}/api/scrape`, {
+          const baseUrl = req.headers.host?.includes('localhost')
+    ? `http://${req.headers.host}`
+    : 'https://urbanator.it';
+
+  const scrapeResponse = await fetch(`${baseUrl}/api/scrape`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ url, type: 'normattiva' })
@@ -74,7 +78,7 @@ import { MongoClient, ObjectId } from 'mongodb';
           const documentId = scrapeData.documentId;
 
           // Step 2: Process
-          const processResponse = await fetch(`${process.env.VERCEL_URL}/api/process`, {
+          const processResponse = await fetch(`${baseUrl}/api/process`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ documentId })
@@ -83,7 +87,7 @@ import { MongoClient, ObjectId } from 'mongodb';
           results.steps.push({ step: 'process', success: true, data: processData });
 
           // Step 3: Embed
-          const embedResponse = await fetch(`${process.env.VERCEL_URL}/api/embed`, {
+          const embedResponse = await fetch(`${baseUrl}/api/embed`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ documentId })
