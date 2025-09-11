@@ -25,13 +25,15 @@ import { MongoClient, ObjectId } from 'mongodb';
 
               res.json({ documents, stats });
 
-          } else if (req.method === 'POST') {
-              const { action, url, documentId } = req.body;
+             } else if (req.method === 'POST') {
+  const { action, url, documentId } = req.body;
 
-              if (action === 'scrape_and_process') {
-                  // Pipeline completa: scrape → process → embed
-                  const results = await runFullPipeline(url);
-                  res.json(results);
+  // Definisci baseUrl qui
+
+  if (action === 'scrape_and_process') {
+          // Pipeline completa: scrape → process → embed
+          const results = await runFullPipeline(url, baseUrl);
+          res.json(results);
 
               } else if (action === 'process_document' && documentId) {
                   // Solo processing
