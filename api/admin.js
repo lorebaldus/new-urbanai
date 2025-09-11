@@ -38,14 +38,24 @@ import { MongoClient, ObjectId } from 'mongodb';
                   res.json(results);
 
               } else if (action === 'process_document' && documentId) {
-                  // Solo processing
-                  const result = await processDocument(documentId);
-                  res.json(result);
+      // Solo processing
+      const processResponse = await fetch(`${baseUrl}/api/process`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ documentId })
+      });
+      const result = await processResponse.json();
+      res.json(result);
 
-              } else if (action === 'embed_document' && documentId) {
-                  // Solo embedding
-                  const result = await embedDocument(documentId);
-                  res.json(result);
+  } else if (action === 'embed_document' && documentId) {
+      // Solo embedding
+      const embedResponse = await fetch(`${baseUrl}/api/embed`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ documentId })
+      });
+      const result = await embedResponse.json();
+      res.json(result);
 
               } else {
                   res.status(400).json({ error: 'Invalid action' });
