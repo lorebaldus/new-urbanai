@@ -122,51 +122,87 @@ import { MongoClient } from 'mongodb';
       const searchUrl = `${baseUrl}/ricerca/pdf/regioni/3/0/0?reset=true`;
 
       try {
-          console.log(`Fetching: ${searchUrl}`);
-          const response = await axios.get(searchUrl, {
+          console.log(`Fetching search form: ${searchUrl}`);
+
+          // Step 1: Get the search form
+          const formResponse = await axios.get(searchUrl, {
               headers: {
                   'User-Agent': 'Mozilla/5.0 (compatible; UrbanAI-Bot/1.0)'
               },
               timeout: 30000
           });
 
-          console.log(`Response status: ${response.status}`);
-          console.log(`Content length: ${response.data.length}`);
+          const $ = cheerio.load(formResponse.data);
 
-          const $ = cheerio.load(response.data);
+          // Step 2: Find form data and submit with year
+          const formAction = $('form').attr('action') ||
+  '/ricerca/pdf/regioni/3/0/0';
+          const formMethod = $('form').attr('method') || 'POST';
 
-          // Debug: Log the HTML structure
-          console.log('Page title:', $('title').text());
-          console.log('Form inputs found:', $('input').length);
-          console.log('Links found:', $('a').length);
-          console.log('Select elements:', $('select').length);
+          console.log(`Form action: ${formAction}, method: ${formMethod}`);
 
-          // Look for year selection elements
-          $('select option').each((i, el) => {
-              const value = $(el).attr('value');
-              const text = $(el).text();
-              if (value && (value.includes('202') || text.includes('202'))) {
-                  console.log(`Year option found: ${text} (value: ${value})`);
+          // Build form data
+          const formData = new URLSearchParams();
+
+          // Add all existing form inputs
+          $('input').each((i, el) => {
+              const name = $(el).attr('name');
+              const value = $(el).attr('value') || '';
+              if (name) {
+                  formData.append(name, value);
               }
           });
 
-          // Look for any PDF links
-          const allLinks = [];
-          $('a').each((i, el) => {
-              const href = $(el).attr('href');
-              const text = $(el).text().trim();
-              if (href) {
-                  allLinks.push({ href, text });
+          // Set the year in the select
+          $('select').each((i, el) => {
+              const name = $(el).attr('name');
+              if (name) {
+                  formData.append(name, year.toString());
+                  console.log(`Setting ${name} = ${year}`);
               }
           });
 
-          console.log(`Total links: ${allLinks.length}`);
-          console.log('First 5 links:', allLinks.slice(0, 5));
+          console.log('Form data:', formData.toString());
 
-          return []; // Return empty for now
+          // Step 3: Submit form to get results
+          const resultsResponse = await axios({
+              method: formMethod.toUpperCase(),
+              url: baseUrl + formAction,
+              data: formData,
+              headers: {
+                  'User-Agent': 'Mozilla/5.0 (compatible; UrbanAI-Bot/1.0)',
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Referer': searchUrl
+              },
+              timeout: 30000
+          });
+
+          console.log(`Results page status: ${resultsResponse.status}`);
+          console.log(`Results content length: ${resultsResponse.data.length}`);
+
+          // Step 4: Parse results page for PDF links
+          const results$ = cheerio.load(resultsResponse.data);
+          const pdfUrls = [];
+
+          results$('a').each((i, el) => {
+              const href = results$(el).attr('href');
+              const text = results$(el).text().trim();
+
+              if (href && (href.includes('.pdf') || href.includes('pdf'))) {
+                  let fullUrl = href;
+                  if (href.startsWith('/')) {
+                      fullUrl = baseUrl + href;
+                  }
+                  pdfUrls.push(fullUrl);
+                  console.log(`Found PDF: ${fullUrl} (${text})`);
+              }
+          });
+
+          console.log(`Total PDFs found for ${year}: ${pdfUrls.length}`);
+          return [...new Set(pdfUrls)]; // Remove duplicates
 
       } catch (error) {
-          console.error(`Error analyzing page:`, error.message);
+          console.error(`Error finding PDFs for year ${year}:`, error.message);
           return [];
       }
   }
