@@ -119,9 +119,10 @@ import { MongoClient } from 'mongodb';
 
   async function findPdfsForYear(year) {
       const baseUrl = 'https://www.gazzettaufficiale.it';
-      const searchUrl = `${baseUrl}/ricerca/pdf/regioni/3/0/0/${year}`;
+      const searchUrl = `${baseUrl}/ricerca/pdf/regioni/3/0/0?reset=true`;
 
       try {
+          console.log(`Fetching: ${searchUrl}`);
           const response = await axios.get(searchUrl, {
               headers: {
                   'User-Agent': 'Mozilla/5.0 (compatible; UrbanAI-Bot/1.0)'
@@ -129,27 +130,43 @@ import { MongoClient } from 'mongodb';
               timeout: 30000
           });
 
-          const $ = cheerio.load(response.data);
-          const pdfUrls = [];
+          console.log(`Response status: ${response.status}`);
+          console.log(`Content length: ${response.data.length}`);
 
-          // Find all PDF links - adjust selectors based on actual HTML structure
-          $('a[href*=".pdf"], a[href*="pdf"]').each((i, element) => {
-              let href = $(element).attr('href');
-              if (href) {
-                  if (href.startsWith('/')) {
-                      href = baseUrl + href;
-                  }
-                  if (href.includes('.pdf') || href.includes('pdf')) {
-                      pdfUrls.push(href);
-                  }
+          const $ = cheerio.load(response.data);
+
+          // Debug: Log the HTML structure
+          console.log('Page title:', $('title').text());
+          console.log('Form inputs found:', $('input').length);
+          console.log('Links found:', $('a').length);
+          console.log('Select elements:', $('select').length);
+
+          // Look for year selection elements
+          $('select option').each((i, el) => {
+              const value = $(el).attr('value');
+              const text = $(el).text();
+              if (value && (value.includes('202') || text.includes('202'))) {
+                  console.log(`Year option found: ${text} (value: ${value})`);
               }
           });
 
-          // Remove duplicates
-          return [...new Set(pdfUrls)];
+          // Look for any PDF links
+          const allLinks = [];
+          $('a').each((i, el) => {
+              const href = $(el).attr('href');
+              const text = $(el).text().trim();
+              if (href) {
+                  allLinks.push({ href, text });
+              }
+          });
+
+          console.log(`Total links: ${allLinks.length}`);
+          console.log('First 5 links:', allLinks.slice(0, 5));
+
+          return []; // Return empty for now
 
       } catch (error) {
-          console.error(`Error finding PDFs for year ${year}:`, error.message);
+          console.error(`Error analyzing page:`, error.message);
           return [];
       }
   }
