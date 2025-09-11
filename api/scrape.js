@@ -79,6 +79,10 @@ import { MongoClient } from 'mongodb';
           });
 
           const $ = cheerio.load(response.data);
+          // Debug: verifica che il contenuto sia stato caricato
+  if (!response.data || response.data.length < 100) {
+    throw new Error('Pagina vuota o troppo corta');
+  }
 
           // Estrai il titolo
           const title = $('h1').first().text().trim() ||
@@ -106,11 +110,10 @@ import { MongoClient } from 'mongodb';
               }
           }
 
-          // Se non troviamo contenuto con i selettori, prendiamo tutto il 
-  body
-          if (!content) {
-              content = $('body').text().trim();
-          }
+           // Se non troviamo contenuto con i selettori, prendiamo tutto il testo
+  if (!content) {
+    content = $.text().trim();
+  }
 
           // Pulisci il contenuto
           content = content
