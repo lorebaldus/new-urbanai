@@ -14,13 +14,28 @@ import { Pinecone } from '@pinecone-database/pinecone';
     const pinecone = new Pinecone({ apiKey: PINECONE_API_KEY });
 
     export default async function handler(req, res) {
-        if (req.method !== 'POST') {
-            return res.status(405).json({ success: false, error: 'Method not allowed'
-    });
-        }
+      if (req.method !== 'POST') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+      }
 
-        const { question, command, ...params } = req.body;
+      // DEBUG: Check environment variables
+      console.log('DEBUG - Environment check:');
+      console.log('MONGODB_URI:', MONGODB_URI ? 'SET' : 'MISSING');
+      console.log('OPENAI_API_KEY:', OPENAI_API_KEY ? 'SET' : 'MISSING');
+      console.log('PINECONE_API_KEY:', PINECONE_API_KEY ? 'SET' : 'MISSING');
+      console.log('PINECONE_INDEX_NAME:', PINECONE_INDEX_NAME);
 
+      if (!MONGODB_URI) {
+          return res.status(400).json({ error: 'MONGODB_URI not configured' });
+      }
+      if (!OPENAI_API_KEY) {
+          return res.status(400).json({ error: 'OPENAI_API_KEY not configured' });
+      }
+      if (!PINECONE_API_KEY) {
+          return res.status(400).json({ error: 'PINECONE_API_KEY not configured' });
+      }
+
+      const { question, command, ...params } = req.body;
         try {
             // Handle special admin commands FIRST
             if (command) {
