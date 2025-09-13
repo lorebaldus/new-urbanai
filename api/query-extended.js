@@ -1,4 +1,4 @@
-import { Pinecone } from '@pinecone-database/pinecone';
+ import { Pinecone } from '@pinecone-database/pinecone';
   import OpenAI from 'openai';
 
   const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
@@ -89,8 +89,6 @@ import { Pinecone } from '@pinecone-database/pinecone';
           });
 
           const answer = completionResponse.choices[0].message.content;
-
-          console.log(`Generated response length: ${answer.length} characters`);
 
           return res.status(200).json({
               success: true,
