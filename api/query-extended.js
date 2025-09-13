@@ -2,7 +2,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
     import OpenAI from 'openai';
 
     const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
-    const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME || 'urbanai';
+    const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME || 'urban-ai';
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
