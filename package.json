@@ -1,6 +1,7 @@
 {
   "name": "urbanai",
   "version": "1.0.0",
+  "type": "module",
   "description": "UrbanAI - Italian Urban Planning Assistant with MongoDB and Pinecone",
   "main": "index.js",
   "scripts": {
