@@ -10,11 +10,7 @@
     "build": "echo 'No build step required'"
   },
   "dependencies": {
-    "openai": "^4.0.0",
-    "mongodb": "^6.0.0",
-    "axios": "^1.6.0",
-    "cheerio": "^1.0.0-rc.12",
-    "pdf-parse": "^1.1.1"
+    "openai": "^4.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
