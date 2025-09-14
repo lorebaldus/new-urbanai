@@ -239,7 +239,7 @@
             const r = await fetch(this.apiUrl('/api/query'), { 
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ command: 'admin' })
+              body: JSON.stringify({ question: 'test' })
             });
             if (r.ok) {
               this.setStatus('Sistema Attivo', 'online');
