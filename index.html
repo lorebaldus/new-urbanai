@@ -93,6 +93,7 @@
         width: 100%; padding: 1rem 1.5rem; border: 2px solid #e2e8f0; border-radius: 25px;
         font-size: 1rem; outline: none; transition: all 0.3s ease;
         resize: none; min-height: 50px; max-height: 120px; font-family: inherit;
+        overflow-y: hidden; line-height: 1.4;
       }
       #questionInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,.1); }
 
@@ -183,7 +184,7 @@
             <div class="input-wrapper">
               <textarea
                 id="questionInput"
-                placeholder="Scrivi la tua domanda urbanistica qui..."
+                placeholder="Scrivi la tua domanda qui..."
                 rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
               ></textarea>
             </div>
