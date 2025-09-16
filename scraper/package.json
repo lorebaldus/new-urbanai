@@ -1,0 +1,22 @@
+{
+  "name": "urbanai-scraper",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "UrbanAI Scraping Service for Railway",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "cheerio": "^1.0.0-rc.12",
+    "mongodb": "^6.0.0",
+    "@pinecone-database/pinecone": "^1.1.0",
+    "openai": "^4.0.0",
+    "node-cron": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
