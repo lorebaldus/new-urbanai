@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "description": "UrbanAI Scraping Service for Railway",
-  "main": "index.js",
+  "main": "scraper.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
+    "start": "node scraper.js",
+    "dev": "node scraper.js"
   },
   "dependencies": {
     "puppeteer": "^21.0.0",
