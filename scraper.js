@@ -28,8 +28,7 @@ server.listen(PORT, () => {
 // Initialize clients
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const pinecone = new Pinecone({ 
-    apiKey: PINECONE_API_KEY,
-    environment: PINECONE_ENVIRONMENT 
+    apiKey: PINECONE_API_KEY
 });
 let mongodb;
 
