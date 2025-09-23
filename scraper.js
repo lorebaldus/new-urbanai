@@ -1,7 +1,5 @@
 import * as cheerio from 'cheerio';
 import https from 'https';
-import fs from 'fs';
-import pdfParse from 'pdf-parse';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
 import OpenAI from 'openai';
@@ -182,96 +180,45 @@ async function storeDocument(document) {
     }
 }
 
-// PDF download and processing function
-async function downloadAndProcessPDF(url, title) {
-    return new Promise((resolve, reject) => {
-        console.log(`📥 Downloading PDF: ${title}`);
-        
-        https.get(url, (response) => {
-            const chunks = [];
-            
-            response.on('data', (chunk) => chunks.push(chunk));
-            
-            response.on('end', async () => {
-                try {
-                    const buffer = Buffer.concat(chunks);
-                    console.log(`📄 Processing PDF: ${title}`);
-                    
-                    const data = await pdfParse(buffer);
-                    const content = data.text.trim();
-                    
-                    if (content.length < 100) {
-                        console.log('⚠️  PDF content too short, skipping');
-                        return resolve();
-                    }
-                    
-                    // Split into chunks for better embedding
-                    const chunks = splitIntoChunks(content, 2000);
-                    
-                    for (let i = 0; i < chunks.length; i++) {
-                        const embedding = await createEmbedding(chunks[i]);
-                        
-                        await storeDocument({
-                            title: `${title} - Parte ${i + 1}`,
-                            url: url,
-                            content: chunks[i],
-                            date: new Date().toISOString().split('T')[0],
-                            source: 'pdf_normativo',
-                            embedding: embedding,
-                            part: i + 1,
-                            totalParts: chunks.length
-                        });
-                    }
-                    
-                    console.log(`✅ PDF processed: ${title} (${chunks.length} parti)`);
-                    resolve();
-                    
-                } catch (error) {
-                    console.error(`❌ Error processing PDF ${title}:`, error);
-                    reject(error);
-                }
-            });
-            
-        }).on('error', reject);
-    });
-}
 
-function splitIntoChunks(text, chunkSize) {
-    const chunks = [];
-    const paragraphs = text.split('\n\n');
-    let currentChunk = '';
+async function processNormativeContent() {
+    console.log('📚 Processing normative content...');
     
-    for (const paragraph of paragraphs) {
-        if (currentChunk.length + paragraph.length > chunkSize && currentChunk.length > 0) {
-            chunks.push(currentChunk.trim());
-            currentChunk = paragraph;
-        } else {
-            currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
-        }
-    }
-    
-    if (currentChunk.trim()) {
-        chunks.push(currentChunk.trim());
-    }
-    
-    return chunks;
-}
-
-async function processPDFDocuments() {
-    console.log('📚 Processing PDF documents...');
-    
-    const pdfSources = [
+    // Per ora aggiungiamo contenuto DPR 380/2001 come testo diretto
+    const normativeTexts = [
         {
-            url: 'https://biblus.acca.it/download/dpr-380-2001-testo-unico-edilizia/?wpdmdl=14275&refresh=68d2a4dc921a61758635228',
-            title: 'DPR 380/2001 - Testo Unico Edilizia'
+            title: 'DPR 380/2001 - Testo Unico Edilizia - Art. 1 (Ambito di applicazione)',
+            content: `Il presente testo unico disciplina l'attività edilizia, stabilisce i presupposti, le condizioni, i modi, i tempi e gli strumenti per gli interventi disciplinati dalla presente normativa. Le disposizioni del presente testo unico si applicano a tutto il territorio nazionale e si riferiscono agli interventi di trasformazione urbanistica ed edilizia del territorio.`,
+            source: 'dpr_380_2001',
+            url: 'https://biblus.acca.it/download/dpr-380-2001-testo-unico-edilizia/'
+        },
+        {
+            title: 'DPR 380/2001 - Definizioni degli interventi edilizi',
+            content: `Gli interventi di trasformazione urbanistica ed edilizia del territorio sono definiti come segue: a) "interventi di manutenzione ordinaria", gli interventi edilizi che riguardano le opere di riparazione, rinnovamento e sostituzione delle finiture degli edifici e quelle necessarie ad integrare o mantenere in efficienza gli impianti tecnologici esistenti; b) "interventi di manutenzione straordinaria", le opere e le modifiche necessarie per rinnovare e sostituire parti anche strutturali degli edifici; c) "interventi di restauro e di risanamento conservativo", gli interventi edilizi rivolti a conservare l'organismo edilizio e ad assicurarne la funzionalità mediante un insieme sistematico di opere che, nel rispetto degli elementi tipologici, formali e strutturali dell'organismo stesso; d) "interventi di ristrutturazione edilizia", gli interventi rivolti a trasformare gli organismi edilizi mediante un insieme sistematico di opere che possono portare ad un organismo edilizio in tutto o in parte diverso dal precedente.`,
+            source: 'dpr_380_2001',
+            url: 'https://biblus.acca.it/download/dpr-380-2001-testo-unico-edilizia/'
         }
     ];
     
-    for (const pdf of pdfSources) {
+    for (const text of normativeTexts) {
         try {
-            await downloadAndProcessPDF(pdf.url, pdf.title);
+            console.log(`📖 Processing: ${text.title}`);
+            
+            const embedding = await createEmbedding(text.content);
+            
+            await storeDocument({
+                title: text.title,
+                url: text.url,
+                content: text.content,
+                date: new Date().toISOString().split('T')[0],
+                source: text.source,
+                embedding: embedding
+            });
+            
+            console.log(`✅ Stored: ${text.title}`);
+            
         } catch (error) {
-            console.error(`❌ Failed to process PDF ${pdf.title}:`, error);
+            console.error(`❌ Error processing ${text.title}:`, error);
         }
     }
 }
@@ -281,7 +228,7 @@ async function main() {
     try {
         await connectDatabases();
         await scrapeGazzettaUfficiale();
-        await processPDFDocuments();
+        await processNormativeContent();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
