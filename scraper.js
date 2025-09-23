@@ -12,7 +12,18 @@ const PINECONE_ENVIRONMENT = process.env.PINECONE_ENVIRONMENT || 'us-east-1';
 const PINECONE_INDEX = process.env.PINECONE_INDEX || 'urbanai-docs';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-console.log('🚂 UrbanAI Scraper starting on Railway...');
+console.log('🚂 UrbanAI Scraper starting on Render...');
+
+// Start HTTP server for Render health check
+import http from 'http';
+const PORT = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('UrbanAI Scraper is running');
+});
+server.listen(PORT, () => {
+    console.log(`🌐 Health check server running on port ${PORT}`);
+});
 
 // Initialize clients
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
