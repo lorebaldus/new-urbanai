@@ -1,5 +1,5 @@
-import { chromium } from 'playwright';
 import * as cheerio from 'cheerio';
+import https from 'https';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
 import OpenAI from 'openai';
@@ -44,62 +44,63 @@ async function connectDatabases() {
 async function scrapeGazzettaUfficiale() {
     console.log('🔍 Starting Gazzetta Ufficiale scraping...');
     
-    const browser = await chromium.launch({
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage'
-        ]
-    });
-
     try {
-        const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+        // Use simple HTTP fetch instead of browser
+        const url = 'https://www.gazzettaufficiale.it/ricerca/serie_generale/1';
+        const html = await fetchPage(url);
         
-        // Navigate to Gazzetta Ufficiale
-        await page.goto('https://www.gazzettaufficiale.it/ricerca/serie_generale/1', {
-            waitUntil: 'networkidle',
-            timeout: 30000
-        });
-
         console.log('📄 Analyzing recent documents...');
         
-        // Extract document links
-        const documentLinks = await page.evaluate(() => {
-            const links = Array.from(document.querySelectorAll('a[href*="/atto/"]'));
-            return links.map(link => ({
-                url: link.href,
-                title: link.textContent.trim(),
-                date: new Date().toISOString().split('T')[0]
-            })).slice(0, 5); // Process only 5 most recent
+        const $ = cheerio.load(html);
+        const documentLinks = [];
+        
+        // Extract document links using Cheerio
+        $('a[href*="/atto/"]').each((i, el) => {
+            if (i < 5) { // Only first 5
+                documentLinks.push({
+                    url: $(el).attr('href'),
+                    title: $(el).text().trim(),
+                    date: new Date().toISOString().split('T')[0]
+                });
+            }
         });
 
         console.log(`📋 Found ${documentLinks.length} documents to process`);
 
         // Process each document
         for (const doc of documentLinks) {
-            await processDocument(page, doc);
+            await processDocument(doc);
         }
+
+        console.log('✅ Scraping completed');
 
     } catch (error) {
         console.error('❌ Scraping error:', error);
-    } finally {
-        await browser.close();
-        console.log('✅ Scraping completed');
     }
 }
 
-async function processDocument(page, doc) {
+function fetchPage(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => resolve(data));
+        }).on('error', reject);
+    });
+}
+
+async function processDocument(doc) {
     try {
         console.log(`📖 Processing: ${doc.title}`);
         
-        await page.goto(doc.url, { waitUntil: 'networkidle' });
+        const html = await fetchPage(doc.url);
+        const $ = cheerio.load(html);
         
-        const content = await page.evaluate(() => {
-            const contentEl = document.querySelector('.contenuto-atto, .testo-atto, main');
-            return contentEl ? contentEl.textContent.trim() : '';
-        });
+        const content = $('.contenuto-atto, .testo-atto, main').text().trim();
 
         if (content.length < 100) {
             console.log('⚠️  Document too short, skipping');

@@ -7,11 +7,9 @@
   "scripts": {
     "start": "node scraper.js",
     "dev": "node scraper.js",
-    "build": "npx playwright install chromium",
-    "postinstall": "npx playwright install chromium"
+    "build": "echo 'No build needed'"
   },
   "dependencies": {
-    "playwright": "^1.40.0",
     "cheerio": "^1.0.0-rc.12",
     "mongodb": "^6.0.0",
     "@pinecone-database/pinecone": "^1.1.0",
