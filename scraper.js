@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright';
 import cheerio from 'cheerio';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
@@ -40,16 +40,12 @@ async function connectDatabases() {
 async function scrapeGazzettaUfficiale() {
     console.log('🔍 Starting Gazzetta Ufficiale scraping...');
     
-    const browser = await puppeteer.launch({
-        headless: 'new',
+    const browser = await chromium.launch({
+        headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--disable-gpu'
+            '--disable-dev-shm-usage'
         ]
     });
 
@@ -59,7 +55,7 @@ async function scrapeGazzettaUfficiale() {
         
         // Navigate to Gazzetta Ufficiale
         await page.goto('https://www.gazzettaufficiale.it/ricerca/serie_generale/1', {
-            waitUntil: 'networkidle2',
+            waitUntil: 'networkidle',
             timeout: 30000
         });
 
@@ -94,7 +90,7 @@ async function processDocument(page, doc) {
     try {
         console.log(`📖 Processing: ${doc.title}`);
         
-        await page.goto(doc.url, { waitUntil: 'networkidle2' });
+        await page.goto(doc.url, { waitUntil: 'networkidle' });
         
         const content = await page.evaluate(() => {
             const contentEl = document.querySelector('.contenuto-atto, .testo-atto, main');

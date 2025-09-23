@@ -9,7 +9,7 @@
     "dev": "node scraper.js"
   },
   "dependencies": {
-    "puppeteer": "^21.0.0",
+    "playwright": "^1.40.0",
     "cheerio": "^1.0.0-rc.12",
     "mongodb": "^6.0.0",
     "@pinecone-database/pinecone": "^1.1.0",
