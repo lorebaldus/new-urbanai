@@ -181,10 +181,107 @@ async function storeDocument(document) {
 }
 
 
+async function scrapePiemonteNormativa() {
+    console.log('🏔️ Starting Regione Piemonte normativa scraping...');
+    
+    try {
+        const url = 'https://www.regione.piemonte.it/web/temi/ambiente-territorio/territorio/urbanistica/normativa-urbanistica';
+        const html = await fetchPage(url);
+        
+        console.log('📄 Analyzing Piemonte normative documents...');
+        
+        const $ = cheerio.load(html);
+        const documentLinks = [];
+        
+        // Extract normative document links
+        $('a[href*=".pdf"], a[href*="/normativa"], a[href*="/legge"], a[href*="/decreto"]').each((i, el) => {
+            const href = $(el).attr('href');
+            const title = $(el).text().trim();
+            
+            if (title.length > 10 && href) {
+                let fullUrl = href;
+                if (href.startsWith('/')) {
+                    fullUrl = 'https://www.regione.piemonte.it' + href;
+                }
+                
+                documentLinks.push({
+                    url: fullUrl,
+                    title: title,
+                    date: new Date().toISOString().split('T')[0]
+                });
+            }
+        });
+
+        console.log(`📋 Found ${documentLinks.length} Piemonte documents to process`);
+
+        // Process first 10 documents
+        for (let i = 0; i < Math.min(documentLinks.length, 10); i++) {
+            const doc = documentLinks[i];
+            await processPiemonteDocument(doc);
+        }
+
+        console.log('✅ Piemonte scraping completed');
+
+    } catch (error) {
+        console.error('❌ Piemonte scraping error:', error);
+    }
+}
+
+async function processPiemonteDocument(doc) {
+    try {
+        console.log(`📖 Processing Piemonte doc: ${doc.title}`);
+        
+        // Skip PDF files for now (would need different handling)
+        if (doc.url.includes('.pdf')) {
+            console.log('⚠️  PDF skipped, will implement later');
+            return;
+        }
+        
+        const html = await fetchPage(doc.url);
+        const $ = cheerio.load(html);
+        
+        // Extract main content from typical Piemonte page structure
+        let content = $('.content-main, .page-content, .text-content, main, article').text().trim();
+        
+        if (!content) {
+            content = $('body').text().trim();
+        }
+        
+        // Clean and limit content
+        content = content.replace(/\s+/g, ' ').trim();
+        
+        if (content.length < 100) {
+            console.log('⚠️  Document too short, skipping');
+            return;
+        }
+        
+        // Limit content size for embedding
+        if (content.length > 3000) {
+            content = content.substring(0, 3000) + '...';
+        }
+
+        const embedding = await createEmbedding(content);
+        
+        await storeDocument({
+            title: `Regione Piemonte - ${doc.title}`,
+            url: doc.url,
+            content: content,
+            date: doc.date,
+            source: 'regione_piemonte',
+            embedding: embedding
+        });
+
+        console.log(`✅ Stored Piemonte: ${doc.title.substring(0, 50)}...`);
+        
+    } catch (error) {
+        console.error(`❌ Error processing Piemonte doc ${doc.title}:`, error);
+    }
+}
+
 async function processNormativeContent() {
     console.log('📚 Processing normative content...');
     
-    // Per ora aggiungiamo contenuto DPR 380/2001 come testo diretto
+    // Contenuto DPR 380/2001 come testo diretto
     const normativeTexts = [
         {
             title: 'DPR 380/2001 - Testo Unico Edilizia - Art. 1 (Ambito di applicazione)',
@@ -229,6 +326,7 @@ async function main() {
         await connectDatabases();
         await scrapeGazzettaUfficiale();
         await processNormativeContent();
+        await scrapePiemonteNormativa();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
