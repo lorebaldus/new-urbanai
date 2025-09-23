@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
 import OpenAI from 'openai';
