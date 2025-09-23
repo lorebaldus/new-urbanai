@@ -1,5 +1,7 @@
 import * as cheerio from 'cheerio';
 import https from 'https';
+import fs from 'fs';
+import pdfParse from 'pdf-parse';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
 import OpenAI from 'openai';
@@ -180,11 +182,106 @@ async function storeDocument(document) {
     }
 }
 
+// PDF download and processing function
+async function downloadAndProcessPDF(url, title) {
+    return new Promise((resolve, reject) => {
+        console.log(`📥 Downloading PDF: ${title}`);
+        
+        https.get(url, (response) => {
+            const chunks = [];
+            
+            response.on('data', (chunk) => chunks.push(chunk));
+            
+            response.on('end', async () => {
+                try {
+                    const buffer = Buffer.concat(chunks);
+                    console.log(`📄 Processing PDF: ${title}`);
+                    
+                    const data = await pdfParse(buffer);
+                    const content = data.text.trim();
+                    
+                    if (content.length < 100) {
+                        console.log('⚠️  PDF content too short, skipping');
+                        return resolve();
+                    }
+                    
+                    // Split into chunks for better embedding
+                    const chunks = splitIntoChunks(content, 2000);
+                    
+                    for (let i = 0; i < chunks.length; i++) {
+                        const embedding = await createEmbedding(chunks[i]);
+                        
+                        await storeDocument({
+                            title: `${title} - Parte ${i + 1}`,
+                            url: url,
+                            content: chunks[i],
+                            date: new Date().toISOString().split('T')[0],
+                            source: 'pdf_normativo',
+                            embedding: embedding,
+                            part: i + 1,
+                            totalParts: chunks.length
+                        });
+                    }
+                    
+                    console.log(`✅ PDF processed: ${title} (${chunks.length} parti)`);
+                    resolve();
+                    
+                } catch (error) {
+                    console.error(`❌ Error processing PDF ${title}:`, error);
+                    reject(error);
+                }
+            });
+            
+        }).on('error', reject);
+    });
+}
+
+function splitIntoChunks(text, chunkSize) {
+    const chunks = [];
+    const paragraphs = text.split('\n\n');
+    let currentChunk = '';
+    
+    for (const paragraph of paragraphs) {
+        if (currentChunk.length + paragraph.length > chunkSize && currentChunk.length > 0) {
+            chunks.push(currentChunk.trim());
+            currentChunk = paragraph;
+        } else {
+            currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+        }
+    }
+    
+    if (currentChunk.trim()) {
+        chunks.push(currentChunk.trim());
+    }
+    
+    return chunks;
+}
+
+async function processPDFDocuments() {
+    console.log('📚 Processing PDF documents...');
+    
+    const pdfSources = [
+        {
+            url: 'https://biblus.acca.it/download/dpr-380-2001-testo-unico-edilizia/?wpdmdl=14275&refresh=68d2a4dc921a61758635228',
+            title: 'DPR 380/2001 - Testo Unico Edilizia'
+        }
+    ];
+    
+    for (const pdf of pdfSources) {
+        try {
+            await downloadAndProcessPDF(pdf.url, pdf.title);
+        } catch (error) {
+            console.error(`❌ Failed to process PDF ${pdf.title}:`, error);
+        }
+    }
+}
+
 // Main function
 async function main() {
     try {
         await connectDatabases();
         await scrapeGazzettaUfficiale();
+        await processPDFDocuments();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
