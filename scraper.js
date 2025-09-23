@@ -8,7 +8,7 @@ import cron from 'node-cron';
 // Environment variables
 const MONGODB_URI = process.env.MONGODB_URI;
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
-const PINECONE_ENVIRONMENT = process.env.PINECONE_ENVIRONMENT || 'us-east-1';
+const PINECONE_ENVIRONMENT = process.env.PINECONE_ENVIRONMENT || 'us-east-1-aws';
 const PINECONE_INDEX = process.env.PINECONE_INDEX || 'urbanai-docs';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -28,7 +28,8 @@ server.listen(PORT, () => {
 // Initialize clients
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const pinecone = new Pinecone({ 
-    apiKey: PINECONE_API_KEY
+    apiKey: PINECONE_API_KEY,
+    environment: PINECONE_ENVIRONMENT 
 });
 let mongodb;
 
