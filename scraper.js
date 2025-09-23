@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
 import https from 'https';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
 import OpenAI from 'openai';
@@ -320,6 +321,106 @@ async function processNormativeContent() {
     }
 }
 
+async function downloadPDF(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, (response) => {
+            const chunks = [];
+            response.on('data', chunk => chunks.push(chunk));
+            response.on('end', () => resolve(Buffer.concat(chunks)));
+        }).on('error', reject);
+    });
+}
+
+async function extractPDFText(buffer) {
+    try {
+        const loadingTask = pdfjsLib.getDocument({ data: buffer });
+        const pdf = await loadingTask.promise;
+        
+        let fullText = '';
+        
+        // Extract text from all pages
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + '\n\n';
+        }
+        
+        return fullText.trim();
+    } catch (error) {
+        console.error('❌ PDF text extraction failed:', error);
+        return null;
+    }
+}
+
+async function processSpecificPDF() {
+    console.log('📄 Processing specific DGR PDF...');
+    
+    const pdfUrl = 'https://www.regione.piemonte.it/governo/bollettino/abbonati/2025/13/attach/dgr_00905_1050_24032025.pdf';
+    const title = 'DGR Piemonte 905/2025 - 24 marzo 2025';
+    
+    try {
+        console.log(`📥 Downloading PDF: ${title}`);
+        const buffer = await downloadPDF(pdfUrl);
+        
+        console.log(`📖 Extracting text from: ${title}`);
+        const content = await extractPDFText(buffer);
+        
+        if (!content || content.length < 100) {
+            console.log('⚠️  PDF content extraction failed or too short');
+            return;
+        }
+        
+        console.log(`📝 Content extracted: ${content.length} characters`);
+        
+        // Split into manageable chunks
+        const maxChunkSize = 2500;
+        const chunks = [];
+        
+        for (let i = 0; i < content.length; i += maxChunkSize) {
+            chunks.push(content.slice(i, i + maxChunkSize));
+        }
+        
+        console.log(`📚 Split into ${chunks.length} chunks`);
+        
+        // Process each chunk
+        for (let i = 0; i < chunks.length; i++) {
+            const chunkTitle = `${title} - Parte ${i + 1}/${chunks.length}`;
+            
+            try {
+                console.log(`📖 Processing chunk: ${i + 1}/${chunks.length}`);
+                
+                const embedding = await createEmbedding(chunks[i]);
+                
+                await storeDocument({
+                    title: chunkTitle,
+                    url: pdfUrl,
+                    content: chunks[i],
+                    date: '2025-03-24',
+                    source: 'dgr_piemonte_905_2025',
+                    embedding: embedding,
+                    documentType: 'pdf',
+                    part: i + 1,
+                    totalParts: chunks.length
+                });
+                
+                console.log(`✅ Stored chunk: ${i + 1}/${chunks.length}`);
+                
+                // Small delay to avoid overwhelming the APIs
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+            } catch (error) {
+                console.error(`❌ Error processing chunk ${i + 1}:`, error);
+            }
+        }
+        
+        console.log(`🎉 Successfully processed PDF: ${title}`);
+        
+    } catch (error) {
+        console.error(`❌ Failed to process PDF ${title}:`, error);
+    }
+}
+
 // Main function
 async function main() {
     try {
@@ -327,6 +428,7 @@ async function main() {
         await scrapeGazzettaUfficiale();
         await processNormativeContent();
         await scrapePiemonteNormativa();
+        await processSpecificPDF();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
