@@ -6,7 +6,8 @@
   "main": "scraper.js",
   "scripts": {
     "start": "node scraper.js",
-    "dev": "node scraper.js"
+    "dev": "node scraper.js",
+    "build": "npx playwright install --with-deps chromium"
   },
   "dependencies": {
     "playwright": "^1.40.0",
