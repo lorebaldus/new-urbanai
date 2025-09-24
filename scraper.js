@@ -357,26 +357,60 @@ async function extractPDFText(buffer) {
     }
 }
 
-async function processSpecificPDFs() {
-    console.log('📄 Processing specific DGR PDFs...');
+async function processSpecificDocuments() {
+    console.log('📄 Processing specific legislative documents...');
     
+    // PDF Documents
     const pdfDocuments = [
         {
             url: 'https://www.regione.piemonte.it/governo/bollettino/abbonati/2025/13/attach/dgr_00905_1050_24032025.pdf',
             title: 'DGR Piemonte 905/2025 - 24 marzo 2025',
             date: '2025-03-24',
-            source: 'dgr_piemonte_905_2025'
+            source: 'dgr_piemonte_905_2025',
+            type: 'pdf'
         },
         {
             url: 'http://www.regione.piemonte.it/governo/bollettino/abbonati/2021/32/attach/dgr_03671_1050_06082021.pdf',
             title: 'DGR Piemonte 3671/2021 - 6 agosto 2021',
             date: '2021-08-06',
-            source: 'dgr_piemonte_3671_2021'
+            source: 'dgr_piemonte_3671_2021',
+            type: 'pdf'
         }
     ];
     
+    // HTML/Web Documents
+    const webDocuments = [
+        {
+            url: 'http://arianna.cr.piemonte.it/iterlegcoordweb/dettaglioLegge.do?urnLegge=urn:nir:regione.piemonte:legge:2020;15',
+            title: 'Legge Regione Piemonte 15/2020',
+            date: '2020-01-01',
+            source: 'legge_piemonte_15_2020',
+            type: 'web'
+        },
+        {
+            url: 'http://www.regione.piemonte.it/governo/bollettino/abbonati/2021/03/siste/00000145.htm',
+            title: 'Bollettino Piemonte 2021/03 - Documento 145',
+            date: '2021-03-01',
+            source: 'bollettino_piemonte_2021_145',
+            type: 'web'
+        },
+        {
+            url: 'http://www.regione.piemonte.it/governo/bollettino/abbonati/2020/28/siste/00000110.htm',
+            title: 'Bollettino Piemonte 2020/28 - Documento 110',
+            date: '2020-07-01',
+            source: 'bollettino_piemonte_2020_110',
+            type: 'web'
+        }
+    ];
+    
+    // Process PDFs
     for (const pdfDoc of pdfDocuments) {
         await processSinglePDF(pdfDoc);
+    }
+    
+    // Process web documents
+    for (const webDoc of webDocuments) {
+        await processSingleWebDocument(webDoc);
     }
 }
 
@@ -443,6 +477,91 @@ async function processSinglePDF(pdfDoc) {
     }
 }
 
+async function processSingleWebDocument(webDoc) {
+    try {
+        console.log(`🌐 Processing web document: ${webDoc.title}`);
+        
+        const html = await fetchPage(webDoc.url);
+        const $ = cheerio.load(html);
+        
+        // Extract content using multiple selectors for different page structures
+        let content = '';
+        
+        // Try specific content selectors first
+        const contentSelectors = [
+            '.contenuto-legge, .testo-legge',  // Arianna legislative texts
+            '.content-main, .page-content',    // General content
+            'main, article, .text-content',    // Semantic content
+            '.bollettino-content, .documento', // Bollettino specific
+            'body'  // Fallback
+        ];
+        
+        for (const selector of contentSelectors) {
+            const extracted = $(selector).text().trim();
+            if (extracted && extracted.length > 200) {
+                content = extracted;
+                break;
+            }
+        }
+        
+        // Clean content
+        content = content.replace(/\s+/g, ' ').trim();
+        
+        if (!content || content.length < 100) {
+            console.log(`⚠️  Web document content too short for: ${webDoc.title}`);
+            return;
+        }
+        
+        console.log(`📝 Content extracted: ${content.length} characters from ${webDoc.title}`);
+        
+        // Split into manageable chunks
+        const maxChunkSize = 2500;
+        const chunks = [];
+        
+        for (let i = 0; i < content.length; i += maxChunkSize) {
+            chunks.push(content.slice(i, i + maxChunkSize));
+        }
+        
+        console.log(`📚 Split ${webDoc.title} into ${chunks.length} chunks`);
+        
+        // Process each chunk
+        for (let i = 0; i < chunks.length; i++) {
+            const chunkTitle = `${webDoc.title} - Parte ${i + 1}/${chunks.length}`;
+            
+            try {
+                console.log(`📖 Processing ${webDoc.title} chunk: ${i + 1}/${chunks.length}`);
+                
+                const embedding = await createEmbedding(chunks[i]);
+                
+                await storeDocument({
+                    title: chunkTitle,
+                    url: webDoc.url,
+                    content: chunks[i],
+                    date: webDoc.date,
+                    source: webDoc.source,
+                    embedding: embedding,
+                    documentType: 'web',
+                    part: i + 1,
+                    totalParts: chunks.length
+                });
+                
+                console.log(`✅ Stored ${webDoc.title} chunk: ${i + 1}/${chunks.length}`);
+                
+                // Small delay to avoid overwhelming the APIs
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+            } catch (error) {
+                console.error(`❌ Error processing ${webDoc.title} chunk ${i + 1}:`, error);
+            }
+        }
+        
+        console.log(`🎉 Successfully processed web document: ${webDoc.title}`);
+        
+    } catch (error) {
+        console.error(`❌ Failed to process web document ${webDoc.title}:`, error);
+    }
+}
+
 // Main function
 async function main() {
     try {
@@ -450,7 +569,7 @@ async function main() {
         await scrapeGazzettaUfficiale();
         await processNormativeContent();
         await scrapePiemonteNormativa();
-        await processSpecificPDFs();
+        await processSpecificDocuments();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
