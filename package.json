@@ -12,7 +12,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "mongodb": "^6.0.0",
-    "@pinecone-database/pinecone": "^1.1.0",
+    "@pinecone-database/pinecone": "^2.0.0",
     "openai": "^4.0.0",
     "node-cron": "^3.0.3",
     "pdfjs-dist": "^3.11.174"

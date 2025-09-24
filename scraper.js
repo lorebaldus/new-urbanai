@@ -29,8 +29,7 @@ server.listen(PORT, () => {
 // Initialize clients
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const pinecone = new Pinecone({ 
-    apiKey: PINECONE_API_KEY,
-    environment: PINECONE_ENVIRONMENT 
+    apiKey: PINECONE_API_KEY
 });
 let mongodb;
 
@@ -163,17 +162,22 @@ async function storeDocument(document) {
 
         // Store in Pinecone (if embedding exists)
         if (document.embedding) {
-            const index = pinecone.index(PINECONE_INDEX);
-            await index.upsert([{
-                id: Buffer.from(document.url).toString('base64'),
-                values: document.embedding,
-                metadata: {
-                    title: document.title,
-                    url: document.url,
-                    source: document.source,
-                    date: document.date
-                }
-            }]);
+            try {
+                const index = pinecone.index(PINECONE_INDEX);
+                await index.upsert([{
+                    id: Buffer.from(document.url + document.title).toString('base64'),
+                    values: document.embedding,
+                    metadata: {
+                        title: document.title,
+                        url: document.url,
+                        source: document.source,
+                        date: document.date
+                    }
+                }]);
+                console.log(`✅ Pinecone stored: ${document.title.substring(0, 50)}...`);
+            } catch (pineconeError) {
+                console.log(`⚠️  Pinecone failed, MongoDB still stored: ${pineconeError.message}`);
+            }
         }
 
     } catch (error) {
