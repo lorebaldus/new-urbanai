@@ -233,6 +233,100 @@ async function scrapePiemonteNormativa() {
     }
 }
 
+async function scrapeAllPiemontePDFs() {
+    console.log('📚 Starting comprehensive Piemonte PDF scraping...');
+    
+    try {
+        const url = 'https://www.regione.piemonte.it/web/temi/ambiente-territorio/territorio/urbanistica/normativa-urbanistica#NormativaRegionale';
+        const html = await fetchPage(url);
+        
+        console.log('🔍 Analyzing all PDF documents in Normativa Regionale section...');
+        
+        const $ = cheerio.load(html);
+        const pdfDocuments = [];
+        
+        // Extract all PDF links from the page
+        $('a[href*=".pdf"]').each((i, el) => {
+            const href = $(el).attr('href');
+            let title = $(el).text().trim();
+            
+            // If title is empty, try to get it from parent elements or nearby text
+            if (!title || title.length < 5) {
+                title = $(el).closest('li, p, div').text().trim();
+                if (title.length > 100) {
+                    title = title.substring(0, 100) + '...';
+                }
+            }
+            
+            if (href && title.length > 5) {
+                let fullUrl = href;
+                if (href.startsWith('/')) {
+                    fullUrl = 'https://www.regione.piemonte.it' + href;
+                } else if (href.startsWith('http://')) {
+                    // Keep HTTP as is - our download function now supports it
+                    fullUrl = href;
+                } else if (!href.startsWith('http')) {
+                    fullUrl = 'https://www.regione.piemonte.it/' + href;
+                }
+                
+                // Extract approximate date from title or URL if possible
+                let docDate = new Date().toISOString().split('T')[0];
+                const yearMatch = title.match(/\b(20\d{2})\b/) || href.match(/\b(20\d{2})\b/);
+                if (yearMatch) {
+                    docDate = `${yearMatch[1]}-01-01`;
+                }
+                
+                // Generate source identifier
+                const sourceId = `piemonte_pdf_${i + 1}`;
+                
+                pdfDocuments.push({
+                    url: fullUrl,
+                    title: `Piemonte Normativa - ${title}`,
+                    date: docDate,
+                    source: sourceId,
+                    type: 'pdf'
+                });
+            }
+        });
+
+        console.log(`📋 Found ${pdfDocuments.length} PDF documents to process`);
+        
+        // Filter out documents we've already processed to avoid duplicates
+        const knownUrls = [
+            'https://www.regione.piemonte.it/governo/bollettino/abbonati/2025/13/attach/dgr_00905_1050_24032025.pdf',
+            'http://www.regione.piemonte.it/governo/bollettino/abbonati/2021/32/attach/dgr_03671_1050_06082021.pdf'
+        ];
+        
+        const newPdfDocuments = pdfDocuments.filter(doc => 
+            !knownUrls.some(knownUrl => doc.url.includes(knownUrl) || knownUrl.includes(doc.url))
+        );
+        
+        console.log(`📋 Processing ${newPdfDocuments.length} new PDF documents (excluding already processed)`);
+
+        // Process all PDF documents (limit to reasonable number to avoid overload)
+        const maxPdfs = Math.min(newPdfDocuments.length, 15); // Process up to 15 PDFs
+        for (let i = 0; i < maxPdfs; i++) {
+            const pdfDoc = newPdfDocuments[i];
+            console.log(`📄 Processing PDF ${i + 1}/${maxPdfs}: ${pdfDoc.title}`);
+            await processSinglePDF(pdfDoc);
+            
+            // Add longer delay between PDFs to be respectful to the server
+            if (i < maxPdfs - 1) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+
+        if (newPdfDocuments.length > 15) {
+            console.log(`⚠️  Found ${newPdfDocuments.length} total PDFs, processed first 15. Remaining will be processed in future runs.`);
+        }
+
+        console.log('✅ Comprehensive Piemonte PDF scraping completed');
+
+    } catch (error) {
+        console.error('❌ Comprehensive Piemonte PDF scraping error:', error);
+    }
+}
+
 async function processPiemonteDocument(doc) {
     try {
         console.log(`📖 Processing Piemonte doc: ${doc.title}`);
@@ -579,6 +673,7 @@ async function main() {
         await processNormativeContent();
         await scrapePiemonteNormativa();
         await processSpecificDocuments();
+        await scrapeAllPiemontePDFs();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
@@ -587,7 +682,7 @@ async function main() {
 }
 
 // Schedule scraping every 6 hours
-cron.schedule('0 */6 * * *', () => {
+cron.schedule('0 */2 * * *', () => {
     console.log('⏰ Scheduled scraping starting...');
     main();
 });
