@@ -33,6 +33,117 @@ const pinecone = new Pinecone({
 });
 let mongodb;
 
+// Enhanced chunking functions
+function createSemanticChunks(content, documentTitle) {
+    const baseChunkSize = 2200; // Slightly smaller for overlap
+    const minOverlap = 50;
+    const maxOverlap = 100;
+    
+    // Detect if it's a legal document
+    const isLegalDoc = /art\.|articolo|comma|decreto|legge|dgr|circolare/i.test(content);
+    
+    if (isLegalDoc) {
+        return createLegalChunks(content, documentTitle);
+    } else {
+        return createGeneralChunks(content, documentTitle, baseChunkSize, minOverlap, maxOverlap);
+    }
+}
+
+function createLegalChunks(content, documentTitle) {
+    const chunks = [];
+    const sections = content.split(/(?=Art\.|Articolo|ARTICOLO|Comma)/i);
+    
+    let currentChunk = '';
+    let chunkIndex = 0;
+    const maxChunkSize = 2500;
+    
+    for (let i = 0; i < sections.length; i++) {
+        const section = sections[i].trim();
+        
+        if (currentChunk.length + section.length <= maxChunkSize) {
+            currentChunk += (currentChunk ? '\n\n' : '') + section;
+        } else {
+            if (currentChunk) {
+                chunks.push({
+                    content: currentChunk.trim(),
+                    metadata: {
+                        type: 'legal_section',
+                        chunkIndex: chunkIndex++,
+                        hasArticles: /art\.|articolo/i.test(currentChunk)
+                    }
+                });
+            }
+            
+            // Smart overlap: take last complete sentence
+            const overlap = getSmartOverlap(currentChunk, 80);
+            currentChunk = overlap + section;
+        }
+    }
+    
+    if (currentChunk) {
+        chunks.push({
+            content: currentChunk.trim(),
+            metadata: {
+                type: 'legal_section',
+                chunkIndex: chunkIndex,
+                hasArticles: /art\.|articolo/i.test(currentChunk)
+            }
+        });
+    }
+    
+    return chunks.map(chunk => chunk.content);
+}
+
+function createGeneralChunks(content, documentTitle, chunkSize, minOverlap, maxOverlap) {
+    const chunks = [];
+    let position = 0;
+    
+    while (position < content.length) {
+        const endPos = Math.min(position + chunkSize, content.length);
+        let chunkText = content.substring(position, endPos);
+        
+        // If not at end and we cut mid-sentence, extend to sentence end
+        if (endPos < content.length) {
+            const sentenceEnd = content.indexOf('.', endPos);
+            if (sentenceEnd !== -1 && sentenceEnd - endPos < 100) {
+                chunkText = content.substring(position, sentenceEnd + 1);
+            }
+        }
+        
+        chunks.push(chunkText.trim());
+        
+        // Smart overlap for next chunk
+        const overlap = getSmartOverlap(chunkText, Math.min(maxOverlap, chunkText.length * 0.05));
+        position = endPos - overlap;
+        
+        if (position >= content.length) break;
+    }
+    
+    return chunks;
+}
+
+function getSmartOverlap(text, targetSize) {
+    if (!text || targetSize <= 0) return '';
+    
+    const maxOverlap = Math.min(targetSize, text.length);
+    const startPos = Math.max(0, text.length - maxOverlap);
+    
+    // Try to find last complete sentence
+    const lastDot = text.lastIndexOf('.', text.length - 10);
+    if (lastDot > startPos) {
+        return text.substring(lastDot + 1).trim();
+    }
+    
+    // Fallback: find last word boundary
+    const overlap = text.substring(startPos);
+    const lastSpace = overlap.lastIndexOf(' ');
+    if (lastSpace > 10) {
+        return overlap.substring(lastSpace + 1).trim();
+    }
+    
+    return overlap.trim();
+}
+
 async function connectDatabases() {
     try {
         // MongoDB connection
@@ -437,14 +548,17 @@ async function downloadPDF(url) {
     });
 }
 
-async function extractPDFText(uint8Array) {
+async function extractPDFText(uint8Array, metadata = {}) {
+    // Strategy 1: Standard PDF.js extraction
     try {
-        const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
+        console.log('📄 Attempting standard PDF extraction...');
+        const loadingTask = pdfjsLib.getDocument({ 
+            data: uint8Array,
+            standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/'
+        });
         const pdf = await loadingTask.promise;
         
         let fullText = '';
-        
-        // Extract text from all pages
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
@@ -452,10 +566,75 @@ async function extractPDFText(uint8Array) {
             fullText += pageText + '\n\n';
         }
         
-        return fullText.trim();
+        const result = fullText.trim();
+        if (result && result.length > 100) {
+            console.log('✅ Standard extraction successful');
+            return result;
+        }
     } catch (error) {
-        console.error('❌ PDF text extraction failed:', error);
-        return null;
+        console.warn('⚠️  Standard PDF extraction failed:', error.message);
+    }
+    
+    // Strategy 2: Alternative PDF.js settings for corrupted files
+    try {
+        console.log('📄 Attempting alternative PDF extraction...');
+        const loadingTask = pdfjsLib.getDocument({ 
+            data: uint8Array,
+            disableFontFace: true,
+            isEvalSupported: false,
+            disableRange: true,
+            disableStream: true
+        });
+        const pdf = await loadingTask.promise;
+        
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+            try {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str || '').join(' ');
+                fullText += pageText + '\n\n';
+            } catch (pageError) {
+                console.warn(`⚠️  Page ${i} extraction failed, continuing...`);
+                continue;
+            }
+        }
+        
+        const result = fullText.trim();
+        if (result && result.length > 50) {
+            console.log('✅ Alternative extraction successful');
+            return result;
+        }
+    } catch (error) {
+        console.warn('⚠️  Alternative PDF extraction failed:', error.message);
+    }
+    
+    console.error('❌ All PDF extraction strategies failed');
+    
+    // Log failure for manual review
+    if (metadata.url && metadata.title) {
+        await logExtractionFailure(metadata.url, metadata.title, 'All extraction strategies failed');
+    }
+    
+    return null;
+}
+
+async function logExtractionFailure(url, title, reason) {
+    try {
+        const failure = {
+            timestamp: new Date().toISOString(),
+            url: url,
+            title: title,
+            reason: reason,
+            needsManualReview: true
+        };
+        
+        if (mongodb) {
+            await mongodb.collection('extraction_failures').insertOne(failure);
+            console.log('📝 Logged extraction failure for manual review');
+        }
+    } catch (error) {
+        console.error('❌ Failed to log extraction failure:', error);
     }
 }
 
@@ -522,7 +701,7 @@ async function processSinglePDF(pdfDoc) {
         const uint8Array = await downloadPDF(pdfDoc.url);
         
         console.log(`📖 Extracting text from: ${pdfDoc.title}`);
-        const content = await extractPDFText(uint8Array);
+        const content = await extractPDFText(uint8Array, { url: pdfDoc.url, title: pdfDoc.title });
         
         if (!content || content.length < 100) {
             console.log(`⚠️  PDF content extraction failed or too short for: ${pdfDoc.title}`);
@@ -531,13 +710,8 @@ async function processSinglePDF(pdfDoc) {
         
         console.log(`📝 Content extracted: ${content.length} characters from ${pdfDoc.title}`);
         
-        // Split into manageable chunks
-        const maxChunkSize = 2500;
-        const chunks = [];
-        
-        for (let i = 0; i < content.length; i += maxChunkSize) {
-            chunks.push(content.slice(i, i + maxChunkSize));
-        }
+        // Split into semantic chunks
+        const chunks = createSemanticChunks(content, pdfDoc.title);
         
         console.log(`📚 Split ${pdfDoc.title} into ${chunks.length} chunks`);
         
@@ -616,13 +790,8 @@ async function processSingleWebDocument(webDoc) {
         
         console.log(`📝 Content extracted: ${content.length} characters from ${webDoc.title}`);
         
-        // Split into manageable chunks
-        const maxChunkSize = 2500;
-        const chunks = [];
-        
-        for (let i = 0; i < content.length; i += maxChunkSize) {
-            chunks.push(content.slice(i, i + maxChunkSize));
-        }
+        // Split into semantic chunks
+        const chunks = createSemanticChunks(content, webDoc.title);
         
         console.log(`📚 Split ${webDoc.title} into ${chunks.length} chunks`);
         
