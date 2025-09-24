@@ -357,25 +357,43 @@ async function extractPDFText(buffer) {
     }
 }
 
-async function processSpecificPDF() {
-    console.log('📄 Processing specific DGR PDF...');
+async function processSpecificPDFs() {
+    console.log('📄 Processing specific DGR PDFs...');
     
-    const pdfUrl = 'https://www.regione.piemonte.it/governo/bollettino/abbonati/2025/13/attach/dgr_00905_1050_24032025.pdf';
-    const title = 'DGR Piemonte 905/2025 - 24 marzo 2025';
+    const pdfDocuments = [
+        {
+            url: 'https://www.regione.piemonte.it/governo/bollettino/abbonati/2025/13/attach/dgr_00905_1050_24032025.pdf',
+            title: 'DGR Piemonte 905/2025 - 24 marzo 2025',
+            date: '2025-03-24',
+            source: 'dgr_piemonte_905_2025'
+        },
+        {
+            url: 'http://www.regione.piemonte.it/governo/bollettino/abbonati/2021/32/attach/dgr_03671_1050_06082021.pdf',
+            title: 'DGR Piemonte 3671/2021 - 6 agosto 2021',
+            date: '2021-08-06',
+            source: 'dgr_piemonte_3671_2021'
+        }
+    ];
     
+    for (const pdfDoc of pdfDocuments) {
+        await processSinglePDF(pdfDoc);
+    }
+}
+
+async function processSinglePDF(pdfDoc) {
     try {
-        console.log(`📥 Downloading PDF: ${title}`);
-        const buffer = await downloadPDF(pdfUrl);
+        console.log(`📥 Downloading PDF: ${pdfDoc.title}`);
+        const buffer = await downloadPDF(pdfDoc.url);
         
-        console.log(`📖 Extracting text from: ${title}`);
+        console.log(`📖 Extracting text from: ${pdfDoc.title}`);
         const content = await extractPDFText(buffer);
         
         if (!content || content.length < 100) {
-            console.log('⚠️  PDF content extraction failed or too short');
+            console.log(`⚠️  PDF content extraction failed or too short for: ${pdfDoc.title}`);
             return;
         }
         
-        console.log(`📝 Content extracted: ${content.length} characters`);
+        console.log(`📝 Content extracted: ${content.length} characters from ${pdfDoc.title}`);
         
         // Split into manageable chunks
         const maxChunkSize = 2500;
@@ -385,43 +403,43 @@ async function processSpecificPDF() {
             chunks.push(content.slice(i, i + maxChunkSize));
         }
         
-        console.log(`📚 Split into ${chunks.length} chunks`);
+        console.log(`📚 Split ${pdfDoc.title} into ${chunks.length} chunks`);
         
         // Process each chunk
         for (let i = 0; i < chunks.length; i++) {
-            const chunkTitle = `${title} - Parte ${i + 1}/${chunks.length}`;
+            const chunkTitle = `${pdfDoc.title} - Parte ${i + 1}/${chunks.length}`;
             
             try {
-                console.log(`📖 Processing chunk: ${i + 1}/${chunks.length}`);
+                console.log(`📖 Processing ${pdfDoc.title} chunk: ${i + 1}/${chunks.length}`);
                 
                 const embedding = await createEmbedding(chunks[i]);
                 
                 await storeDocument({
                     title: chunkTitle,
-                    url: pdfUrl,
+                    url: pdfDoc.url,
                     content: chunks[i],
-                    date: '2025-03-24',
-                    source: 'dgr_piemonte_905_2025',
+                    date: pdfDoc.date,
+                    source: pdfDoc.source,
                     embedding: embedding,
                     documentType: 'pdf',
                     part: i + 1,
                     totalParts: chunks.length
                 });
                 
-                console.log(`✅ Stored chunk: ${i + 1}/${chunks.length}`);
+                console.log(`✅ Stored ${pdfDoc.title} chunk: ${i + 1}/${chunks.length}`);
                 
                 // Small delay to avoid overwhelming the APIs
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
             } catch (error) {
-                console.error(`❌ Error processing chunk ${i + 1}:`, error);
+                console.error(`❌ Error processing ${pdfDoc.title} chunk ${i + 1}:`, error);
             }
         }
         
-        console.log(`🎉 Successfully processed PDF: ${title}`);
+        console.log(`🎉 Successfully processed PDF: ${pdfDoc.title}`);
         
     } catch (error) {
-        console.error(`❌ Failed to process PDF ${title}:`, error);
+        console.error(`❌ Failed to process PDF ${pdfDoc.title}:`, error);
     }
 }
 
@@ -432,7 +450,7 @@ async function main() {
         await scrapeGazzettaUfficiale();
         await processNormativeContent();
         await scrapePiemonteNormativa();
-        await processSpecificPDF();
+        await processSpecificPDFs();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
