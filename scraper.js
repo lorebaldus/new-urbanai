@@ -619,6 +619,134 @@ async function extractPDFText(uint8Array, metadata = {}) {
     return null;
 }
 
+async function scrapeNazionaleNormativa() {
+    console.log('🇮🇹 Starting Nazionale Normativa scraping...');
+    
+    try {
+        const url = 'https://www.regione.piemonte.it/web/temi/ambiente-territorio/territorio/urbanistica/normativa-urbanistica#NormativaNazionale';
+        const html = await fetchPage(url);
+        
+        console.log('🔍 Analyzing national legislation documents...');
+        
+        const $ = cheerio.load(html);
+        const nazionaleDocuments = [];
+        
+        // Find the NormativaNazionale section
+        const nazionaleSection = $('a[name="NormativaNazionale"]').parent();
+        
+        // Extract all links in the nazionale section
+        nazionaleSection.nextAll().find('a[href]').each((i, el) => {
+            const href = $(el).attr('href');
+            let title = $(el).text().trim();
+            
+            // Get more context from parent elements
+            if (!title || title.length < 10) {
+                title = $(el).parent().text().trim();
+            }
+            
+            // Only process substantial links
+            if (title.length > 15 && href && href.length > 10) {
+                let fullUrl = href;
+                
+                // Handle relative URLs
+                if (href.startsWith('/')) {
+                    fullUrl = 'https://www.regione.piemonte.it' + href;
+                } else if (href.startsWith('http')) {
+                    fullUrl = href;
+                } else {
+                    return; // Skip invalid URLs
+                }
+                
+                // Identify document type
+                let docType = 'web';
+                if (href.includes('.pdf')) {
+                    docType = 'pdf';
+                }
+                
+                nazionaleDocuments.push({
+                    url: fullUrl,
+                    title: cleanTitle(title),
+                    date: extractDateFromTitle(title),
+                    source: 'piemonte_nazionale',
+                    type: docType
+                });
+            }
+        });
+        
+        console.log(`📋 Found ${nazionaleDocuments.length} national documents to process`);
+        
+        // Process documents with rate limiting
+        const maxDocumentsPerRun = 10; // Process 10 documents per run
+        const documentsToProcess = nazionaleDocuments.slice(0, maxDocumentsPerRun);
+        
+        for (const [index, doc] of documentsToProcess.entries()) {
+            console.log(`📄 Processing national doc ${index + 1}/${documentsToProcess.length}: ${doc.title}`);
+            
+            // Check if already processed
+            const existing = await mongodb.collection('documents').findOne({
+                url: doc.url,
+                source: doc.source
+            });
+            
+            if (existing) {
+                console.log(`⏭️  Document already processed: ${doc.title}`);
+                continue;
+            }
+            
+            try {
+                if (doc.type === 'pdf') {
+                    await processSinglePDFDocument(doc);
+                } else {
+                    await processSingleWebDocument(doc);
+                }
+                
+                // Rate limiting
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+            } catch (error) {
+                console.error(`❌ Failed to process ${doc.title}:`, error.message);
+                continue;
+            }
+        }
+        
+        console.log('✅ Nazionale normativa scraping completed');
+        
+    } catch (error) {
+        console.error('❌ Nazionale normativa scraping error:', error);
+    }
+}
+
+function cleanTitle(title) {
+    return title
+        .replace(/\s+/g, ' ')
+        .replace(/^[^\w]*/, '')
+        .replace(/[^\w]*$/, '')
+        .trim()
+        .substring(0, 150);
+}
+
+function extractDateFromTitle(title) {
+    // Try to extract date patterns like "16 luglio 2020", "26 marzo 2008"
+    const dateMatch = title.match(/(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+(\d{4})/i);
+    
+    if (dateMatch) {
+        const [, day, month, year] = dateMatch;
+        const monthMap = {
+            'gennaio': '01', 'febbraio': '02', 'marzo': '03', 'aprile': '04',
+            'maggio': '05', 'giugno': '06', 'luglio': '07', 'agosto': '08',
+            'settembre': '09', 'ottobre': '10', 'novembre': '11', 'dicembre': '12'
+        };
+        
+        const monthNum = monthMap[month.toLowerCase()];
+        if (monthNum) {
+            return `${year}-${monthNum}-${day.padStart(2, '0')}`;
+        }
+    }
+    
+    // Fallback to current date
+    return new Date().toISOString().split('T')[0];
+}
+
 async function logExtractionFailure(url, title, reason) {
     try {
         const failure = {
@@ -842,6 +970,7 @@ async function main() {
         await scrapePiemonteNormativa();
         await processSpecificDocuments();
         await scrapeAllPiemontePDFs();
+        await scrapeNazionaleNormativa();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
