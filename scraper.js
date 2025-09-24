@@ -17,7 +17,6 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 console.log('🚂 UrbanAI Scraper starting on Render...');
 
 // Start HTTP server for Render health check
-import http from 'http';
 const PORT = process.env.PORT || 3000;
 const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
