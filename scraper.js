@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
 import https from 'https';
+import http from 'http';
 import pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
@@ -327,17 +328,25 @@ async function processNormativeContent() {
 
 async function downloadPDF(url) {
     return new Promise((resolve, reject) => {
-        https.get(url, (response) => {
+        // Support both HTTP and HTTPS
+        const httpModule = url.startsWith('https:') ? https : http;
+        
+        httpModule.get(url, (response) => {
             const chunks = [];
             response.on('data', chunk => chunks.push(chunk));
-            response.on('end', () => resolve(Buffer.concat(chunks)));
+            response.on('end', () => {
+                const buffer = Buffer.concat(chunks);
+                // Convert Buffer to Uint8Array for PDF.js
+                const uint8Array = new Uint8Array(buffer);
+                resolve(uint8Array);
+            });
         }).on('error', reject);
     });
 }
 
-async function extractPDFText(buffer) {
+async function extractPDFText(uint8Array) {
     try {
-        const loadingTask = pdfjsLib.getDocument({ data: buffer });
+        const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
         const pdf = await loadingTask.promise;
         
         let fullText = '';
@@ -417,10 +426,10 @@ async function processSpecificDocuments() {
 async function processSinglePDF(pdfDoc) {
     try {
         console.log(`📥 Downloading PDF: ${pdfDoc.title}`);
-        const buffer = await downloadPDF(pdfDoc.url);
+        const uint8Array = await downloadPDF(pdfDoc.url);
         
         console.log(`📖 Extracting text from: ${pdfDoc.title}`);
-        const content = await extractPDFText(buffer);
+        const content = await extractPDFText(uint8Array);
         
         if (!content || content.length < 100) {
             console.log(`⚠️  PDF content extraction failed or too short for: ${pdfDoc.title}`);
