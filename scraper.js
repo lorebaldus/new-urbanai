@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import https from 'https';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+import pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import { MongoClient } from 'mongodb';
 import { Pinecone } from '@pinecone-database/pinecone';
 import OpenAI from 'openai';
