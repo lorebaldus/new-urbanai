@@ -1180,6 +1180,189 @@ async function processDocumentFile(doc) {
     }
 }
 
+async function scrapeModulisticaOnline() {
+    console.log('📋 Starting ModulisticaOnline.it archive scraping...');
+    
+    try {
+        const baseUrl = 'https://www.modulisticaonline.it/prodotti/archivio_news/3/';
+        const categories = [
+            'edilizia',
+            'ambiente', 
+            'autorizzazione-paesaggistica',
+            'conferenza-di-servizi',
+            'sismica',
+            'urbanistica',
+            'espropri',
+            'guide-operative'
+        ];
+        
+        console.log('🔍 Analyzing modulistica archive...');
+        
+        const modulisticaDocuments = [];
+        
+        // First, try to get the main archive page
+        const mainHtml = await fetchPage(baseUrl);
+        const $ = cheerio.load(mainHtml);
+        
+        // Extract articles from main archive page
+        $('a[href*="/prodotti/testo-news/3/"]').each((i, el) => {
+            const $el = $(el);
+            const href = $el.attr('href');
+            const title = $el.text().trim();
+            
+            if (title.length > 10 && href) {
+                let fullUrl = href;
+                if (href.startsWith('/')) {
+                    fullUrl = 'https://www.modulisticaonline.it' + href;
+                }
+                
+                // Extract article ID from URL
+                const articleIdMatch = href.match(/\/(\d+)\//);
+                const articleId = articleIdMatch ? articleIdMatch[1] : null;
+                
+                modulisticaDocuments.push({
+                    url: fullUrl,
+                    title: cleanModulisticaTitle(title),
+                    date: new Date().toISOString().split('T')[0], // Will extract proper date from article
+                    source: 'modulistica_online',
+                    type: 'web',
+                    articleId: articleId,
+                    category: extractCategoryFromTitle(title)
+                });
+            }
+        });
+        
+        // Try to discover more articles by exploring pagination and direct URL patterns
+        console.log('🔍 Exploring additional articles...');
+        
+        // Try common article ID ranges (recent articles are likely high numbers)
+        const recentArticleIds = [];
+        for (let id = 7900; id <= 8000; id += 5) {
+            recentArticleIds.push(id);
+        }
+        
+        // Test a sample of recent articles
+        const sampleIds = recentArticleIds.slice(0, 20);
+        
+        for (const articleId of sampleIds) {
+            try {
+                const testUrl = `https://www.modulisticaonline.it/prodotti/testo-news/3/${articleId}/`;
+                
+                // Try to access the article
+                const response = await fetchPage(testUrl);
+                if (response && response.length > 100) {
+                    const $article = cheerio.load(response);
+                    
+                    // Extract title from article page
+                    const articleTitle = $article('h1').text().trim() || 
+                                      $article('title').text().trim() || 
+                                      `Articolo ${articleId}`;
+                    
+                    // Extract date if possible
+                    let articleDate = new Date().toISOString().split('T')[0];
+                    const dateText = $article('body').text();
+                    const dateMatch = dateText.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+                    if (dateMatch) {
+                        const [, day, month, year] = dateMatch;
+                        articleDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    }
+                    
+                    if (articleTitle.length > 5) {
+                        modulisticaDocuments.push({
+                            url: testUrl,
+                            title: cleanModulisticaTitle(articleTitle),
+                            date: articleDate,
+                            source: 'modulistica_online',
+                            type: 'web',
+                            articleId: articleId.toString(),
+                            category: extractCategoryFromTitle(articleTitle)
+                        });
+                    }
+                }
+                
+                // Rate limiting for discovery
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+            } catch (error) {
+                // Article might not exist, continue
+                continue;
+            }
+        }
+        
+        // Remove duplicates by URL
+        const uniqueModulistica = modulisticaDocuments.filter((doc, index, self) =>
+            index === self.findIndex(d => d.url === doc.url)
+        );
+        
+        console.log(`📋 Found ${uniqueModulistica.length} modulistica articles to process`);
+        
+        // Process articles with rate limiting
+        const maxArticlesPerRun = 12; // Process 12 articles per run
+        const articlesToProcess = uniqueModulistica.slice(0, maxArticlesPerRun);
+        
+        for (const [index, doc] of articlesToProcess.entries()) {
+            console.log(`📋 Processing modulistica article ${index + 1}/${articlesToProcess.length}: ${doc.title}`);
+            
+            // Check if already processed
+            const existing = await mongodb.collection('documents').findOne({
+                url: doc.url,
+                source: doc.source
+            });
+            
+            if (existing) {
+                console.log(`⏭️  Article already processed: ${doc.title}`);
+                continue;
+            }
+            
+            try {
+                await processSingleWebDocument(doc);
+                
+                // Respectful rate limiting
+                await new Promise(resolve => setTimeout(resolve, 3500));
+                
+            } catch (error) {
+                console.error(`❌ Failed to process modulistica article ${doc.title}:`, error.message);
+                continue;
+            }
+        }
+        
+        console.log('✅ ModulisticaOnline scraping completed');
+        
+    } catch (error) {
+        console.error('❌ ModulisticaOnline scraping error:', error);
+    }
+}
+
+function cleanModulisticaTitle(title) {
+    return title
+        .replace(/\s+/g, ' ')
+        .replace(/^[^\w]*/, '')
+        .replace(/[^\w]*$/, '')
+        .replace(/modulisticaonline\.it/gi, '')
+        .trim()
+        .substring(0, 180);
+}
+
+function extractCategoryFromTitle(title) {
+    const lowerTitle = title.toLowerCase();
+    
+    if (lowerTitle.includes('edilizia') || lowerTitle.includes('costruz') || lowerTitle.includes('permesso')) {
+        return 'edilizia';
+    } else if (lowerTitle.includes('ambiente') || lowerTitle.includes('via') || lowerTitle.includes('vas')) {
+        return 'ambiente';
+    } else if (lowerTitle.includes('paesagg')) {
+        return 'autorizzazione-paesaggistica';
+    } else if (lowerTitle.includes('sismic') || lowerTitle.includes('terremoto')) {
+        return 'sismica';
+    } else if (lowerTitle.includes('urban')) {
+        return 'urbanistica';
+    } else if (lowerTitle.includes('esprop')) {
+        return 'espropri';
+    } else {
+        return 'generale';
+    }
+}
+
 async function logExtractionFailure(url, title, reason) {
     try {
         const failure = {
@@ -1407,6 +1590,7 @@ async function main() {
         await scrapeCircolariPiemonte();
         await scrapeComunicatiPiemonte();
         await scrapeAttiCollegatiPiemonte();
+        await scrapeModulisticaOnline();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
