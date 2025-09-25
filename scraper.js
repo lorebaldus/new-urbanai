@@ -900,6 +900,286 @@ function cleanCircolarTitle(title) {
         .substring(0, 200); // Longer limit for circolari titles
 }
 
+async function scrapeComunicatiPiemonte() {
+    console.log('📢 Starting Comunicati Piemonte scraping...');
+    
+    try {
+        const url = 'https://www.regione.piemonte.it/web/temi/ambiente-territorio/territorio/urbanistica/normativa-urbanistica';
+        const html = await fetchPage(url);
+        
+        console.log('🔍 Analyzing Comunicati section...');
+        
+        const $ = cheerio.load(html);
+        const comunicatiDocuments = [];
+        
+        // Look for Comunicati section or communications
+        const comunicatiSection = $('a[name="Comunicati"]').parent();
+        
+        // If no direct anchor, look for content with "comunicat" pattern
+        if (comunicatiSection.length === 0) {
+            console.log('🔍 Searching for comunicati content broadly...');
+            
+            // Search for links and content containing "comunicat" 
+            $('a[href], h1, h2, h3, h4').each((i, el) => {
+                const $el = $(el);
+                const text = $el.text().toLowerCase();
+                const href = $el.attr('href');
+                
+                if (text.includes('comunicat') && href) {
+                    let fullUrl = href;
+                    if (href.startsWith('/')) {
+                        fullUrl = 'https://www.regione.piemonte.it' + href;
+                    } else if (!href.startsWith('http')) {
+                        return;
+                    }
+                    
+                    const title = $el.text().trim() || $el.parent().text().trim();
+                    if (title.length > 10) {
+                        comunicatiDocuments.push({
+                            url: fullUrl,
+                            title: cleanTitle(title),
+                            date: new Date().toISOString().split('T')[0],
+                            source: 'piemonte_comunicati',
+                            type: href.includes('.pdf') ? 'pdf' : 'web'
+                        });
+                    }
+                }
+            });
+        } else {
+            // Process structured comunicati section
+            comunicatiSection.nextAll().each((i, element) => {
+                const $element = $(element);
+                
+                // Stop at next section
+                if ($element.find('a[name]').length > 0) {
+                    return false;
+                }
+                
+                $element.find('a[href]').each((j, linkEl) => {
+                    const href = $(linkEl).attr('href');
+                    const title = $(linkEl).text().trim() || $(linkEl).parent().text().trim();
+                    
+                    if (title.length > 15 && href) {
+                        let fullUrl = href;
+                        if (href.startsWith('/')) {
+                            fullUrl = 'https://www.regione.piemonte.it' + href;
+                        } else if (!href.startsWith('http')) {
+                            return;
+                        }
+                        
+                        comunicatiDocuments.push({
+                            url: fullUrl,
+                            title: cleanTitle(title),
+                            date: extractDateFromTitle(title),
+                            source: 'piemonte_comunicati',
+                            type: href.includes('.pdf') ? 'pdf' : 'web'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Remove duplicates
+        const uniqueComunicati = comunicatiDocuments.filter((doc, index, self) =>
+            index === self.findIndex(d => d.url === doc.url)
+        );
+        
+        console.log(`📋 Found ${uniqueComunicati.length} comunicati to process`);
+        
+        // Process with rate limiting
+        const maxDocumentsPerRun = 5; // Conservative for official communications
+        const documentsToProcess = uniqueComunicati.slice(0, maxDocumentsPerRun);
+        
+        for (const [index, doc] of documentsToProcess.entries()) {
+            console.log(`📢 Processing comunicato ${index + 1}/${documentsToProcess.length}: ${doc.title}`);
+            
+            // Check if already processed
+            const existing = await mongodb.collection('documents').findOne({
+                url: doc.url,
+                source: doc.source
+            });
+            
+            if (existing) {
+                console.log(`⏭️  Comunicato already processed: ${doc.title}`);
+                continue;
+            }
+            
+            try {
+                if (doc.type === 'pdf') {
+                    await processSinglePDFDocument(doc);
+                } else {
+                    await processSingleWebDocument(doc);
+                }
+                
+                // Rate limiting for official content
+                await new Promise(resolve => setTimeout(resolve, 4000));
+                
+            } catch (error) {
+                console.error(`❌ Failed to process comunicato ${doc.title}:`, error.message);
+                continue;
+            }
+        }
+        
+        console.log('✅ Comunicati Piemonte scraping completed');
+        
+    } catch (error) {
+        console.error('❌ Comunicati scraping error:', error);
+    }
+}
+
+async function scrapeAttiCollegatiPiemonte() {
+    console.log('📎 Starting Atti Collegati Piemonte scraping...');
+    
+    try {
+        const url = 'https://www.regione.piemonte.it/web/temi/ambiente-territorio/territorio/urbanistica/normativa-urbanistica';
+        const html = await fetchPage(url);
+        
+        console.log('🔍 Analyzing Atti Collegati section...');
+        
+        const $ = cheerio.load(html);
+        const attiDocuments = [];
+        
+        // Search for downloadable documents - conventions, certificates, models
+        const downloadablePatterns = [
+            'convenzione tipo',
+            'schema convenzione', 
+            'modelli di certificato',
+            'iter procedurale',
+            'convenzione',
+            'certificato',
+            'modello',
+            'schema'
+        ];
+        
+        // Look for download links and documents
+        $('a[href]').each((i, el) => {
+            const $el = $(el);
+            const href = $el.attr('href');
+            const linkText = $el.text().toLowerCase().trim();
+            const contextText = $el.parent().text().toLowerCase().trim();
+            
+            // Check if this looks like a related act/document
+            const isRelevant = downloadablePatterns.some(pattern => 
+                linkText.includes(pattern) || contextText.includes(pattern)
+            );
+            
+            if (isRelevant && href && (href.includes('.pdf') || href.includes('.doc') || href.includes('.odt'))) {
+                let fullUrl = href;
+                if (href.startsWith('/')) {
+                    fullUrl = 'https://www.regione.piemonte.it' + href;
+                } else if (!href.startsWith('http')) {
+                    return;
+                }
+                
+                // Get the best title from link text or context
+                let title = $el.text().trim();
+                if (!title || title.length < 5) {
+                    title = contextText;
+                }
+                
+                // Extract file size if mentioned
+                const sizeMatch = contextText.match(/(\d+[\.,]?\d*\s*(?:kb|mb|gb))/i);
+                const fileSize = sizeMatch ? sizeMatch[1] : null;
+                
+                if (title.length > 5) {
+                    attiDocuments.push({
+                        url: fullUrl,
+                        title: cleanTitle(title),
+                        date: new Date().toISOString().split('T')[0],
+                        source: 'piemonte_atti_collegati',
+                        type: getDocumentType(href),
+                        fileSize: fileSize
+                    });
+                }
+            }
+        });
+        
+        // Remove duplicates
+        const uniqueAtti = attiDocuments.filter((doc, index, self) =>
+            index === self.findIndex(d => d.url === doc.url)
+        );
+        
+        console.log(`📋 Found ${uniqueAtti.length} atti collegati to process`);
+        
+        // Process all atti collegati (usually not many)
+        for (const [index, doc] of uniqueAtti.entries()) {
+            console.log(`📎 Processing atto collegato ${index + 1}/${uniqueAtti.length}: ${doc.title}`);
+            
+            // Check if already processed
+            const existing = await mongodb.collection('documents').findOne({
+                url: doc.url,
+                source: doc.source
+            });
+            
+            if (existing) {
+                console.log(`⏭️  Atto collegato already processed: ${doc.title}`);
+                continue;
+            }
+            
+            try {
+                if (doc.type === 'pdf') {
+                    await processSinglePDFDocument(doc);
+                } else if (doc.type === 'web') {
+                    await processSingleWebDocument(doc);
+                } else {
+                    // For DOC/ODT files, we'll try to download and store basic info
+                    await processDocumentFile(doc);
+                }
+                
+                // Rate limiting
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+            } catch (error) {
+                console.error(`❌ Failed to process atto collegato ${doc.title}:`, error.message);
+                continue;
+            }
+        }
+        
+        console.log('✅ Atti Collegati Piemonte scraping completed');
+        
+    } catch (error) {
+        console.error('❌ Atti Collegati scraping error:', error);
+    }
+}
+
+function getDocumentType(url) {
+    if (url.includes('.pdf')) return 'pdf';
+    if (url.includes('.doc') || url.includes('.docx')) return 'doc';
+    if (url.includes('.odt')) return 'odt';
+    return 'web';
+}
+
+async function processDocumentFile(doc) {
+    try {
+        // For non-PDF documents, store basic metadata and reference
+        const documentInfo = {
+            title: doc.title,
+            url: doc.url,
+            content: `Documento: ${doc.title}\n\nTipo: ${doc.type.toUpperCase()}\n\nLink: ${doc.url}\n\n` +
+                    `Questo documento contiene modelli e template per procedure urbanistiche. ` +
+                    `Per il contenuto completo, consultare il documento originale.`,
+            date: doc.date,
+            source: doc.source,
+            documentType: doc.type,
+            fileSize: doc.fileSize
+        };
+        
+        // Create embedding for search
+        const embedding = await createEmbedding(documentInfo.content);
+        
+        await storeDocument({
+            ...documentInfo,
+            embedding: embedding
+        });
+        
+        console.log(`✅ Stored document reference: ${doc.title}`);
+        
+    } catch (error) {
+        console.error(`❌ Error processing document file ${doc.title}:`, error);
+        throw error;
+    }
+}
+
 async function logExtractionFailure(url, title, reason) {
     try {
         const failure = {
@@ -1125,6 +1405,8 @@ async function main() {
         await scrapeAllPiemontePDFs();
         await scrapeNazionaleNormativa();
         await scrapeCircolariPiemonte();
+        await scrapeComunicatiPiemonte();
+        await scrapeAttiCollegatiPiemonte();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
