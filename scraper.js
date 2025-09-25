@@ -1363,6 +1363,235 @@ function extractCategoryFromTitle(title) {
     }
 }
 
+async function scrapeArpaPiemontePDFs() {
+    console.log('🌿 Starting ARPA Piemonte environmental documents scraping...');
+    
+    try {
+        const arpaPDFs = [];
+        
+        // Known ARPA Piemonte document sections and common paths
+        const arpaEndpoints = [
+            'https://geoportale.arpa.piemonte.it/app/public/?pg=contenuti',
+            'https://www.arpa.piemonte.it/pubblicazioni',
+            'https://www.arpa.piemonte.it/reporting',
+            'https://www.arpa.piemonte.it/reti-di-monitoraggio',
+            'https://webgis.arpa.piemonte.it/geoportale/index.php/tematiche'
+        ];
+        
+        // Environmental topics commonly found in ARPA documents
+        const environmentalTopics = [
+            'qualità aria',
+            'monitoraggio ambientale', 
+            'acque superficiali',
+            'suolo',
+            'rumore',
+            'radiazioni',
+            'rifiuti',
+            'energia',
+            'clima',
+            'biodiversità'
+        ];
+        
+        console.log('🔍 Analyzing ARPA environmental content...');
+        
+        // Try to access each known endpoint
+        for (const endpoint of arpaEndpoints) {
+            try {
+                console.log(`🔍 Exploring: ${endpoint}`);
+                
+                const html = await fetchPage(endpoint);
+                if (!html || html.length < 100) {
+                    console.log(`⚠️  Endpoint not accessible: ${endpoint}`);
+                    continue;
+                }
+                
+                const $ = cheerio.load(html);
+                
+                // Look for PDF links in various formats
+                $('a[href*=".pdf"], a[href*="/pdf/"], a[href*="documento"]').each((i, el) => {
+                    const $el = $(el);
+                    const href = $el.attr('href');
+                    const title = $el.text().trim() || $el.attr('title') || $el.parent().text().trim();
+                    
+                    if (href && title.length > 5) {
+                        let fullUrl = href;
+                        if (href.startsWith('/')) {
+                            const baseUrl = new URL(endpoint).origin;
+                            fullUrl = baseUrl + href;
+                        } else if (!href.startsWith('http')) {
+                            continue;
+                        }
+                        
+                        // Check if it looks like an environmental document
+                        const isEnvironmental = environmentalTopics.some(topic => 
+                            title.toLowerCase().includes(topic) || 
+                            fullUrl.toLowerCase().includes(topic.replace(/\s+/g, ''))
+                        );
+                        
+                        if (fullUrl.includes('.pdf') || isEnvironmental) {
+                            arpaPDFs.push({
+                                url: fullUrl,
+                                title: cleanArpaTitle(title),
+                                date: new Date().toISOString().split('T')[0],
+                                source: 'arpa_piemonte',
+                                type: 'pdf',
+                                category: classifyArpaDocument(title),
+                                sourceEndpoint: endpoint
+                            });
+                        }
+                    }
+                });
+                
+                // Rate limiting between endpoints
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+            } catch (error) {
+                console.warn(`⚠️  Failed to access ${endpoint}:`, error.message);
+                continue;
+            }
+        }
+        
+        // Try common ARPA document patterns via direct URL exploration
+        console.log('🔍 Exploring common ARPA document patterns...');
+        
+        const commonPaths = [
+            '/documenti/aria/',
+            '/documenti/acqua/',
+            '/documenti/suolo/',
+            '/documenti/rumore/',
+            '/report/',
+            '/pubblicazioni/',
+            '/relazioni/'
+        ];
+        
+        const baseUrls = [
+            'https://www.arpa.piemonte.it',
+            'https://geoportale.arpa.piemonte.it'
+        ];
+        
+        for (const baseUrl of baseUrls) {
+            for (const path of commonPaths) {
+                try {
+                    const testUrl = baseUrl + path;
+                    const html = await fetchPage(testUrl);
+                    
+                    if (html && html.length > 100) {
+                        const $ = cheerio.load(html);
+                        
+                        $('a[href*=".pdf"]').each((i, el) => {
+                            const $el = $(el);
+                            const href = $el.attr('href');
+                            const title = $el.text().trim() || $el.attr('title');
+                            
+                            if (href && title && title.length > 5) {
+                                let fullUrl = href;
+                                if (href.startsWith('/')) {
+                                    fullUrl = baseUrl + href;
+                                }
+                                
+                                arpaPDFs.push({
+                                    url: fullUrl,
+                                    title: cleanArpaTitle(title),
+                                    date: new Date().toISOString().split('T')[0],
+                                    source: 'arpa_piemonte',
+                                    type: 'pdf',
+                                    category: classifyArpaDocument(title),
+                                    sourceEndpoint: testUrl
+                                });
+                            }
+                        });
+                    }
+                    
+                    // Rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                } catch (error) {
+                    continue; // Path might not exist
+                }
+            }
+        }
+        
+        // Remove duplicates by URL
+        const uniqueArpaPDFs = arpaPDFs.filter((doc, index, self) =>
+            index === self.findIndex(d => d.url === doc.url)
+        );
+        
+        console.log(`📋 Found ${uniqueArpaPDFs.length} ARPA documents to process`);
+        
+        // Process with conservative rate limiting for environmental documents
+        const maxDocsPerRun = 8; // Conservative for ARPA resources
+        const docsToProcess = uniqueArpaPDFs.slice(0, maxDocsPerRun);
+        
+        for (const [index, doc] of docsToProcess.entries()) {
+            console.log(`🌿 Processing ARPA doc ${index + 1}/${docsToProcess.length}: ${doc.title}`);
+            
+            // Check if already processed
+            const existing = await mongodb.collection('documents').findOne({
+                url: doc.url,
+                source: doc.source
+            });
+            
+            if (existing) {
+                console.log(`⏭️  ARPA document already processed: ${doc.title}`);
+                continue;
+            }
+            
+            try {
+                await processSinglePDFDocument(doc);
+                
+                // Conservative rate limiting for environmental agency
+                await new Promise(resolve => setTimeout(resolve, 4000));
+                
+            } catch (error) {
+                console.error(`❌ Failed to process ARPA document ${doc.title}:`, error.message);
+                continue;
+            }
+        }
+        
+        console.log('✅ ARPA Piemonte environmental documents scraping completed');
+        
+    } catch (error) {
+        console.error('❌ ARPA Piemonte scraping error:', error);
+    }
+}
+
+function cleanArpaTitle(title) {
+    return title
+        .replace(/\s+/g, ' ')
+        .replace(/^[^\w]*/, '')
+        .replace(/[^\w]*$/, '')
+        .replace(/arpa\.piemonte\.it/gi, '')
+        .replace(/geoportale/gi, '')
+        .trim()
+        .substring(0, 200);
+}
+
+function classifyArpaDocument(title) {
+    const lowerTitle = title.toLowerCase();
+    
+    if (lowerTitle.includes('aria') || lowerTitle.includes('atmosfer') || lowerTitle.includes('emission')) {
+        return 'qualità_aria';
+    } else if (lowerTitle.includes('acqu') || lowerTitle.includes('idric') || lowerTitle.includes('fluvial')) {
+        return 'risorse_idriche';
+    } else if (lowerTitle.includes('suolo') || lowerTitle.includes('terreno') || lowerTitle.includes('contaminaz')) {
+        return 'suolo_contaminazione';
+    } else if (lowerTitle.includes('rumore') || lowerTitle.includes('acustic')) {
+        return 'inquinamento_acustico';
+    } else if (lowerTitle.includes('rifiut') || lowerTitle.includes('ricicl')) {
+        return 'gestione_rifiuti';
+    } else if (lowerTitle.includes('energia') || lowerTitle.includes('rinnovabil')) {
+        return 'energia';
+    } else if (lowerTitle.includes('clima') || lowerTitle.includes('meteorolog')) {
+        return 'clima_meteorologia';
+    } else if (lowerTitle.includes('biodiversità') || lowerTitle.includes('ecosistem') || lowerTitle.includes('natura')) {
+        return 'biodiversita';
+    } else if (lowerTitle.includes('radiaz') || lowerTitle.includes('radioatt')) {
+        return 'radiazioni';
+    } else {
+        return 'ambientale_generico';
+    }
+}
+
 async function logExtractionFailure(url, title, reason) {
     try {
         const failure = {
@@ -1591,6 +1820,7 @@ async function main() {
         await scrapeComunicatiPiemonte();
         await scrapeAttiCollegatiPiemonte();
         await scrapeModulisticaOnline();
+        await scrapeArpaPiemontePDFs();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
