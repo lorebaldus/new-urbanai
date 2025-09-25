@@ -747,6 +747,159 @@ function extractDateFromTitle(title) {
     return new Date().toISOString().split('T')[0];
 }
 
+async function scrapeCircolariPiemonte() {
+    console.log('📜 Starting Circolari Piemonte scraping...');
+    
+    try {
+        const url = 'https://www.regione.piemonte.it/web/temi/ambiente-territorio/territorio/urbanistica/normativa-urbanistica#Circolari';
+        const html = await fetchPage(url);
+        
+        console.log('🔍 Analyzing Circolari section...');
+        
+        const $ = cheerio.load(html);
+        const circolariDocuments = [];
+        
+        // Find the Circolari section anchor
+        const circolariSection = $('a[name="Circolari"]').parent();
+        
+        // Extract all links in the circolari section
+        // Look for links in the section that follows the Circolari anchor
+        let currentSection = circolariSection;
+        let foundCircolari = false;
+        
+        // Navigate through siblings to find circolari content
+        circolariSection.nextAll().each((i, element) => {
+            const $element = $(element);
+            
+            // Stop if we hit another section anchor
+            if ($element.find('a[name]').length > 0 && $element.find('a[name]').attr('name') !== 'Circolari') {
+                return false; // Stop iteration
+            }
+            
+            // Extract links from this section
+            $element.find('a[href]').each((j, linkEl) => {
+                const href = $(linkEl).attr('href');
+                let title = $(linkEl).text().trim();
+                
+                // Get more context if title is short
+                if (!title || title.length < 15) {
+                    title = $(linkEl).parent().text().trim();
+                }
+                
+                // Clean up title and look for circular patterns
+                if (title.length > 20 && href && href.length > 15) {
+                    // Check if it looks like a circular document
+                    if (/circolare|bollettino|siste/i.test(title) || /circolare|bollettino|siste/i.test(href)) {
+                        let fullUrl = href;
+                        
+                        // Handle relative URLs
+                        if (href.startsWith('/')) {
+                            fullUrl = 'https://www.regione.piemonte.it' + href;
+                        } else if (href.startsWith('http')) {
+                            fullUrl = href;
+                        } else {
+                            return; // Skip invalid URLs
+                        }
+                        
+                        // Extract date and number from title
+                        const dateMatch = title.match(/(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+(\d{4})/i);
+                        const numberMatch = title.match(/n\.\s*(\d+[\w\/]*)/i);
+                        
+                        circolariDocuments.push({
+                            url: fullUrl,
+                            title: cleanCircolarTitle(title),
+                            date: dateMatch ? extractDateFromTitle(title) : new Date().toISOString().split('T')[0],
+                            number: numberMatch ? numberMatch[1] : null,
+                            source: 'piemonte_circolari',
+                            type: href.includes('.pdf') ? 'pdf' : 'web'
+                        });
+                        
+                        foundCircolari = true;
+                    }
+                }
+            });
+        });
+        
+        // If we didn't find much in the structured approach, try a broader search
+        if (!foundCircolari) {
+            console.log('🔍 Trying broader circular search...');
+            
+            // Look for any link containing "circolare" in the entire page
+            $('a[href*="bollettino"], a[href*="siste"]').each((i, el) => {
+                const href = $(el).attr('href');
+                const title = $(el).text().trim() || $(el).parent().text().trim();
+                
+                if (title.length > 15 && /circolare/i.test(title)) {
+                    let fullUrl = href.startsWith('/') ? 'https://www.regione.piemonte.it' + href : href;
+                    
+                    circolariDocuments.push({
+                        url: fullUrl,
+                        title: cleanCircolarTitle(title),
+                        date: extractDateFromTitle(title),
+                        source: 'piemonte_circolari',
+                        type: href.includes('.pdf') ? 'pdf' : 'web'
+                    });
+                }
+            });
+        }
+        
+        // Remove duplicates by URL
+        const uniqueCircolari = circolariDocuments.filter((doc, index, self) =>
+            index === self.findIndex(d => d.url === doc.url)
+        );
+        
+        console.log(`📋 Found ${uniqueCircolari.length} circolari to process`);
+        
+        // Process documents with rate limiting  
+        const maxDocumentsPerRun = 8; // Process 8 circolari per run
+        const documentsToProcess = uniqueCircolari.slice(0, maxDocumentsPerRun);
+        
+        for (const [index, doc] of documentsToProcess.entries()) {
+            console.log(`📜 Processing circolare ${index + 1}/${documentsToProcess.length}: ${doc.title}`);
+            
+            // Check if already processed
+            const existing = await mongodb.collection('documents').findOne({
+                url: doc.url,
+                source: doc.source
+            });
+            
+            if (existing) {
+                console.log(`⏭️  Circolare already processed: ${doc.title}`);
+                continue;
+            }
+            
+            try {
+                if (doc.type === 'pdf') {
+                    await processSinglePDFDocument(doc);
+                } else {
+                    await processSingleWebDocument(doc);
+                }
+                
+                // Rate limiting - be respectful to Piemonte servers
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+            } catch (error) {
+                console.error(`❌ Failed to process circolare ${doc.title}:`, error.message);
+                continue;
+            }
+        }
+        
+        console.log('✅ Circolari Piemonte scraping completed');
+        
+    } catch (error) {
+        console.error('❌ Circolari scraping error:', error);
+    }
+}
+
+function cleanCircolarTitle(title) {
+    return title
+        .replace(/\s+/g, ' ')
+        .replace(/^[^\w]*/, '')
+        .replace(/[^\w]*$/, '')
+        .trim()
+        .substring(0, 200); // Longer limit for circolari titles
+}
+
 async function logExtractionFailure(url, title, reason) {
     try {
         const failure = {
@@ -971,6 +1124,7 @@ async function main() {
         await processSpecificDocuments();
         await scrapeAllPiemontePDFs();
         await scrapeNazionaleNormativa();
+        await scrapeCircolariPiemonte();
         console.log('🎉 Scraping cycle completed successfully');
     } catch (error) {
         console.error('💥 Main process failed:', error);
