@@ -33,7 +33,14 @@ const pinecone = new Pinecone({
 });
 let mongodb;
 
-// Enhanced chunking functions
+// Enhanced chunking functions with token awareness
+function estimateTokens(text) {
+    // Conservative token estimation for Italian legal text
+    // OpenAI models typically use ~4 chars per token for Italian
+    // We use 3.5 to be conservative with legal/technical text
+    return Math.ceil(text.length / 3.5);
+}
+
 function createSemanticChunks(content, documentTitle) {
     const baseChunkSize = 2200; // Slightly smaller for overlap
     const minOverlap = 50;
@@ -56,12 +63,15 @@ function createLegalChunks(content, documentTitle) {
     let currentChunk = '';
     let chunkIndex = 0;
     const maxChunkSize = 2500;
+    const MAX_TOKENS = 6000; // Safe token limit
     
     for (let i = 0; i < sections.length; i++) {
         const section = sections[i].trim();
+        const potentialChunk = currentChunk + (currentChunk ? '\n\n' : '') + section;
+        const tokenCount = estimateTokens(potentialChunk);
         
-        if (currentChunk.length + section.length <= maxChunkSize) {
-            currentChunk += (currentChunk ? '\n\n' : '') + section;
+        if (potentialChunk.length <= maxChunkSize && tokenCount <= MAX_TOKENS) {
+            currentChunk = potentialChunk;
         } else {
             if (currentChunk) {
                 chunks.push({
@@ -69,7 +79,8 @@ function createLegalChunks(content, documentTitle) {
                     metadata: {
                         type: 'legal_section',
                         chunkIndex: chunkIndex++,
-                        hasArticles: /art\.|articolo/i.test(currentChunk)
+                        hasArticles: /art\.|articolo/i.test(currentChunk),
+                        estimatedTokens: estimateTokens(currentChunk)
                     }
                 });
             }
@@ -86,7 +97,8 @@ function createLegalChunks(content, documentTitle) {
             metadata: {
                 type: 'legal_section',
                 chunkIndex: chunkIndex,
-                hasArticles: /art\.|articolo/i.test(currentChunk)
+                hasArticles: /art\.|articolo/i.test(currentChunk),
+                estimatedTokens: estimateTokens(currentChunk)
             }
         });
     }
@@ -97,20 +109,39 @@ function createLegalChunks(content, documentTitle) {
 function createGeneralChunks(content, documentTitle, chunkSize, minOverlap, maxOverlap) {
     const chunks = [];
     let position = 0;
+    const MAX_TOKENS = 6000; // Safe token limit
     
     while (position < content.length) {
-        const endPos = Math.min(position + chunkSize, content.length);
+        let endPos = Math.min(position + chunkSize, content.length);
         let chunkText = content.substring(position, endPos);
         
-        // If not at end and we cut mid-sentence, extend to sentence end
-        if (endPos < content.length) {
+        // Check token count and adjust if necessary
+        let tokenCount = estimateTokens(chunkText);
+        
+        // If token count exceeds limit, reduce chunk size
+        while (tokenCount > MAX_TOKENS && chunkText.length > 500) {
+            const reductionFactor = MAX_TOKENS / tokenCount;
+            const newLength = Math.floor(chunkText.length * reductionFactor * 0.9); // 10% extra margin
+            endPos = position + newLength;
+            chunkText = content.substring(position, endPos);
+            tokenCount = estimateTokens(chunkText);
+        }
+        
+        // If not at end and we cut mid-sentence, extend to sentence end (but check tokens)
+        if (endPos < content.length && tokenCount < MAX_TOKENS * 0.8) {
             const sentenceEnd = content.indexOf('.', endPos);
             if (sentenceEnd !== -1 && sentenceEnd - endPos < 100) {
-                chunkText = content.substring(position, sentenceEnd + 1);
+                const extendedChunk = content.substring(position, sentenceEnd + 1);
+                if (estimateTokens(extendedChunk) <= MAX_TOKENS) {
+                    chunkText = extendedChunk;
+                    endPos = sentenceEnd + 1;
+                }
             }
         }
         
-        chunks.push(chunkText.trim());
+        if (chunkText.trim().length > 50) {
+            chunks.push(chunkText.trim());
+        }
         
         // Smart overlap for next chunk
         const overlap = getSmartOverlap(chunkText, Math.min(maxOverlap, chunkText.length * 0.05));
@@ -251,13 +282,33 @@ async function processDocument(doc) {
 
 async function createEmbedding(text) {
     try {
+        const tokenCount = estimateTokens(text);
+        
+        // Pre-check token count to avoid API errors
+        if (tokenCount > 8000) {
+            console.error(`❌ Chunk too large: ${tokenCount} tokens (max 8192). Skipping embedding.`);
+            return null;
+        }
+        
+        if (tokenCount > 6000) {
+            console.warn(`⚠️  Large chunk warning: ${tokenCount} tokens. Proceeding with caution.`);
+        }
+        
         const response = await openai.embeddings.create({
             model: "text-embedding-ada-002",
             input: text
         });
         return response.data[0].embedding;
     } catch (error) {
-        console.error('❌ Embedding creation failed:', error);
+        const tokenCount = estimateTokens(text);
+        
+        // Enhanced error handling for token limit issues
+        if (error.message?.includes('maximum context length')) {
+            console.error(`❌ Token limit exceeded: ${tokenCount} estimated tokens`);
+            console.error(`📝 Chunk preview: ${text.substring(0, 200)}...`);
+        } else {
+            console.error('❌ Embedding creation failed:', error.message);
+        }
         return null;
     }
 }
@@ -1683,10 +1734,16 @@ async function processSinglePDF(pdfDoc) {
         
         console.log(`📝 Content extracted: ${content.length} characters from ${pdfDoc.title}`);
         
-        // Split into semantic chunks
+        // Split into semantic chunks with token awareness
         const chunks = createSemanticChunks(content, pdfDoc.title);
         
+        // Calculate token statistics
+        const tokenStats = chunks.map(chunk => estimateTokens(chunk));
+        const maxTokens = Math.max(...tokenStats);
+        const avgTokens = Math.round(tokenStats.reduce((a, b) => a + b, 0) / tokenStats.length);
+        
         console.log(`📚 Split ${pdfDoc.title} into ${chunks.length} chunks`);
+        console.log(`🔢 Token stats: max=${maxTokens}, avg=${avgTokens}, safe=${maxTokens <= 6000 ? '✅' : '⚠️'}`);
         
         // Process each chunk
         for (let i = 0; i < chunks.length; i++) {
@@ -1763,10 +1820,16 @@ async function processSingleWebDocument(webDoc) {
         
         console.log(`📝 Content extracted: ${content.length} characters from ${webDoc.title}`);
         
-        // Split into semantic chunks
+        // Split into semantic chunks with token awareness
         const chunks = createSemanticChunks(content, webDoc.title);
         
+        // Calculate token statistics
+        const tokenStats = chunks.map(chunk => estimateTokens(chunk));
+        const maxTokens = Math.max(...tokenStats);
+        const avgTokens = Math.round(tokenStats.reduce((a, b) => a + b, 0) / tokenStats.length);
+        
         console.log(`📚 Split ${webDoc.title} into ${chunks.length} chunks`);
+        console.log(`🔢 Token stats: max=${maxTokens}, avg=${avgTokens}, safe=${maxTokens <= 6000 ? '✅' : '⚠️'}`);
         
         // Process each chunk
         for (let i = 0; i < chunks.length; i++) {
