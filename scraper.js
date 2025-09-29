@@ -1419,7 +1419,7 @@ async function scrapeArpaPiemontePDFs() {
                             const baseUrl = new URL(endpoint).origin;
                             fullUrl = baseUrl + href;
                         } else if (!href.startsWith('http')) {
-                            continue;
+                            return;
                         }
                         
                         // Check if it looks like an environmental document
