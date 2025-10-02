@@ -87,7 +87,29 @@ function createLegalChunks(content, documentTitle) {
             
             // Smart overlap: take last complete sentence
             const overlap = getSmartOverlap(currentChunk, 80);
-            currentChunk = overlap + section;
+            const newChunk = overlap + section;
+            
+            // If the new chunk (overlap + section) exceeds token limit, split the section
+            if (estimateTokens(newChunk) > MAX_TOKENS) {
+                // Split large section into smaller parts
+                const sectionChunks = splitLargeSection(section, MAX_TOKENS, overlap);
+                currentChunk = sectionChunks[0];
+                
+                // Add remaining section chunks directly to chunks array
+                for (let j = 1; j < sectionChunks.length; j++) {
+                    chunks.push({
+                        content: sectionChunks[j].trim(),
+                        metadata: {
+                            type: 'legal_section',
+                            chunkIndex: chunkIndex++,
+                            hasArticles: /art\.|articolo/i.test(sectionChunks[j]),
+                            estimatedTokens: estimateTokens(sectionChunks[j])
+                        }
+                    });
+                }
+            } else {
+                currentChunk = newChunk;
+            }
         }
     }
     
@@ -173,6 +195,65 @@ function getSmartOverlap(text, targetSize) {
     }
     
     return overlap.trim();
+}
+
+function splitLargeSection(section, maxTokens, overlap = '') {
+    const chunks = [];
+    const maxChars = Math.floor(maxTokens * 3.5 * 0.9); // Conservative character limit
+    
+    if (estimateTokens(overlap + section) <= maxTokens) {
+        return [overlap + section];
+    }
+    
+    // If section is too large, split it recursively
+    let remainingText = section;
+    let firstChunk = true;
+    
+    while (remainingText.length > 0) {
+        let chunkSize = maxChars;
+        
+        // For first chunk, account for overlap
+        if (firstChunk && overlap) {
+            chunkSize = Math.max(500, maxChars - overlap.length);
+        }
+        
+        let chunk = remainingText.substring(0, Math.min(chunkSize, remainingText.length));
+        
+        // Try to end at sentence boundary
+        if (chunk.length < remainingText.length) {
+            const lastDot = chunk.lastIndexOf('.');
+            const lastNewline = chunk.lastIndexOf('\n');
+            const cutPoint = Math.max(lastDot, lastNewline);
+            
+            if (cutPoint > chunk.length * 0.7) {
+                chunk = chunk.substring(0, cutPoint + 1);
+            }
+        }
+        
+        // Ensure we don't exceed token limit
+        while (estimateTokens(chunk) > maxTokens && chunk.length > 100) {
+            chunk = chunk.substring(0, Math.floor(chunk.length * 0.8));
+            // Find last space to avoid cutting words
+            const lastSpace = chunk.lastIndexOf(' ');
+            if (lastSpace > chunk.length * 0.8) {
+                chunk = chunk.substring(0, lastSpace);
+            }
+        }
+        
+        if (firstChunk && overlap) {
+            chunks.push(overlap + chunk);
+            firstChunk = false;
+        } else {
+            chunks.push(chunk);
+        }
+        
+        remainingText = remainingText.substring(chunk.length);
+        
+        // Prevent infinite loop
+        if (chunk.length === 0) break;
+    }
+    
+    return chunks.filter(chunk => chunk.trim().length > 50);
 }
 
 async function connectDatabases() {
