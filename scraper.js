@@ -275,6 +275,136 @@ async function connectDatabases() {
     }
 }
 
+async function cleanupPineconeStorage() {
+    console.log('🧹 Starting Pinecone storage cleanup...');
+    
+    try {
+        const index = pinecone.index(PINECONE_INDEX);
+        
+        // Get index stats to check current usage
+        const stats = await index.describeIndexStats();
+        console.log(`📊 Current index stats: ${JSON.stringify(stats.namespaces?.[''] || {})}`);
+        
+        // Strategy 1: Clean up by date - remove vectors older than 6 months
+        const cutoffDate = new Date();
+        cutoffDate.setMonth(cutoffDate.getMonth() - 6);
+        const cutoffTimestamp = Math.floor(cutoffDate.getTime() / 1000);
+        
+        console.log(`🗓️  Removing vectors older than ${cutoffDate.toISOString().split('T')[0]}`);
+        
+        // Query old vectors in batches
+        let deletedCount = 0;
+        let hasMore = true;
+        const batchSize = 1000;
+        
+        while (hasMore) {
+            try {
+                // Query vectors with metadata filter for old dates
+                const queryResponse = await index.query({
+                    vector: new Array(1536).fill(0), // Dummy vector for metadata-only query
+                    topK: batchSize,
+                    includeMetadata: true,
+                    filter: {
+                        timestamp: { $lt: cutoffTimestamp }
+                    }
+                });
+                
+                if (queryResponse.matches && queryResponse.matches.length > 0) {
+                    const idsToDelete = queryResponse.matches.map(match => match.id);
+                    
+                    // Delete in chunks of 100 (Pinecone limit)
+                    for (let i = 0; i < idsToDelete.length; i += 100) {
+                        const chunk = idsToDelete.slice(i, i + 100);
+                        await index.deleteMany(chunk);
+                        deletedCount += chunk.length;
+                        console.log(`🗑️  Deleted ${chunk.length} old vectors (total: ${deletedCount})`);
+                        
+                        // Small delay to avoid rate limits
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                } else {
+                    hasMore = false;
+                }
+                
+                // Safety break to avoid infinite loops
+                if (deletedCount > 10000) {
+                    console.log('⚠️  Reached deletion limit (10k), stopping for safety');
+                    break;
+                }
+                
+            } catch (queryError) {
+                console.log('📝 No timestamp metadata found, trying alternative cleanup...');
+                hasMore = false;
+            }
+        }
+        
+        // Strategy 2: Clean up duplicates - remove vectors with same title
+        console.log('🔍 Looking for duplicate documents...');
+        const documents = await mongodb.collection('urban_documents').find({}).toArray();
+        const titleGroups = {};
+        
+        // Group by title to find duplicates
+        documents.forEach(doc => {
+            const normalizedTitle = doc.title?.toLowerCase().replace(/\s+/g, ' ').trim();
+            if (normalizedTitle) {
+                if (!titleGroups[normalizedTitle]) {
+                    titleGroups[normalizedTitle] = [];
+                }
+                titleGroups[normalizedTitle].push(doc);
+            }
+        });
+        
+        // Find duplicates and delete older versions
+        let duplicatesDeleted = 0;
+        for (const [title, docs] of Object.entries(titleGroups)) {
+            if (docs.length > 1) {
+                // Sort by date, keep newest
+                docs.sort((a, b) => new Date(b.processedAt || b.dateAdded || 0) - new Date(a.processedAt || a.dateAdded || 0));
+                const toDelete = docs.slice(1); // All except the newest
+                
+                for (const doc of toDelete) {
+                    try {
+                        // Delete from Pinecone using document ID pattern
+                        const vectorId = `${doc._id}`;
+                        await index.deleteOne(vectorId);
+                        
+                        // Also try chunk-based IDs
+                        for (let i = 0; i < 20; i++) {
+                            const chunkId = `${doc._id}_chunk_${i}`;
+                            try {
+                                await index.deleteOne(chunkId);
+                            } catch (e) {
+                                // Chunk doesn't exist, that's fine
+                                break;
+                            }
+                        }
+                        
+                        duplicatesDeleted++;
+                        console.log(`🗑️  Removed duplicate: ${title.substring(0, 50)}...`);
+                        
+                        // Small delay
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    } catch (deleteError) {
+                        // Vector might not exist in Pinecone, continue
+                    }
+                }
+            }
+        }
+        
+        // Final stats
+        const finalStats = await index.describeIndexStats();
+        console.log(`✅ Cleanup completed!`);
+        console.log(`📊 Final index stats: ${JSON.stringify(finalStats.namespaces?.[''] || {})}`);
+        console.log(`🗑️  Total cleanup: ${deletedCount} old vectors + ${duplicatesDeleted} duplicates`);
+        
+        return { deletedCount, duplicatesDeleted };
+        
+    } catch (error) {
+        console.error('❌ Cleanup failed:', error);
+        return { deletedCount: 0, duplicatesDeleted: 0 };
+    }
+}
+
 async function scrapeGazzettaUfficiale() {
     console.log('🔍 Starting Gazzetta Ufficiale scraping...');
     
@@ -420,6 +550,33 @@ async function storeDocument(document) {
                 console.log(`✅ Pinecone stored: ${document.title.substring(0, 50)}...`);
             } catch (pineconeError) {
                 console.log(`⚠️  Pinecone failed, MongoDB still stored: ${pineconeError.message}`);
+                
+                // If storage limit reached, trigger cleanup
+                if (pineconeError.message.includes('max storage allowed') || pineconeError.message.includes('Status: 429')) {
+                    console.log('🧹 Storage limit detected, running emergency cleanup...');
+                    try {
+                        const emergencyCleanup = await cleanupPineconeStorage();
+                        console.log(`✅ Emergency cleanup freed: ${emergencyCleanup.deletedCount + emergencyCleanup.duplicatesDeleted} vectors`);
+                        
+                        // Retry storing after cleanup
+                        if (emergencyCleanup.deletedCount > 0 || emergencyCleanup.duplicatesDeleted > 0) {
+                            console.log('🔄 Retrying Pinecone storage after cleanup...');
+                            await index.upsert([{
+                                id: Buffer.from(document.url + document.title).toString('base64'),
+                                values: document.embedding,
+                                metadata: {
+                                    title: document.title,
+                                    url: document.url,
+                                    source: document.source,
+                                    date: document.date
+                                }
+                            }]);
+                            console.log(`✅ Pinecone stored after cleanup: ${document.title.substring(0, 50)}...`);
+                        }
+                    } catch (cleanupError) {
+                        console.log(`❌ Emergency cleanup failed: ${cleanupError.message}`);
+                    }
+                }
             }
         }
 
@@ -1954,6 +2111,14 @@ async function processSingleWebDocument(webDoc) {
 async function main() {
     try {
         await connectDatabases();
+        
+        // Run cleanup every cycle to manage storage
+        console.log('🧹 Running Pinecone storage cleanup...');
+        const cleanupResult = await cleanupPineconeStorage();
+        if (cleanupResult.deletedCount > 0 || cleanupResult.duplicatesDeleted > 0) {
+            console.log(`✅ Freed up space: ${cleanupResult.deletedCount + cleanupResult.duplicatesDeleted} vectors removed`);
+        }
+        
         await scrapeGazzettaUfficiale();
         await processNormativeContent();
         await scrapePiemonteNormativa();
