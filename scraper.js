@@ -283,26 +283,77 @@ async function cleanupPineconeStorage() {
         
         // Get index stats to check current usage
         const stats = await index.describeIndexStats();
-        console.log(`📊 Current index stats: ${JSON.stringify(stats.namespaces?.[''] || {})}`);
+        const totalVectors = stats.namespaces?.['']?.recordCount || 0;
+        console.log(`📊 Current index stats: ${JSON.stringify(stats.namespaces?.[''] || {})} (${totalVectors} vectors)`);
         
-        // Strategy 1: Clean up by date - remove vectors older than 6 months
-        const cutoffDate = new Date();
-        cutoffDate.setMonth(cutoffDate.getMonth() - 6);
-        const cutoffTimestamp = Math.floor(cutoffDate.getTime() / 1000);
-        
-        console.log(`🗓️  Removing vectors older than ${cutoffDate.toISOString().split('T')[0]}`);
-        
-        // Query old vectors in batches
         let deletedCount = 0;
-        let hasMore = true;
-        const batchSize = 1000;
         
-        while (hasMore) {
+        // Strategy 1: Aggressive deletion - delete 30% of vectors to free significant space
+        if (totalVectors > 200000) { // If we have > 200k vectors
+            console.log('🚨 High vector count detected, implementing aggressive cleanup...');
+            
+            const targetDeletions = Math.floor(totalVectors * 0.3); // Delete 30%
+            console.log(`🎯 Target: Delete ${targetDeletions} vectors to free space`);
+            
+            // Use list() to get vector IDs without metadata filtering
+            let deletedInThisStrategy = 0;
+            let paginationToken = undefined;
+            
+            while (deletedInThisStrategy < targetDeletions) {
+                try {
+                    const listResponse = await index.listPaginated({
+                        prefix: '',
+                        limit: 1000,
+                        paginationToken: paginationToken
+                    });
+                    
+                    if (listResponse.vectors && listResponse.vectors.length > 0) {
+                        const idsToDelete = listResponse.vectors.map(v => v.id).slice(0, Math.min(1000, targetDeletions - deletedInThisStrategy));
+                        
+                        // Delete in chunks of 100
+                        for (let i = 0; i < idsToDelete.length; i += 100) {
+                            const chunk = idsToDelete.slice(i, i + 100);
+                            await index.deleteMany(chunk);
+                            deletedInThisStrategy += chunk.length;
+                            deletedCount += chunk.length;
+                            console.log(`🗑️  Aggressive cleanup: deleted ${chunk.length} vectors (total: ${deletedCount})`);
+                            
+                            // Small delay
+                            await new Promise(resolve => setTimeout(resolve, 200));
+                        }
+                        
+                        paginationToken = listResponse.pagination?.next;
+                        if (!paginationToken) break;
+                    } else {
+                        break;
+                    }
+                    
+                    // Safety break
+                    if (deletedInThisStrategy >= targetDeletions || deletedCount > 50000) {
+                        console.log('✅ Aggressive cleanup target reached or safety limit hit');
+                        break;
+                    }
+                    
+                } catch (listError) {
+                    console.log(`⚠️  List operation failed: ${listError.message}, trying alternative method...`);
+                    break;
+                }
+            }
+        }
+        
+        // Strategy 2: Fallback - Clean up by date (reduced to 3 months)
+        if (deletedCount < 10000) {
+            console.log('🗓️  Trying date-based cleanup (3 months)...');
+            const cutoffDate = new Date();
+            cutoffDate.setMonth(cutoffDate.getMonth() - 3); // More aggressive: 3 months instead of 6
+            const cutoffTimestamp = Math.floor(cutoffDate.getTime() / 1000);
+            
+            console.log(`🗓️  Removing vectors older than ${cutoffDate.toISOString().split('T')[0]}`);
+            
             try {
-                // Query vectors with metadata filter for old dates
                 const queryResponse = await index.query({
-                    vector: new Array(1536).fill(0), // Dummy vector for metadata-only query
-                    topK: batchSize,
+                    vector: new Array(1536).fill(0),
+                    topK: 5000,
                     includeMetadata: true,
                     filter: {
                         timestamp: { $lt: cutoffTimestamp }
@@ -312,33 +363,50 @@ async function cleanupPineconeStorage() {
                 if (queryResponse.matches && queryResponse.matches.length > 0) {
                     const idsToDelete = queryResponse.matches.map(match => match.id);
                     
-                    // Delete in chunks of 100 (Pinecone limit)
                     for (let i = 0; i < idsToDelete.length; i += 100) {
                         const chunk = idsToDelete.slice(i, i + 100);
                         await index.deleteMany(chunk);
                         deletedCount += chunk.length;
-                        console.log(`🗑️  Deleted ${chunk.length} old vectors (total: ${deletedCount})`);
-                        
-                        // Small delay to avoid rate limits
+                        console.log(`🗑️  Date cleanup: deleted ${chunk.length} vectors (total: ${deletedCount})`);
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
-                } else {
-                    hasMore = false;
                 }
-                
-                // Safety break to avoid infinite loops
-                if (deletedCount > 10000) {
-                    console.log('⚠️  Reached deletion limit (10k), stopping for safety');
-                    break;
-                }
-                
             } catch (queryError) {
-                console.log('📝 No timestamp metadata found, trying alternative cleanup...');
-                hasMore = false;
+                console.log('📝 Date-based cleanup failed, metadata might not be available');
             }
         }
         
-        // Strategy 2: Clean up duplicates - remove vectors with same title
+        // Strategy 3: Pattern-based cleanup - remove old document patterns
+        if (deletedCount < 5000) {
+            console.log('🔍 Trying pattern-based cleanup...');
+            try {
+                // Look for old document patterns that might be taking space
+                const patterns = ['2023', '2022', '2021', 'old_', 'temp_'];
+                
+                for (const pattern of patterns) {
+                    const listResponse = await index.listPaginated({
+                        prefix: pattern,
+                        limit: 1000
+                    });
+                    
+                    if (listResponse.vectors && listResponse.vectors.length > 0) {
+                        const idsToDelete = listResponse.vectors.map(v => v.id);
+                        
+                        for (let i = 0; i < idsToDelete.length; i += 100) {
+                            const chunk = idsToDelete.slice(i, i + 100);
+                            await index.deleteMany(chunk);
+                            deletedCount += chunk.length;
+                            console.log(`🗑️  Pattern cleanup (${pattern}): deleted ${chunk.length} vectors (total: ${deletedCount})`);
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                        }
+                    }
+                }
+            } catch (patternError) {
+                console.log('📝 Pattern-based cleanup failed');
+            }
+        }
+        
+        // Strategy 4: Clean up duplicates - remove vectors with same title
         console.log('🔍 Looking for duplicate documents...');
         const documents = await mongodb.collection('urban_documents').find({}).toArray();
         const titleGroups = {};
