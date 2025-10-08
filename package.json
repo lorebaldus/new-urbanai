@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "description": "UrbanAI Scraping Service for Railway",
-  "main": "scraper.js",
+  "main": "enhanced-processor.js",
   "scripts": {
-    "start": "node scraper.js",
-    "dev": "node scraper.js",
+    "start": "node enhanced-processor.js",
+    "dev": "node enhanced-processor.js",
+    "legacy": "node scraper.js",
     "build": "echo 'No build needed'"
   },
   "dependencies": {
