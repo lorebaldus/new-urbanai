@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#grad)" stroke="#fff" stroke-width="3"/>
+  
+  <!-- Stylized U -->
+  <path d="M 25 25 L 25 55 Q 25 75 45 75 L 55 75 Q 75 75 75 55 L 75 25" 
+        fill="none" 
+        stroke="#ffffff" 
+        stroke-width="8" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  
+  <!-- Small AI indicator -->
+  <circle cx="70" cy="30" r="6" fill="#00ff88" opacity="0.9"/>
+  <circle cx="70" cy="30" r="2" fill="#ffffff"/>
+</svg>
