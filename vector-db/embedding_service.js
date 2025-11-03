@@ -8,7 +8,7 @@ export class EmbeddingService {
         this.config = {
             apiKey: process.env.OPENAI_API_KEY,
             model: 'text-embedding-3-small',
-            dimension: 1536,
+            dimension: parseInt(process.env.EMBEDDING_DIMENSIONS || '1024'), // Pinecone serverless compatible
             batchSize: 100, // OpenAI recommended batch size
             maxRetries: 3,
             retryDelay: 1000,

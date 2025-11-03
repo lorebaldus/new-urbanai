@@ -8,7 +8,7 @@ export class PineconeClient {
         this.config = {
             apiKey: process.env.PINECONE_API_KEY,
             indexName: process.env.PINECONE_INDEX || 'urbanai-docs',
-            dimension: 1536, // OpenAI text-embedding-3-small
+            dimension: parseInt(process.env.EMBEDDING_DIMENSIONS || '1024'), // Pinecone serverless compatible
             namespaces: {
                 base: process.env.PINECONE_NAMESPACE_BASE || 'urbanistica-base',
                 laws: process.env.PINECONE_NAMESPACE_LAWS || 'laws-national',

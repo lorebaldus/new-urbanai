@@ -217,7 +217,7 @@ async function generateQueryEmbedding(question) {
         const response = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: question,
-            dimensions: 1536
+            dimensions: parseInt(process.env.EMBEDDING_DIMENSIONS || '1024')
         });
         
         return response.data[0].embedding;

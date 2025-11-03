@@ -352,7 +352,7 @@ async function cleanupPineconeStorage() {
             
             try {
                 const queryResponse = await index.query({
-                    vector: new Array(1536).fill(0),
+                    vector: new Array(1024).fill(0),
                     topK: 5000,
                     includeMetadata: true,
                     filter: {
