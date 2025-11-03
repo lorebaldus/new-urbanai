@@ -1,0 +1,4332 @@
+{
+  "document_id": "normattiva_legge_1150_1942",
+  "processing_timestamp": "2025-11-03T10:31:33.259Z",
+  "document_metadata": {
+    "source": "normattiva",
+    "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+    "number": "1150/1942",
+    "type": "legge",
+    "date": "1942-08-17",
+    "status": "vigente",
+    "authority": "Regione",
+    "topics": [
+      "urbanistica",
+      "edilizia",
+      "ambiente",
+      "procedimento"
+    ],
+    "references": [],
+    "document_classification": {
+      "primary_type": "legge",
+      "secondary_types": [],
+      "confidence": 40,
+      "detected_patterns": [
+        "legge 17",
+        "legge 17"
+      ],
+      "authority": "Parlamento",
+      "formal_citation": "L 17"
+    },
+    "topic_analysis": {
+      "primary_topics": [
+        {
+          "topic": "pianificazione",
+          "score": 60,
+          "description": "Pianificazione territoriale e urbanistica"
+        },
+        {
+          "topic": "esproprio",
+          "score": 42,
+          "description": "Procedure espropriative"
+        },
+        {
+          "topic": "edilizia",
+          "score": 40,
+          "description": "Procedure e titoli edilizi"
+        }
+      ],
+      "secondary_topics": [
+        {
+          "topic": "vincoli",
+          "score": 16,
+          "description": "Vincoli e tutele"
+        },
+        {
+          "topic": "procedimento",
+          "score": 10,
+          "description": "Procedimenti amministrativi"
+        },
+        {
+          "topic": "abuso",
+          "score": 8,
+          "description": "Abusi edilizi e sanatorie"
+        }
+      ],
+      "topic_scores": {
+        "pianificazione": {
+          "score": 60,
+          "found_keywords": [
+            {
+              "keyword": "piano regolatore",
+              "count": 6
+            }
+          ],
+          "description": "Pianificazione territoriale e urbanistica"
+        },
+        "edilizia": {
+          "score": 40,
+          "found_keywords": [
+            {
+              "keyword": "scia",
+              "count": 3
+            },
+            {
+              "keyword": "costruzione",
+              "count": 1
+            }
+          ],
+          "description": "Procedure e titoli edilizi"
+        },
+        "vincoli": {
+          "score": 16,
+          "found_keywords": [
+            {
+              "keyword": "vincolo paesaggistico",
+              "count": 1
+            },
+            {
+              "keyword": "soprintendenza",
+              "count": 1
+            }
+          ],
+          "description": "Vincoli e tutele"
+        },
+        "esproprio": {
+          "score": 42,
+          "found_keywords": [
+            {
+              "keyword": "espropriazione",
+              "count": 2
+            },
+            {
+              "keyword": "pubblica utilità",
+              "count": 3
+            },
+            {
+              "keyword": "indennità",
+              "count": 1
+            }
+          ],
+          "description": "Procedure espropriative"
+        },
+        "standard": {
+          "score": 6,
+          "found_keywords": [
+            {
+              "keyword": "parcheggi",
+              "count": 1
+            }
+          ],
+          "description": "Standard urbanistici"
+        },
+        "abuso": {
+          "score": 8,
+          "found_keywords": [
+            {
+              "keyword": "demolizione",
+              "count": 1
+            }
+          ],
+          "description": "Abusi edilizi e sanatorie"
+        },
+        "procedimento": {
+          "score": 10,
+          "found_keywords": [
+            {
+              "keyword": "autorizzazione",
+              "count": 2
+            }
+          ],
+          "description": "Procedimenti amministrativi"
+        }
+      },
+      "urbanistic_relevance": 18
+    },
+    "status_analysis": {
+      "current_status": "vigente",
+      "confidence": 50,
+      "status_indicators": [
+        {
+          "status": "vigente",
+          "keyword": "vigente",
+          "found": true
+        },
+        {
+          "status": "vigente",
+          "keyword": "in vigore",
+          "found": true
+        }
+      ],
+      "modification_history": [],
+      "effective_date": null,
+      "expiration_date": null
+    },
+    "structure_analysis": {
+      "total_articles": 12,
+      "article_distribution": {
+        "total": 12,
+        "with_commas": 2,
+        "avg_commas_per_article": 1.4166666666666667
+      },
+      "structural_complexity": "simple",
+      "has_annexes": false,
+      "hierarchical_depth": 2
+    },
+    "reference_analysis": {
+      "internal_references": {
+        "internal_article": {
+          "count": 12,
+          "examples": [
+            "Art. 1",
+            "Art. 2",
+            "Art. 3"
+          ],
+          "targets": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12"
+          ]
+        }
+      },
+      "external_references": {},
+      "reference_density": 3,
+      "total_references": 12
+    },
+    "authority_analysis": {
+      "issuing_authority": "Parlamento",
+      "competent_authorities": [
+        {
+          "name": "Comune",
+          "level": "municipal",
+          "mentions": 3
+        },
+        {
+          "name": "Regione",
+          "level": "regional",
+          "mentions": 1
+        },
+        {
+          "name": "Ministero",
+          "level": "national",
+          "mentions": 1
+        },
+        {
+          "name": "Soprintendenza",
+          "level": "special",
+          "mentions": 1
+        }
+      ],
+      "territorial_scope": "regional",
+      "administrative_level": "regional"
+    },
+    "temporal_analysis": {
+      "publication_date": null,
+      "effective_date": null,
+      "important_dates": [],
+      "temporal_references": [
+        "entro",
+        "giorni"
+      ],
+      "has_deadlines": true
+    },
+    "quality_metrics": {
+      "completeness_score": 60,
+      "structure_score": 80,
+      "metadata_richness": 75,
+      "overall_quality": 71
+    },
+    "processing_info": {
+      "extracted_at": "2025-11-03T10:31:33.253Z",
+      "extractor_version": "1.0.0",
+      "confidence_score": 73
+    }
+  },
+  "chunking_strategy": "article-based",
+  "chunking_stats": {
+    "totalChunks": 12,
+    "totalTokens": 2778,
+    "avgTokensPerChunk": 232,
+    "minTokens": 83,
+    "maxTokens": 297,
+    "chunksInTargetRange": 0,
+    "qualityScores": {
+      "avg": 80,
+      "min": 80,
+      "max": 80
+    }
+  },
+  "chunks": [
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore generale quando la popolazione residente nel territorio comunale superi i diecimila abitanti_chunk0",
+      "text": "Art. 1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore generale quando la popolazione residente nel territorio comunale superi i diecimila abitanti. Il piano regolatore generale deve essere esteso a tutto il territorio comunale e deve indicare la rete delle principali vie di comunicazione.",
+      "tokens": 83,
+      "position_in_doc": 0,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore generale quando la popolazione residente nel territorio comunale superi i diecimila abitanti",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "pianificazione",
+            "score": 10,
+            "keywords": [
+              "piano regolatore"
+            ],
+            "relevance": 20
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 1,
+            "examples": [
+              "Art. 1"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 83,
+          "sentence_count": 3,
+          "legal_terms": 0,
+          "reference_density": 0,
+          "readability": 80.28231292517006
+        },
+        "context_info": {
+          "position_percentage": 0,
+          "legal_context": "article_main",
+          "relevance_indicators": []
+        }
+      },
+      "overlap_with_previous": 0,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art2 - Contenuto del piano regolatore generale Il piano regolatore generale deve indicare: 1_chunk1",
+      "text": "Art. 1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore generale quando la popolazione residente nel territorio comunale superi i diecimila abitanti. Il piano regolatore generale deve essere esteso a tutto il territorio comunale e deve indicare la rete delle principali vie di comunicazione. Art. 2 - Contenuto del piano regolatore generale Il piano regolatore generale deve indicare: 1. la divisione in zone del territorio comunale secondo l'uso cui le singole zone sono destinate; 2. le aree destinate alla formazione di spazi di uso pubblico; 3. le aree nelle quali è vietata l'edificazione; 4. la rete delle principali vie di comunicazione; 5. la divisione in zone del territorio comunale per l'applicazione di particolari norme edilizie.",
+      "tokens": 196,
+      "position_in_doc": 1,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "2 - Contenuto del piano regolatore generale Il piano regolatore generale deve indicare: 1",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "pianificazione",
+            "score": 10,
+            "keywords": [
+              "piano regolatore"
+            ],
+            "relevance": 20
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 2,
+            "examples": [
+              "Art. 1",
+              "Art. 2"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 196,
+          "sentence_count": 10,
+          "legal_terms": 0,
+          "reference_density": 0,
+          "readability": 82.95
+        },
+        "context_info": {
+          "position_percentage": 1,
+          "legal_context": "article_main",
+          "relevance_indicators": []
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art3 - Formazione dei programmi di fabbricazione I Comuni che non sono obbligati alla formazione del piano regolatore generale devono formare un programma di fabbricazione_chunk2",
+      "text": "Art. 1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore generale quando la popolazione residente nel territorio comunale superi i diecimila abitanti. Il piano regolatore generale deve essere esteso a tutto il territorio comunale e deve indicare la rete delle principali vie di comunicazione. Art. 2 - Contenuto del piano regolatore generale Il piano regolatore generale deve indicare: 1. la divisione in zone del territorio comunale secondo l'uso cui le singole zone sono destinate; 2. le aree destinate alla formazione di spazi di uso pubblico; 3. le aree nelle quali è vietata l'edificazione; 4. la rete delle principali vie di comunicazione; 5. la divisione in zone del territorio comunale per l'applicazione di particolari norme edilizie. Art. 3 - Formazione dei programmi di fabbricazione I Comuni che non sono obbligati alla formazione del piano regolatore generale devono formare un programma di fabbricazione. Il programma di fabbricazione deve stabilire quali aree del territorio comunale debbano essere riservate all'ampliamento dell'aggregato urbano e quali altre aree debbano essere destinate alla formazione di spazi di uso pubblico.",
+      "tokens": 297,
+      "position_in_doc": 2,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "3 - Formazione dei programmi di fabbricazione I Comuni che non sono obbligati alla formazione del piano regolatore generale devono formare un programma di fabbricazione",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "pianificazione",
+            "score": 10,
+            "keywords": [
+              "piano regolatore"
+            ],
+            "relevance": 20
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 3,
+            "examples": [
+              "Art. 1",
+              "Art. 2"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 297,
+          "sentence_count": 13,
+          "legal_terms": 0,
+          "reference_density": 0,
+          "readability": 81.77987831377662
+        },
+        "context_info": {
+          "position_percentage": 2,
+          "legal_context": "article_main",
+          "relevance_indicators": []
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art4 - Approvazione dei piani I piani regolatori generali e i programmi di fabbricazione sono approvati con decreto del Ministro per i lavori pubblici_chunk3",
+      "text": "la divisione in zone del territorio comunale secondo l'uso cui le singole zone sono destinate; 2. le aree destinate alla formazione di spazi di uso pubblico; 3. le aree nelle quali è vietata l'edificazione; 4. la rete delle principali vie di comunicazione; 5. la divisione in zone del territorio comunale per l'applicazione di particolari norme edilizie. Art. 3 - Formazione dei programmi di fabbricazione I Comuni che non sono obbligati alla formazione del piano regolatore generale devono formare un programma di fabbricazione. Il programma di fabbricazione deve stabilire quali aree del territorio comunale debbano essere riservate all'ampliamento dell'aggregato urbano e quali altre aree debbano essere destinate alla formazione di spazi di uso pubblico. Art. 4 - Approvazione dei piani I piani regolatori generali e i programmi di fabbricazione sono approvati con decreto del Ministro per i lavori pubblici. Prima dell'approvazione il piano deve essere depositato nella segreteria del Comune per la durata di quindici giorni consecutivi perché chiunque possa prenderne visione.",
+      "tokens": 271,
+      "position_in_doc": 3,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "4 - Approvazione dei piani I piani regolatori generali e i programmi di fabbricazione sono approvati con decreto del Ministro per i lavori pubblici",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "pianificazione",
+            "score": 10,
+            "keywords": [
+              "piano regolatore"
+            ],
+            "relevance": 20
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 2,
+            "examples": [
+              "Art. 3",
+              "Art. 4"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 271,
+          "sentence_count": 11,
+          "legal_terms": 1,
+          "reference_density": 0,
+          "readability": 81.22840203274986
+        },
+        "context_info": {
+          "position_percentage": 3,
+          "legal_context": "article_main",
+          "relevance_indicators": []
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art5 - Efficacia dei piani L'approvazione del piano regolatore generale comporta la dichiarazione di pubblica utilità delle opere in esso previste_chunk4",
+      "text": "Art. 3 - Formazione dei programmi di fabbricazione I Comuni che non sono obbligati alla formazione del piano regolatore generale devono formare un programma di fabbricazione. Il programma di fabbricazione deve stabilire quali aree del territorio comunale debbano essere riservate all'ampliamento dell'aggregato urbano e quali altre aree debbano essere destinate alla formazione di spazi di uso pubblico. Art. 4 - Approvazione dei piani I piani regolatori generali e i programmi di fabbricazione sono approvati con decreto del Ministro per i lavori pubblici. Prima dell'approvazione il piano deve essere depositato nella segreteria del Comune per la durata di quindici giorni consecutivi perché chiunque possa prenderne visione. Art. 5 - Efficacia dei piani L'approvazione del piano regolatore generale comporta la dichiarazione di pubblica utilità delle opere in esso previste. Le opere di urbanizzazione primaria comprendono le strade, gli spazi di sosta e di parcheggio, le fognature, la rete idrica, la rete del gas, la rete elettrica.",
+      "tokens": 260,
+      "position_in_doc": 4,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "5 - Efficacia dei piani L'approvazione del piano regolatore generale comporta la dichiarazione di pubblica utilità delle opere in esso previste",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "pianificazione",
+            "score": 10,
+            "keywords": [
+              "piano regolatore"
+            ],
+            "relevance": 20
+          },
+          {
+            "topic": "esproprio",
+            "score": 7,
+            "keywords": [
+              "pubblica utilità"
+            ],
+            "relevance": 14
+          },
+          {
+            "topic": "standard",
+            "score": 6,
+            "keywords": [
+              "parcheggi"
+            ],
+            "relevance": 12
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 3,
+            "examples": [
+              "Art. 3",
+              "Art. 4"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 260,
+          "sentence_count": 9,
+          "legal_terms": 1,
+          "reference_density": 0,
+          "readability": 79.95093795093794
+        },
+        "context_info": {
+          "position_percentage": 4,
+          "legal_context": "article_main",
+          "relevance_indicators": []
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art6 - Varianti ai piani Le varianti ai piani regolatori generali sono approvate con la stessa procedura stabilita per l'approvazione del piano_chunk5",
+      "text": "Art. 4 - Approvazione dei piani I piani regolatori generali e i programmi di fabbricazione sono approvati con decreto del Ministro per i lavori pubblici. Prima dell'approvazione il piano deve essere depositato nella segreteria del Comune per la durata di quindici giorni consecutivi perché chiunque possa prenderne visione. Art. 5 - Efficacia dei piani L'approvazione del piano regolatore generale comporta la dichiarazione di pubblica utilità delle opere in esso previste. Le opere di urbanizzazione primaria comprendono le strade, gli spazi di sosta e di parcheggio, le fognature, la rete idrica, la rete del gas, la rete elettrica. Art. 6 - Varianti ai piani Le varianti ai piani regolatori generali sono approvate con la stessa procedura stabilita per l'approvazione del piano. Le varianti di modesta entità possono essere approvate dalla Regione.",
+      "tokens": 213,
+      "position_in_doc": 5,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "6 - Varianti ai piani Le varianti ai piani regolatori generali sono approvate con la stessa procedura stabilita per l'approvazione del piano",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "pianificazione",
+            "score": 10,
+            "keywords": [
+              "piano regolatore"
+            ],
+            "relevance": 20
+          },
+          {
+            "topic": "esproprio",
+            "score": 7,
+            "keywords": [
+              "pubblica utilità"
+            ],
+            "relevance": 14
+          },
+          {
+            "topic": "standard",
+            "score": 6,
+            "keywords": [
+              "parcheggi"
+            ],
+            "relevance": 12
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 3,
+            "examples": [
+              "Art. 4",
+              "Art. 5"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 213,
+          "sentence_count": 9,
+          "legal_terms": 1,
+          "reference_density": 0,
+          "readability": 81.67008547008547
+        },
+        "context_info": {
+          "position_percentage": 5,
+          "legal_context": "article_main",
+          "relevance_indicators": [
+            "procedure"
+          ]
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art7 - Licenza di costruzione Chiunque intenda eseguire nuove costruzioni deve munirsi di licenza del sindaco_chunk6",
+      "text": "Prima dell'approvazione il piano deve essere depositato nella segreteria del Comune per la durata di quindici giorni consecutivi perché chiunque possa prenderne visione. Art. 5 - Efficacia dei piani L'approvazione del piano regolatore generale comporta la dichiarazione di pubblica utilità delle opere in esso previste. Le opere di urbanizzazione primaria comprendono le strade, gli spazi di sosta e di parcheggio, le fognature, la rete idrica, la rete del gas, la rete elettrica. Art. 6 - Varianti ai piani Le varianti ai piani regolatori generali sono approvate con la stessa procedura stabilita per l'approvazione del piano. Le varianti di modesta entità possono essere approvate dalla Regione. Art. 7 - Licenza di costruzione Chiunque intenda eseguire nuove costruzioni deve munirsi di licenza del sindaco. La licenza è rilasciata in conformità alle norme del presente decreto e del regolamento edilizio. La licenza deve essere richiesta per iscritto e deve contenere l'indicazione del terreno su cui si intende costruire e il progetto delle opere.",
+      "tokens": 263,
+      "position_in_doc": 6,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "7 - Licenza di costruzione Chiunque intenda eseguire nuove costruzioni deve munirsi di licenza del sindaco",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "edilizia",
+            "score": 20,
+            "keywords": [
+              "scia",
+              "costruzione"
+            ],
+            "relevance": 40
+          },
+          {
+            "topic": "pianificazione",
+            "score": 10,
+            "keywords": [
+              "piano regolatore"
+            ],
+            "relevance": 20
+          },
+          {
+            "topic": "esproprio",
+            "score": 7,
+            "keywords": [
+              "pubblica utilità"
+            ],
+            "relevance": 14
+          },
+          {
+            "topic": "standard",
+            "score": 6,
+            "keywords": [
+              "parcheggi"
+            ],
+            "relevance": 12
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 3,
+            "examples": [
+              "Art. 5",
+              "Art. 6"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 263,
+          "sentence_count": 11,
+          "legal_terms": 2,
+          "reference_density": 0,
+          "readability": 81.56477272727273
+        },
+        "context_info": {
+          "position_percentage": 6,
+          "legal_context": "article_main",
+          "relevance_indicators": [
+            "procedure"
+          ]
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art8 - Costruzioni in zone vincolate Nelle zone dichiarate soggette a vincolo paesaggistico la licenza non può essere rilasciata senza l'autorizzazione della competente soprintendenza_chunk7",
+      "text": "Le opere di urbanizzazione primaria comprendono le strade, gli spazi di sosta e di parcheggio, le fognature, la rete idrica, la rete del gas, la rete elettrica. Art. 6 - Varianti ai piani Le varianti ai piani regolatori generali sono approvate con la stessa procedura stabilita per l'approvazione del piano. Le varianti di modesta entità possono essere approvate dalla Regione. Art. 7 - Licenza di costruzione Chiunque intenda eseguire nuove costruzioni deve munirsi di licenza del sindaco. La licenza è rilasciata in conformità alle norme del presente decreto e del regolamento edilizio. La licenza deve essere richiesta per iscritto e deve contenere l'indicazione del terreno su cui si intende costruire e il progetto delle opere. Art. 8 - Costruzioni in zone vincolate Nelle zone dichiarate soggette a vincolo paesaggistico la licenza non può essere rilasciata senza l'autorizzazione della competente soprintendenza. L'autorizzazione deve essere rilasciata entro sessanta giorni dalla richiesta.",
+      "tokens": 250,
+      "position_in_doc": 7,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "8 - Costruzioni in zone vincolate Nelle zone dichiarate soggette a vincolo paesaggistico la licenza non può essere rilasciata senza l'autorizzazione della competente soprintendenza",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "edilizia",
+            "score": 20,
+            "keywords": [
+              "scia",
+              "costruzione"
+            ],
+            "relevance": 40
+          },
+          {
+            "topic": "vincoli",
+            "score": 16,
+            "keywords": [
+              "vincolo paesaggistico",
+              "soprintendenza"
+            ],
+            "relevance": 32
+          },
+          {
+            "topic": "standard",
+            "score": 6,
+            "keywords": [
+              "parcheggi"
+            ],
+            "relevance": 12
+          },
+          {
+            "topic": "procedimento",
+            "score": 5,
+            "keywords": [
+              "autorizzazione"
+            ],
+            "relevance": 10
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 3,
+            "examples": [
+              "Art. 6",
+              "Art. 7"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 250,
+          "sentence_count": 11,
+          "legal_terms": 4,
+          "reference_density": 0,
+          "readability": 81.81787675411837
+        },
+        "context_info": {
+          "position_percentage": 7,
+          "legal_context": "article_main",
+          "relevance_indicators": [
+            "procedure"
+          ]
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art9 - Vigilanza sull'attività edilizia Il sindaco esercita la vigilanza sull'attività edilizia nel territorio comunale_chunk8",
+      "text": "Le varianti di modesta entità possono essere approvate dalla Regione. Art. 7 - Licenza di costruzione Chiunque intenda eseguire nuove costruzioni deve munirsi di licenza del sindaco. La licenza è rilasciata in conformità alle norme del presente decreto e del regolamento edilizio. La licenza deve essere richiesta per iscritto e deve contenere l'indicazione del terreno su cui si intende costruire e il progetto delle opere. Art. 8 - Costruzioni in zone vincolate Nelle zone dichiarate soggette a vincolo paesaggistico la licenza non può essere rilasciata senza l'autorizzazione della competente soprintendenza. L'autorizzazione deve essere rilasciata entro sessanta giorni dalla richiesta. Art. 9 - Vigilanza sull'attività edilizia Il sindaco esercita la vigilanza sull'attività edilizia nel territorio comunale. Quando sia accertata l'esecuzione di opere senza licenza o difformi dalla licenza, il sindaco dispone la sospensione dei lavori.",
+      "tokens": 236,
+      "position_in_doc": 8,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "9 - Vigilanza sull'attività edilizia Il sindaco esercita la vigilanza sull'attività edilizia nel territorio comunale",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "edilizia",
+            "score": 20,
+            "keywords": [
+              "scia",
+              "costruzione"
+            ],
+            "relevance": 40
+          },
+          {
+            "topic": "vincoli",
+            "score": 16,
+            "keywords": [
+              "vincolo paesaggistico",
+              "soprintendenza"
+            ],
+            "relevance": 32
+          },
+          {
+            "topic": "procedimento",
+            "score": 5,
+            "keywords": [
+              "autorizzazione"
+            ],
+            "relevance": 10
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 3,
+            "examples": [
+              "Art. 7",
+              "Art. 8"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 236,
+          "sentence_count": 11,
+          "legal_terms": 4,
+          "reference_density": 0,
+          "readability": 81.83446404341927
+        },
+        "context_info": {
+          "position_percentage": 8,
+          "legal_context": "article_main",
+          "relevance_indicators": []
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art10 - Sanzioni Chiunque esegue opere edilizie senza licenza o in difformità da essa è punito con ammenda da lire centomila a un milione_chunk9",
+      "text": "La licenza è rilasciata in conformità alle norme del presente decreto e del regolamento edilizio. La licenza deve essere richiesta per iscritto e deve contenere l'indicazione del terreno su cui si intende costruire e il progetto delle opere. Art. 8 - Costruzioni in zone vincolate Nelle zone dichiarate soggette a vincolo paesaggistico la licenza non può essere rilasciata senza l'autorizzazione della competente soprintendenza. L'autorizzazione deve essere rilasciata entro sessanta giorni dalla richiesta. Art. 9 - Vigilanza sull'attività edilizia Il sindaco esercita la vigilanza sull'attività edilizia nel territorio comunale. Quando sia accertata l'esecuzione di opere senza licenza o difformi dalla licenza, il sindaco dispone la sospensione dei lavori. Art. 10 - Sanzioni Chiunque esegue opere edilizie senza licenza o in difformità da essa è punito con ammenda da lire centomila a un milione. Il sindaco può ordinare la demolizione delle opere abusivamente costruite.",
+      "tokens": 244,
+      "position_in_doc": 9,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "10 - Sanzioni Chiunque esegue opere edilizie senza licenza o in difformità da essa è punito con ammenda da lire centomila a un milione",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "vincoli",
+            "score": 16,
+            "keywords": [
+              "vincolo paesaggistico",
+              "soprintendenza"
+            ],
+            "relevance": 32
+          },
+          {
+            "topic": "edilizia",
+            "score": 10,
+            "keywords": [
+              "scia"
+            ],
+            "relevance": 20
+          },
+          {
+            "topic": "abuso",
+            "score": 8,
+            "keywords": [
+              "demolizione"
+            ],
+            "relevance": 16
+          },
+          {
+            "topic": "procedimento",
+            "score": 5,
+            "keywords": [
+              "autorizzazione"
+            ],
+            "relevance": 10
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 3,
+            "examples": [
+              "Art. 8",
+              "Art. 9"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 244,
+          "sentence_count": 11,
+          "legal_terms": 4,
+          "reference_density": 0,
+          "readability": 81.79897567221511
+        },
+        "context_info": {
+          "position_percentage": 9,
+          "legal_context": "article_main",
+          "relevance_indicators": [
+            "sanctions"
+          ]
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art11 - Espropriazione per pubblica utilità Le aree comprese nei piani di zona per l'edilizia economica e popolare possono essere espropriate per pubblica utilità_chunk10",
+      "text": "Art. 8 - Costruzioni in zone vincolate Nelle zone dichiarate soggette a vincolo paesaggistico la licenza non può essere rilasciata senza l'autorizzazione della competente soprintendenza. L'autorizzazione deve essere rilasciata entro sessanta giorni dalla richiesta. Art. 9 - Vigilanza sull'attività edilizia Il sindaco esercita la vigilanza sull'attività edilizia nel territorio comunale. Quando sia accertata l'esecuzione di opere senza licenza o difformi dalla licenza, il sindaco dispone la sospensione dei lavori. Art. 10 - Sanzioni Chiunque esegue opere edilizie senza licenza o in difformità da essa è punito con ammenda da lire centomila a un milione. Il sindaco può ordinare la demolizione delle opere abusivamente costruite. Art. 11 - Espropriazione per pubblica utilità Le aree comprese nei piani di zona per l'edilizia economica e popolare possono essere espropriate per pubblica utilità. L'indennità di espropriazione è determinata secondo i criteri stabiliti dalla legislazione vigente.",
+      "tokens": 250,
+      "position_in_doc": 10,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "11 - Espropriazione per pubblica utilità Le aree comprese nei piani di zona per l'edilizia economica e popolare possono essere espropriate per pubblica utilità",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "esproprio",
+            "score": 21,
+            "keywords": [
+              "espropriazione",
+              "pubblica utilità",
+              "indennità"
+            ],
+            "relevance": 42
+          },
+          {
+            "topic": "vincoli",
+            "score": 16,
+            "keywords": [
+              "vincolo paesaggistico",
+              "soprintendenza"
+            ],
+            "relevance": 32
+          },
+          {
+            "topic": "edilizia",
+            "score": 10,
+            "keywords": [
+              "scia"
+            ],
+            "relevance": 20
+          },
+          {
+            "topic": "abuso",
+            "score": 8,
+            "keywords": [
+              "demolizione"
+            ],
+            "relevance": 16
+          },
+          {
+            "topic": "procedimento",
+            "score": 5,
+            "keywords": [
+              "autorizzazione"
+            ],
+            "relevance": 10
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 4,
+            "examples": [
+              "Art. 8",
+              "Art. 9"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 250,
+          "sentence_count": 12,
+          "legal_terms": 2,
+          "reference_density": 0,
+          "readability": 81.94060283687944
+        },
+        "context_info": {
+          "position_percentage": 10,
+          "legal_context": "article_main",
+          "relevance_indicators": [
+            "sanctions"
+          ]
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    },
+    {
+      "chunk_id": "normattiva_legge_1150_1942_art12 - Norma finale La presente legge entra in vigore il giorno della sua pubblicazione nella Gazzetta Ufficiale del Regno_chunk11",
+      "text": "Art. 9 - Vigilanza sull'attività edilizia Il sindaco esercita la vigilanza sull'attività edilizia nel territorio comunale. Quando sia accertata l'esecuzione di opere senza licenza o difformi dalla licenza, il sindaco dispone la sospensione dei lavori. Art. 10 - Sanzioni Chiunque esegue opere edilizie senza licenza o in difformità da essa è punito con ammenda da lire centomila a un milione. Il sindaco può ordinare la demolizione delle opere abusivamente costruite. Art. 11 - Espropriazione per pubblica utilità Le aree comprese nei piani di zona per l'edilizia economica e popolare possono essere espropriate per pubblica utilità. L'indennità di espropriazione è determinata secondo i criteri stabiliti dalla legislazione vigente. Art. 12 - Norma finale La presente legge entra in vigore il giorno della sua pubblicazione nella Gazzetta Ufficiale del Regno.",
+      "tokens": 215,
+      "position_in_doc": 11,
+      "metadata": {
+        "doc_id": "normattiva_legge_1150_1942",
+        "doc_title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+        "doc_number": "1150/1942",
+        "doc_date": "1942-08-17",
+        "doc_type": "legge",
+        "doc_status": "vigente",
+        "source": "normattiva",
+        "article": "12 - Norma finale La presente legge entra in vigore il giorno della sua pubblicazione nella Gazzetta Ufficiale del Regno",
+        "articleTitle": "",
+        "chunk_type": "complete_article",
+        "hierarchy": [
+          "documento",
+          "articolo"
+        ],
+        "topics": [
+          "urbanistica",
+          "edilizia",
+          "ambiente",
+          "procedimento"
+        ],
+        "references": [],
+        "document_metadata": {
+          "source": "normattiva",
+          "title": "Legge 17 agosto 1942, n. 1150 - Legge Urbanistica",
+          "number": "1150/1942",
+          "type": "legge",
+          "date": "1942-08-17",
+          "status": "vigente",
+          "authority": "Regione",
+          "topics": [
+            "urbanistica",
+            "edilizia",
+            "ambiente",
+            "procedimento"
+          ],
+          "references": [],
+          "document_classification": {
+            "primary_type": "legge",
+            "secondary_types": [],
+            "confidence": 40,
+            "detected_patterns": [
+              "legge 17",
+              "legge 17"
+            ],
+            "authority": "Parlamento",
+            "formal_citation": "L 17"
+          },
+          "topic_analysis": {
+            "primary_topics": [
+              {
+                "topic": "pianificazione",
+                "score": 60,
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              {
+                "topic": "esproprio",
+                "score": 42,
+                "description": "Procedure espropriative"
+              },
+              {
+                "topic": "edilizia",
+                "score": 40,
+                "description": "Procedure e titoli edilizi"
+              }
+            ],
+            "secondary_topics": [
+              {
+                "topic": "vincoli",
+                "score": 16,
+                "description": "Vincoli e tutele"
+              },
+              {
+                "topic": "procedimento",
+                "score": 10,
+                "description": "Procedimenti amministrativi"
+              },
+              {
+                "topic": "abuso",
+                "score": 8,
+                "description": "Abusi edilizi e sanatorie"
+              }
+            ],
+            "topic_scores": {
+              "pianificazione": {
+                "score": 60,
+                "found_keywords": [
+                  {
+                    "keyword": "piano regolatore",
+                    "count": 6
+                  }
+                ],
+                "description": "Pianificazione territoriale e urbanistica"
+              },
+              "edilizia": {
+                "score": 40,
+                "found_keywords": [
+                  {
+                    "keyword": "scia",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "costruzione",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure e titoli edilizi"
+              },
+              "vincoli": {
+                "score": 16,
+                "found_keywords": [
+                  {
+                    "keyword": "vincolo paesaggistico",
+                    "count": 1
+                  },
+                  {
+                    "keyword": "soprintendenza",
+                    "count": 1
+                  }
+                ],
+                "description": "Vincoli e tutele"
+              },
+              "esproprio": {
+                "score": 42,
+                "found_keywords": [
+                  {
+                    "keyword": "espropriazione",
+                    "count": 2
+                  },
+                  {
+                    "keyword": "pubblica utilità",
+                    "count": 3
+                  },
+                  {
+                    "keyword": "indennità",
+                    "count": 1
+                  }
+                ],
+                "description": "Procedure espropriative"
+              },
+              "standard": {
+                "score": 6,
+                "found_keywords": [
+                  {
+                    "keyword": "parcheggi",
+                    "count": 1
+                  }
+                ],
+                "description": "Standard urbanistici"
+              },
+              "abuso": {
+                "score": 8,
+                "found_keywords": [
+                  {
+                    "keyword": "demolizione",
+                    "count": 1
+                  }
+                ],
+                "description": "Abusi edilizi e sanatorie"
+              },
+              "procedimento": {
+                "score": 10,
+                "found_keywords": [
+                  {
+                    "keyword": "autorizzazione",
+                    "count": 2
+                  }
+                ],
+                "description": "Procedimenti amministrativi"
+              }
+            },
+            "urbanistic_relevance": 18
+          },
+          "status_analysis": {
+            "current_status": "vigente",
+            "confidence": 50,
+            "status_indicators": [
+              {
+                "status": "vigente",
+                "keyword": "vigente",
+                "found": true
+              },
+              {
+                "status": "vigente",
+                "keyword": "in vigore",
+                "found": true
+              }
+            ],
+            "modification_history": [],
+            "effective_date": null,
+            "expiration_date": null
+          },
+          "structure_analysis": {
+            "total_articles": 12,
+            "article_distribution": {
+              "total": 12,
+              "with_commas": 2,
+              "avg_commas_per_article": 1.4166666666666667
+            },
+            "structural_complexity": "simple",
+            "has_annexes": false,
+            "hierarchical_depth": 2
+          },
+          "reference_analysis": {
+            "internal_references": {
+              "internal_article": {
+                "count": 12,
+                "examples": [
+                  "Art. 1",
+                  "Art. 2",
+                  "Art. 3"
+                ],
+                "targets": [
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "external_references": {},
+            "reference_density": 3,
+            "total_references": 12
+          },
+          "authority_analysis": {
+            "issuing_authority": "Parlamento",
+            "competent_authorities": [
+              {
+                "name": "Comune",
+                "level": "municipal",
+                "mentions": 3
+              },
+              {
+                "name": "Regione",
+                "level": "regional",
+                "mentions": 1
+              },
+              {
+                "name": "Ministero",
+                "level": "national",
+                "mentions": 1
+              },
+              {
+                "name": "Soprintendenza",
+                "level": "special",
+                "mentions": 1
+              }
+            ],
+            "territorial_scope": "regional",
+            "administrative_level": "regional"
+          },
+          "temporal_analysis": {
+            "publication_date": null,
+            "effective_date": null,
+            "important_dates": [],
+            "temporal_references": [
+              "entro",
+              "giorni"
+            ],
+            "has_deadlines": true
+          },
+          "quality_metrics": {
+            "completeness_score": 60,
+            "structure_score": 80,
+            "metadata_richness": 75,
+            "overall_quality": 71
+          },
+          "processing_info": {
+            "extracted_at": "2025-11-03T10:31:33.253Z",
+            "extractor_version": "1.0.0",
+            "confidence_score": 73
+          }
+        },
+        "chunk_topics": [
+          {
+            "topic": "esproprio",
+            "score": 21,
+            "keywords": [
+              "espropriazione",
+              "pubblica utilità",
+              "indennità"
+            ],
+            "relevance": 42
+          },
+          {
+            "topic": "abuso",
+            "score": 8,
+            "keywords": [
+              "demolizione"
+            ],
+            "relevance": 16
+          }
+        ],
+        "chunk_references": [
+          {
+            "type": "internal_article",
+            "count": 4,
+            "examples": [
+              "Art. 9",
+              "Art. 10"
+            ]
+          }
+        ],
+        "chunk_complexity": {
+          "token_count": 215,
+          "sentence_count": 11,
+          "legal_terms": 1,
+          "reference_density": 0,
+          "readability": 82.72869318181819
+        },
+        "context_info": {
+          "position_percentage": 11,
+          "legal_context": "article_main",
+          "relevance_indicators": [
+            "sanctions"
+          ]
+        }
+      },
+      "overlap_with_previous": 200,
+      "quality_score": 80
+    }
+  ],
+  "total_chunks": 12,
+  "total_tokens": 2778,
+  "processing_pipeline": {
+    "parser_version": "1.0.0",
+    "chunker_version": "1.0.0",
+    "metadata_extractor_version": "1.0.0"
+  }
+}

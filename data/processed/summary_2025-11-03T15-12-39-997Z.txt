@@ -1,0 +1,53 @@
+
+DOCUMENT PROCESSING SUMMARY
+===========================
+
+Document: Legge 17 agosto 1942, n. 1150 - Legge Urbanistica
+Type: legge
+Number: 1150/1942
+Date: 1942-08-17
+Status: vigente
+
+STRUCTURE ANALYSIS:
+- Total articles: 12
+- Complexity: simple
+- Has annexes: false
+
+CHUNKING RESULTS:
+- Strategy used: article-based
+- Total chunks: 12
+- Total tokens: 2778
+- Average tokens per chunk: 232
+- Chunks in target range: 0/12
+
+QUALITY METRICS:
+- Overall quality: 71/100
+- Completeness: 60/100
+- Structure score: 80/100
+- Confidence: 73%
+
+TOPIC ANALYSIS:
+Primary topics: pianificazione, esproprio, edilizia
+Urbanistic relevance: 18%
+
+PROCESSING INFO:
+- Processed at: 2025-11-03T15:12:39.997Z
+- Pipeline versions: Parser 1.0.0, Chunker 1.0.0, Metadata 1.0.0
+
+SAMPLE CHUNKS:
+
+1. normattiva_legge_1150_1942_art1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore generale quando la popolazione residente nel territorio comunale superi i diecimila abitanti_chunk0
+   Tokens: 83
+   Quality: 80/100
+   Preview: Art. 1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore gene...
+
+2. normattiva_legge_1150_1942_art2 - Contenuto del piano regolatore generale Il piano regolatore generale deve indicare: 1_chunk1
+   Tokens: 196
+   Quality: 80/100
+   Preview: Art. 1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore gene...
+
+3. normattiva_legge_1150_1942_art3 - Formazione dei programmi di fabbricazione I Comuni che non sono obbligati alla formazione del piano regolatore generale devono formare un programma di fabbricazione_chunk2
+   Tokens: 297
+   Quality: 80/100
+   Preview: Art. 1 - Formazione dei piani regolatori generali Ogni Comune deve adottare un piano regolatore gene...
+
