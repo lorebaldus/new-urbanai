@@ -1,5 +1,26 @@
 {
   "buildCommand": "echo 'Static site - no build needed'",
   "outputDirectory": ".",
-  "framework": null
+  "framework": null,
+  "functions": {
+    "api/query-optimized.js": {
+      "maxDuration": 30
+    },
+    "api/query-stream.js": {
+      "maxDuration": 30
+    },
+    "api/cache-stats.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index-optimized.html"
+    },
+    {
+      "source": "/optimized",
+      "destination": "/index-optimized.html"
+    }
+  ]
 }

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="urbanai-api" content="https://new-urbanai3.vercel.app">
+    <title>UrbanAI - Assistente Urbanistico Intelligente [Ottimizzato]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo { display: flex; align-items: center; gap: 12px; }
+      .logo h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; }
+      .logo .beta { background: #48bb78; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; }
+
+      .performance-stats {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.9rem;
+        color: #4a5568;
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .stat-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #48bb78;
+      }
+
+      .stat-dot.orange { background: #ed8936; }
+      .stat-dot.red { background: #e53e3e; }
+
+      .main-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 2rem;
+        gap: 2rem;
+      }
+
+      .chat-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        backdrop-filter: blur(20px);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 600px;
+      }
+
+      .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 2rem;
+        padding-right: 10px;
+      }
+
+      .message {
+        margin-bottom: 1.5rem;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .message.user {
+        text-align: right;
+      }
+
+      .message.assistant {
+        text-align: left;
+      }
+
+      .message-content {
+        display: inline-block;
+        max-width: 80%;
+        padding: 1rem 1.5rem;
+        border-radius: 18px;
+        line-height: 1.6;
+      }
+
+      .message.user .message-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .message.assistant .message-content {
+        background: #f7fafc;
+        color: #2d3748;
+        border: 1px solid #e2e8f0;
+      }
+
+      .message-meta {
+        font-size: 0.8rem;
+        color: #718096;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .message.user .message-meta {
+        justify-content: flex-end;
+      }
+
+      .cache-indicator {
+        background: #48bb78;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+      }
+
+      .cache-indicator.precomputed {
+        background: #ed8936;
+      }
+
+      .streaming-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 1rem;
+        background: #ebf8ff;
+        border: 1px solid #90cdf4;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        color: #2b6cb0;
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #e2e8f0;
+        border-top: 2px solid #3182ce;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      .input-container {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+      }
+
+      .input-wrapper {
+        flex: 1;
+        position: relative;
+      }
+
+      .question-input {
+        width: 100%;
+        min-height: 50px;
+        max-height: 120px;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 15px;
+        font-size: 1rem;
+        resize: vertical;
+        font-family: inherit;
+        transition: border-color 0.2s ease;
+      }
+
+      .question-input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .send-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .send-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .send-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .quick-questions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+
+      .quick-question {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+        color: #4a5568;
+      }
+
+      .quick-question:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .performance-panel {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .performance-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .performance-card {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+      }
+
+      .performance-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+      }
+
+      .performance-label {
+        font-size: 0.9rem;
+        color: #718096;
+      }
+
+      .sources-list {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .source-item {
+        background: #ebf8ff;
+        border: 1px solid #90cdf4;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: #2b6cb0;
+      }
+
+      @media (max-width: 768px) {
+        .main-container {
+          padding: 1rem;
+        }
+        
+        .header {
+          padding: 1rem;
+        }
+        
+        .performance-stats {
+          display: none;
+        }
+        
+        .quick-questions {
+          flex-direction: column;
+        }
+        
+        .input-container {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-city" style="color: #667eea; font-size: 1.5rem;"></i>
+            <h1>UrbanAI</h1>
+            <span class="beta">OTTIMIZZATO</span>
+        </div>
+        <div class="performance-stats">
+            <div class="stat-item">
+                <span class="stat-dot" id="cacheStatus"></span>
+                <span>Cache: <span id="cacheRate">--%</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-dot" id="responseStatus"></span>
+                <span>Tempo: <span id="avgResponseTime">--ms</span></span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-database"></i>
+                <span>Query: <span id="totalQueries">--</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="quick-questions">
+            <div class="quick-question" onclick="askQuestion('Come ottenere il permesso di costruire?')">
+                🏗️ Permesso di Costruire
+            </div>
+            <div class="quick-question" onclick="askQuestion('Quando serve la SCIA edilizia?')">
+                📋 SCIA Edilizia
+            </div>
+            <div class="quick-question" onclick="askQuestion('Distanze minime tra edifici')">
+                📏 Distanze Edifici
+            </div>
+            <div class="quick-question" onclick="askQuestion('Superbonus 110% requisiti attuali')">
+                💰 Superbonus 110%
+            </div>
+            <div class="quick-question" onclick="askQuestion('Cambio destinazione d uso procedura')">
+                🔄 Cambio Destinazione
+            </div>
+            <div class="quick-question" onclick="askQuestion('Come fare sanatoria edilizia')">
+                ⚖️ Sanatoria Edilizia
+            </div>
+            <div class="quick-question" onclick="askQuestion('Abuso edilizio sanzioni e procedure')">
+                🚫 Abuso Edilizio
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="messages-container" id="messagesContainer">
+                <div class="message assistant">
+                    <div class="message-content">
+                        👋 Ciao! Sono UrbanAI, il tuo assistente esperto in <strong>urbanistica ed edilizia italiana</strong>.
+                        <br><br>
+                        Posso aiutarti con:
+                        <br>• DPR 380/2001 (Testo Unico Edilizia)
+                        <br>• Permessi, SCIA, CILA
+                        <br>• Distanze, altezze, indici urbanistici
+                        <br>• Superbonus e incentivi edilizi
+                        <br>• Normative regionali e comunali
+                        <br><br>
+                        <i class="fas fa-rocket"></i> <strong>Sistema ottimizzato</strong> con cache intelligente per risposte più veloci!
+                    </div>
+                    <div class="message-meta">
+                        <i class="fas fa-robot"></i>
+                        <span>UrbanAI</span>
+                        <span class="cache-indicator">SISTEMA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="questionInput" 
+                        class="question-input" 
+                        placeholder="Scrivi la tua domanda su urbanistica ed edilizia..."
+                        rows="2"
+                    ></textarea>
+                </div>
+                <button id="sendBtn" class="send-btn" onclick="sendQuestion()">
+                    <i class="fas fa-paper-plane"></i>
+                    Invia
+                </button>
+            </div>
+        </div>
+
+        <div class="performance-panel" id="performancePanel" style="display: none;">
+            <h3 style="margin-bottom: 1rem; color: #2d3748;">
+                <i class="fas fa-chart-line"></i> Performance Sistema
+            </h3>
+            <div class="performance-grid">
+                <div class="performance-card">
+                    <div class="performance-value" id="perfCacheRate">--%</div>
+                    <div class="performance-label">Cache Hit Rate</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="perfAvgTime">--ms</div>
+                    <div class="performance-label">Tempo Medio</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="perfTotalQueries">--</div>
+                    <div class="performance-label">Query Totali</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="perfSystemHealth">--</div>
+                    <div class="performance-label">Stato Sistema</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://new-urbanai3.vercel.app/api';
+        let isStreaming = false;
+        let currentEventSource = null;
+
+        // Auto-resize textarea
+        document.getElementById('questionInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Enter to send
+        document.getElementById('questionInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendQuestion();
+            }
+        });
+
+        function askQuestion(question) {
+            document.getElementById('questionInput').value = question;
+            sendQuestion();
+        }
+
+        async function sendQuestion() {
+            const input = document.getElementById('questionInput');
+            const question = input.value.trim();
+            
+            if (!question || isStreaming) return;
+
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            isStreaming = true;
+
+            // Add user message
+            addMessage(question, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Try optimized endpoint first
+            try {
+                const startTime = Date.now();
+                
+                const response = await fetch(`${API_BASE}/query-optimized`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                const result = await response.json();
+                const responseTime = Date.now() - startTime;
+
+                if (result.success) {
+                    addMessage(result.answer, 'assistant', {
+                        responseTime: result.responseTime || responseTime,
+                        cached: result.cached,
+                        precomputed: result.precomputed,
+                        sources: result.sources
+                    });
+                    updatePerformanceStats();
+                } else {
+                    throw new Error(result.message || 'Errore nella risposta');
+                }
+            } catch (error) {
+                console.log('Fallback to streaming...', error);
+                await sendQuestionStreaming(question);
+            }
+
+            sendBtn.disabled = false;
+            isStreaming = false;
+        }
+
+        async function sendQuestionStreaming(question) {
+            const streamingIndicator = showStreamingIndicator();
+
+            try {
+                const eventSource = new EventSource(`${API_BASE}/query-stream`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                currentEventSource = eventSource;
+                let assistantMessageId = null;
+
+                eventSource.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.status === 'processing' || data.status === 'searching' || data.status === 'generating') {
+                        updateStreamingIndicator(streamingIndicator, data.message, data.progress);
+                    } else if (data.status === 'precomputed_hit') {
+                        updateStreamingIndicator(streamingIndicator, '⚡ ' + data.message, 100);
+                    } else if (data.status === 'cache_hit') {
+                        updateStreamingIndicator(streamingIndicator, '🔄 ' + data.message, 100);
+                    } else if (data.status === 'streaming') {
+                        if (!assistantMessageId) {
+                            assistantMessageId = addMessage('', 'assistant', { streaming: true });
+                        }
+                        updateMessageContent(assistantMessageId, data.partial);
+                    } else if (data.status === 'completed') {
+                        hideStreamingIndicator(streamingIndicator);
+                        
+                        const metadata = {
+                            responseTime: data.responseTime,
+                            cached: data.cached,
+                            streamed: data.streamed,
+                            sources: data.sources,
+                            precomputed: data.precomputed
+                        };
+                        
+                        if (assistantMessageId) {
+                            updateMessageContent(assistantMessageId, data.answer, metadata);
+                        } else {
+                            addMessage(data.answer, 'assistant', metadata);
+                        }
+                        eventSource.close();
+                        updatePerformanceStats();
+                    } else if (data.status === 'error') {
+                        hideStreamingIndicator(streamingIndicator);
+                        addMessage('❌ ' + data.message, 'assistant', { error: true });
+                        eventSource.close();
+                    }
+                };
+
+                eventSource.onerror = function() {
+                    hideStreamingIndicator(streamingIndicator);
+                    addMessage('❌ Errore di connessione. Riprova tra qualche istante.', 'assistant', { error: true });
+                    eventSource.close();
+                };
+
+            } catch (error) {
+                hideStreamingIndicator(streamingIndicator);
+                addMessage('❌ Errore del sistema. Riprova tra qualche istante.', 'assistant', { error: true });
+            }
+        }
+
+        function addMessage(content, sender, metadata = {}) {
+            const container = document.getElementById('messagesContainer');
+            const messageId = 'msg_' + Date.now();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.id = messageId;
+            
+            let cacheIndicator = '';
+            if (metadata.cached) {
+                cacheIndicator = '<span class="cache-indicator">CACHE</span>';
+            } else if (metadata.precomputed) {
+                cacheIndicator = '<span class="cache-indicator precomputed">PRECOMPILATO</span>';
+            } else if (metadata.streamed) {
+                cacheIndicator = '<span class="cache-indicator" style="background: #9f7aea;">STREAMING</span>';
+            }
+
+            let sourcesHtml = '';
+            if (metadata.sources && metadata.sources.length > 0) {
+                sourcesHtml = '<div class="sources-list">';
+                metadata.sources.forEach(source => {
+                    sourcesHtml += `<div class="source-item"><i class="fas fa-book"></i> ${source.title || source}</div>`;
+                });
+                sourcesHtml += '</div>';
+            }
+
+            messageDiv.innerHTML = `
+                <div class="message-content">${content.replace(/\n/g, '<br>')}</div>
+                <div class="message-meta">
+                    <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
+                    <span>${sender === 'user' ? 'Tu' : 'UrbanAI'}</span>
+                    ${cacheIndicator}
+                    ${metadata.responseTime ? `<span>${metadata.responseTime}ms</span>` : ''}
+                </div>
+                ${sourcesHtml}
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            return messageId;
+        }
+
+        function updateMessageContent(messageId, content, metadata = {}) {
+            const messageDiv = document.getElementById(messageId);
+            if (!messageDiv) return;
+
+            const contentDiv = messageDiv.querySelector('.message-content');
+            const metaDiv = messageDiv.querySelector('.message-meta');
+            
+            contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+            
+            if (metadata.responseTime && !metadata.streaming) {
+                const timeSpan = metaDiv.querySelector('span:last-child');
+                if (timeSpan) {
+                    timeSpan.textContent = `${metadata.responseTime}ms`;
+                }
+            }
+        }
+
+        function showStreamingIndicator() {
+            const container = document.getElementById('messagesContainer');
+            const indicator = document.createElement('div');
+            indicator.className = 'streaming-indicator';
+            indicator.id = 'streamingIndicator';
+            indicator.innerHTML = `
+                <div class="spinner"></div>
+                <span id="streamingText">Inizializzazione...</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="streamingProgress"></div>
+                </div>
+            `;
+            container.appendChild(indicator);
+            container.scrollTop = container.scrollHeight;
+            return indicator;
+        }
+
+        function updateStreamingIndicator(indicator, message, progress = 0) {
+            const textSpan = indicator.querySelector('#streamingText');
+            const progressFill = indicator.querySelector('#streamingProgress');
+            
+            if (textSpan) textSpan.textContent = message;
+            if (progressFill && progress) {
+                progressFill.style.width = `${progress}%`;
+            }
+        }
+
+        function hideStreamingIndicator(indicator) {
+            if (indicator && indicator.parentNode) {
+                indicator.parentNode.removeChild(indicator);
+            }
+        }
+
+        async function updatePerformanceStats() {
+            try {
+                const response = await fetch(`${API_BASE}/cache-stats`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const stats = result.stats;
+                    
+                    // Update header stats
+                    document.getElementById('cacheRate').textContent = stats.cache.hitRate;
+                    document.getElementById('avgResponseTime').textContent = stats.performance.averageResponseTime;
+                    document.getElementById('totalQueries').textContent = stats.cache.total;
+                    
+                    // Update status dots
+                    const cacheStatus = document.getElementById('cacheStatus');
+                    const hitRate = parseFloat(stats.cache.hitRate);
+                    if (hitRate >= 50) {
+                        cacheStatus.className = 'stat-dot';
+                    } else if (hitRate >= 25) {
+                        cacheStatus.className = 'stat-dot orange';
+                    } else {
+                        cacheStatus.className = 'stat-dot red';
+                    }
+                    
+                    const responseStatus = document.getElementById('responseStatus');
+                    const avgTime = parseFloat(stats.performance.averageResponseTime);
+                    if (avgTime <= 1000) {
+                        responseStatus.className = 'stat-dot';
+                    } else if (avgTime <= 3000) {
+                        responseStatus.className = 'stat-dot orange';
+                    } else {
+                        responseStatus.className = 'stat-dot red';
+                    }
+                    
+                    // Update performance panel if visible
+                    document.getElementById('perfCacheRate').textContent = stats.cache.hitRate;
+                    document.getElementById('perfAvgTime').textContent = stats.performance.averageResponseTime;
+                    document.getElementById('perfTotalQueries').textContent = stats.cache.total;
+                    document.getElementById('perfSystemHealth').textContent = stats.optimization.systemHealth;
+                }
+            } catch (error) {
+                console.log('Could not update performance stats:', error);
+            }
+        }
+
+        // Toggle performance panel
+        let showingPerformance = false;
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                showingPerformance = !showingPerformance;
+                document.getElementById('performancePanel').style.display = 
+                    showingPerformance ? 'block' : 'none';
+                if (showingPerformance) {
+                    updatePerformanceStats();
+                }
+            }
+        });
+
+        // Initial load
+        updatePerformanceStats();
+        setInterval(updatePerformanceStats, 30000); // Update every 30 seconds
+    </script>
+</body>
+</html>
