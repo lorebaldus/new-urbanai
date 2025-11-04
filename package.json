@@ -5,10 +5,11 @@
   "description": "UrbanAI Scraping Service for Railway",
   "main": "simple-processor.js",
   "scripts": {
-    "start": "node simple-processor.js",
-    "dev": "node simple-processor.js",
+    "start": "node server.js",
+    "dev": "node server.js",
     "enhanced": "node enhanced-processor.js",
     "legacy": "node scraper.js",
+    "processor": "node simple-processor.js",
     "build": "echo 'No build needed'"
   },
   "dependencies": {
