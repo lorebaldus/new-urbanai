@@ -104,23 +104,23 @@ async function handleEnhancedQuery(question, startTime) {
     console.log(`🎯 Query classified as: ${classification.strategy}`);
 
     // Step 2: Query vector database with routing
-    const searchResults = await queryEngine.queryMultipleNamespaces(
-        await generateQueryEmbedding(question),
-        classification.namespaces,
+    const searchResults = await queryEngine.query(
+        question,
         {
             topK: 8,
-            filter: classification.filters,
-            mergeResults: true,
-            weights: classification.weights
+            namespaces: classification.namespaces,
+            filters: classification.filters,
+            searchMode: 'hybrid',
+            enableReranking: true
         }
     );
 
-    console.log(`📊 Found ${searchResults.matches?.length || 0} relevant sources`);
+    console.log(`📊 Found ${searchResults.results?.length || 0} relevant sources`);
 
     // Step 3: Generate enhanced response
     const response = responseGenerator.generateResponse(
         question,
-        searchResults.matches || [],
+        searchResults.results || [],
         classification,
         {
             search_metadata: searchResults.metadata,
