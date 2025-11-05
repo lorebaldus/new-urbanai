@@ -17,6 +17,7 @@ export class QueryRouter {
             
             // Default namespace weights
             defaultWeights: {
+                '__default__': 1.0,         // Default namespace (for Phase 1 testing)
                 'laws-national': 0.6,
                 'laws-regional': 0.5,
                 'laws-jurisprudence': 0.7,
@@ -197,17 +198,15 @@ export class QueryRouter {
         const extractedRegion = this.extractRegion(normalizedQuery);
         
         // Comprehensive multi-source strategy
-        if (legal >= this.config.legalConfidenceThreshold && 
-            regional >= this.config.regionalConfidenceThreshold && 
+        if (legal >= this.config.legalConfidenceThreshold &&
+            regional >= this.config.regionalConfidenceThreshold &&
             urban > 0.2) {
-            
+
             return {
                 strategy: 'comprehensive',
-                namespaces: ['laws-national', 'laws-regional', 'urbanistica-base'],
+                namespaces: ['__default__'],
                 weights: {
-                    'laws-national': 0.35,
-                    'laws-regional': 0.35,
-                    'urbanistica-base': 0.30
+                    '__default__': 1.0
                 },
                 filters: extractedRegion ? { region: extractedRegion } : {},
                 needsLegalDisclaimer: true,
@@ -220,10 +219,9 @@ export class QueryRouter {
         if (legal >= this.config.legalConfidenceThreshold && urban > 0.2) {
             return {
                 strategy: 'legal-urban',
-                namespaces: ['laws-national', 'urbanistica-base'],
+                namespaces: ['__default__'],
                 weights: {
-                    'laws-national': 0.60,
-                    'urbanistica-base': 0.40
+                    '__default__': 1.0
                 },
                 filters: {},
                 needsLegalDisclaimer: true,
@@ -236,10 +234,9 @@ export class QueryRouter {
         if (regional >= this.config.regionalConfidenceThreshold) {
             return {
                 strategy: 'regional-focus',
-                namespaces: ['laws-regional', 'urbanistica-base'],
+                namespaces: ['__default__'],
                 weights: {
-                    'laws-regional': 0.55,
-                    'urbanistica-base': 0.45
+                    '__default__': 1.0
                 },
                 filters: extractedRegion ? { region: extractedRegion } : {},
                 needsLegalDisclaimer: true,
@@ -252,9 +249,9 @@ export class QueryRouter {
         if (legal >= this.config.legalConfidenceThreshold) {
             return {
                 strategy: 'legal-only',
-                namespaces: ['laws-national'],
+                namespaces: ['__default__'],
                 weights: {
-                    'laws-national': 1.0
+                    '__default__': 1.0
                 },
                 filters: {},
                 needsLegalDisclaimer: true,
@@ -267,10 +264,9 @@ export class QueryRouter {
         if (urban > 0.4 && legal > 0.1) {
             return {
                 strategy: 'urban-legal-light',
-                namespaces: ['urbanistica-base', 'laws-national'],
+                namespaces: ['__default__'],
                 weights: {
-                    'urbanistica-base': 0.70,
-                    'laws-national': 0.30
+                    '__default__': 1.0
                 },
                 filters: {},
                 needsLegalDisclaimer: true,
@@ -282,9 +278,9 @@ export class QueryRouter {
         // Default: pure urban planning
         return {
             strategy: 'urban-only',
-            namespaces: ['urbanistica-base'],
+            namespaces: ['__default__'],
             weights: {
-                'urbanistica-base': 1.0
+                '__default__': 1.0
             },
             filters: {},
             needsLegalDisclaimer: false,
