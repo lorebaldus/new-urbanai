@@ -18,7 +18,7 @@ export class QueryEngine {
             // Query parameters
             defaultTopK: 10,
             maxTopK: 100,
-            defaultThreshold: 0.7,
+            defaultThreshold: 0.5,  // Lowered from 0.7 to allow more relevant matches
 
             // Search weights for different namespaces
             namespaceWeights: {
