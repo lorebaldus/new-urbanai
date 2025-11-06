@@ -17,7 +17,7 @@ export class QueryRouter {
             
             // Default namespace weights
             defaultWeights: {
-                '__default__': 1.0,         // Default namespace (for Phase 1 testing)
+                '': 1.0,                    // Default/unnamed namespace (Pinecone default)
                 'laws-national': 0.6,
                 'laws-regional': 0.5,
                 'laws-jurisprudence': 0.7,
@@ -204,9 +204,9 @@ export class QueryRouter {
 
             return {
                 strategy: 'comprehensive',
-                namespaces: ['__default__'],
+                namespaces: [''],
                 weights: {
-                    '__default__': 1.0
+                    '': 1.0
                 },
                 filters: extractedRegion ? { region: extractedRegion } : {},
                 needsLegalDisclaimer: true,
@@ -219,9 +219,9 @@ export class QueryRouter {
         if (legal >= this.config.legalConfidenceThreshold && urban > 0.2) {
             return {
                 strategy: 'legal-urban',
-                namespaces: ['__default__'],
+                namespaces: [''],
                 weights: {
-                    '__default__': 1.0
+                    '': 1.0
                 },
                 filters: {},
                 needsLegalDisclaimer: true,
@@ -234,9 +234,9 @@ export class QueryRouter {
         if (regional >= this.config.regionalConfidenceThreshold) {
             return {
                 strategy: 'regional-focus',
-                namespaces: ['__default__'],
+                namespaces: [''],
                 weights: {
-                    '__default__': 1.0
+                    '': 1.0
                 },
                 filters: extractedRegion ? { region: extractedRegion } : {},
                 needsLegalDisclaimer: true,
@@ -249,9 +249,9 @@ export class QueryRouter {
         if (legal >= this.config.legalConfidenceThreshold) {
             return {
                 strategy: 'legal-only',
-                namespaces: ['__default__'],
+                namespaces: [''],
                 weights: {
-                    '__default__': 1.0
+                    '': 1.0
                 },
                 filters: {},
                 needsLegalDisclaimer: true,
@@ -264,9 +264,9 @@ export class QueryRouter {
         if (urban > 0.4 && legal > 0.1) {
             return {
                 strategy: 'urban-legal-light',
-                namespaces: ['__default__'],
+                namespaces: [''],
                 weights: {
-                    '__default__': 1.0
+                    '': 1.0
                 },
                 filters: {},
                 needsLegalDisclaimer: true,
@@ -278,9 +278,9 @@ export class QueryRouter {
         // Default: pure urban planning
         return {
             strategy: 'urban-only',
-            namespaces: ['__default__'],
+            namespaces: [''],
             weights: {
-                '__default__': 1.0
+                '': 1.0
             },
             filters: {},
             needsLegalDisclaimer: false,

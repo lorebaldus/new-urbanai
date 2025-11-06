@@ -10,10 +10,10 @@ export class PineconeClient {
             indexName: process.env.PINECONE_INDEX || 'urbanai-docs',
             dimension: parseInt(process.env.EMBEDDING_DIMENSIONS || '1024'), // Pinecone serverless compatible
             namespaces: {
-                base: process.env.PINECONE_NAMESPACE_BASE || '__default__',
-                laws: process.env.PINECONE_NAMESPACE_LAWS || '__default__',
-                jurisprudence: process.env.PINECONE_NAMESPACE_JURISPRUDENCE || '__default__',
-                regional: process.env.PINECONE_NAMESPACE_REGIONAL || '__default__'
+                base: process.env.PINECONE_NAMESPACE_BASE || '',
+                laws: process.env.PINECONE_NAMESPACE_LAWS || '',
+                jurisprudence: process.env.PINECONE_NAMESPACE_JURISPRUDENCE || '',
+                regional: process.env.PINECONE_NAMESPACE_REGIONAL || ''
             },
             batchSize: 100, // Max vectors per upsert
             ...config

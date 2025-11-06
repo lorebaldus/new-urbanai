@@ -9,10 +9,10 @@ export class QueryEngine {
         this.config = {
             // Default namespaces
             namespaces: {
-                base: process.env.PINECONE_NAMESPACE_BASE || '__default__',
-                laws: process.env.PINECONE_NAMESPACE_LAWS || '__default__',
-                jurisprudence: process.env.PINECONE_NAMESPACE_JURISPRUDENCE || '__default__',
-                regional: process.env.PINECONE_NAMESPACE_REGIONAL || '__default__'
+                base: process.env.PINECONE_NAMESPACE_BASE || '',
+                laws: process.env.PINECONE_NAMESPACE_LAWS || '',
+                jurisprudence: process.env.PINECONE_NAMESPACE_JURISPRUDENCE || '',
+                regional: process.env.PINECONE_NAMESPACE_REGIONAL || ''
             },
 
             // Query parameters
@@ -22,7 +22,7 @@ export class QueryEngine {
 
             // Search weights for different namespaces
             namespaceWeights: {
-                '__default__': 1.0,         // Default namespace (used for initial testing)
+                '': 1.0,                    // Default/unnamed namespace (Pinecone default)
                 'urbanistica-base': 1.0,    // Existing urban planning content
                 'laws-national': 0.9,       // National laws (slightly lower)
                 'jurisprudence': 0.8,       // Court decisions
